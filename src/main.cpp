@@ -8,30 +8,28 @@
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
-#define UNIT 5
+#define UNIT 1
 #define DELAY 0.1
 
-std::deque<Box> buffer;
 
-
-Box judge(Box &box)
-{
-    Box tmp = buffer[0];
-    buffer.pop_front();
-    if (box.get_x() - box.get_w() / 2 <= 0 ||
-        box.get_x() + box.get_w() / 2 >= WINDOW_WIDTH ||
-        box.get_y() - box.get_h() / 2 <= 0 ||
-        box.get_y() + box.get_h() / 2 >= WINDOW_HEIGHT)
-    {
-        // std::cout << "out of range" << '\n';
-        return tmp;
-    }
-    else
-    {
-        // std::cout << "Inside" << '\n';
-        return box;
-    }
-}
+// Box judge(Box &box)
+// {
+//     Box tmp = buffer[0];
+//     buffer.pop_front();
+//     if (box.get_x() - box.get_w() / 2 <= 0 ||
+//         box.get_x() + box.get_w() / 2 >= WINDOW_WIDTH ||
+//         box.get_y() - box.get_h() / 2 <= 0 ||
+//         box.get_y() + box.get_h() / 2 >= WINDOW_HEIGHT)
+//     {
+//         // std::cout << "out of range" << '\n';
+//         return tmp;
+//     }
+//     else
+//     {
+//         // std::cout << "Inside" << '\n';
+//         return box;
+//     }
+// }
 double timer = 0;
 int cnt = 0;
 
@@ -51,7 +49,7 @@ int main() {
 
     /* Box 碰撞測試 */
     Box box1(300, 300, 100, 200);
-    Box box2(400, 400, 300, 150);
+    Box box2(200, 200, 300, 150);
     sf::Clock clock;
 
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "My window");
@@ -66,8 +64,13 @@ int main() {
                 window.close();
         }
         window.clear();
-        buffer.push_back(box1);
-        buffer.push_back(box2);
+        // buffer.push_back(box1);
+        // buffer.push_back(box2);
+
+        float unit_time = clock.getElapsedTime().asSeconds();
+        clock.restart();
+        timer += unit_time;
+
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
             box1.set_y(box1.get_y() - UNIT);
@@ -86,10 +89,6 @@ int main() {
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
             box2.set_x(box2.get_x() + UNIT);
 
-        float unit_time = clock.getElapsedTime().asSeconds();
-        clock.restart();
-        timer += unit_time;
-
         if (timer > DELAY)
         {
             if (cnt == 360)
@@ -100,9 +99,6 @@ int main() {
         }
         box1.setAngle(cnt);
         box2.setAngle(cnt);
-
-        box1 = judge(box1);
-        box2 = judge(box2);
 
         //test
         if (box1.SAT_collision(box2))

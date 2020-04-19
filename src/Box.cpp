@@ -8,10 +8,10 @@ Box::Box(double x, double y, double w, double h)
     _w = w;
     _h = h;
     _angle = 0;
-    corner.push_back(Vector(-w / 2, h / 2));
-    corner.push_back(Vector(w / 2, h / 2));
-    corner.push_back(Vector(w / 2, -h / 2));
-    corner.push_back(Vector(-w / 2, -h / 2));
+    corner.push_back(Vector(-w / 2.0, -h / 2.0));
+    corner.push_back(Vector(w / 2.0, -h / 2.0));
+    corner.push_back(Vector(w / 2.0, h / 2.0));
+    corner.push_back(Vector(-w / 2.0, h / 2.0));
 }
 
 void Box::set_x(double x)
@@ -62,7 +62,6 @@ void Box::setAngle(double angle)
 // default: 旋轉0度
 void Box::setVertices()
 {
-    //std::cout << _angle << '\n';
     double angle_rad = degreesToRadians(_angle);
     Vertices.clear();
     for (auto &idx : corner)
@@ -102,6 +101,9 @@ bool Box::SAT_collision(Box &other)
 {
     this->setVertices();
     this->findSAT();
+
+    for(auto i : SAT)
+        std::cout << i << '\n';
     other.setVertices();
     other.findSAT();
 
