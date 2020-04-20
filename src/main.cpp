@@ -32,27 +32,26 @@
 // }
 double timer = 0;
 int cnt = 0;
+int cnt2 = 360;
 
 
 int main() {
 
     /* 向量測試 */
-
     // Vector vec(3, 4);
     // Vector vec2(1, 0);
-    // vector test:
-    // std::cout << vec.getLength() << '\n';              // => 5
-    // std::cout << vec.dot(vec2)               << '\n';  // => 3
-    // std::cout << vec.projectLengthOnto(vec2) << '\n';  // => 3
-    //std::cout << vec2 << '\n';  // = (-4, 3)
-    //std::cout << vec.normalR()               << '\n';  // = (4, -3)
+    // std::cout << vec.getLength() << '\n'; // => 5
+    // std::cout << vec.dot(vec2) << '\n';                 // => 3
+    // std::cout << vec.projectLengthOnto(vec2) << '\n';   // => 3
+    // std::cout << vec2 << '\n';                          // = (-4, 3)
+    // std::cout << vec.normalR() << '\n';                 // = (4, -3)
 
     /* Box 碰撞測試 */
-    Box box1(300, 300, 100, 200);
-    Box box2(200, 200, 300, 150);
+    Box box1(200, 200, 100, 200);
+    Box box2(0, 0, 300, 150);
     sf::Clock clock;
 
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "My window");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
 
     // run the program as long as the window is open
     while (window.isOpen())
@@ -89,16 +88,23 @@ int main() {
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
             box2.set_x(box2.get_x() + UNIT);
 
+        //std::cout << box2.get_x() << " " << box2.get_y() << '\n';
         if (timer > DELAY)
         {
             if (cnt == 360)
                 cnt = 0;
             else
                 cnt += 1;
+
+            if (cnt2 == 0)
+                cnt2 = 360;
+            else
+                cnt2 -= 1;
             timer = 0;
         }
         box1.setAngle(cnt);
-        box2.setAngle(cnt);
+        box2.setAngle(cnt2);
+
 
         //test
         if (box1.SAT_collision(box2))

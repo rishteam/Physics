@@ -52,26 +52,26 @@ std::ostream &operator<<(std::ostream &os, const Vector &vec)
 
 Vector Vector::normalL()
 {
-    return Vector(-_y, _x);
+    return Vector(_y*-1, _x);
 }
 
 Vector Vector::normalR()
 {
-    return Vector(_y, -_x);
+    return Vector(_y, _x*-1);
 }
 
 void Vector::rotate(double angle)
 {
     double tmp_x = (_x * cos(angle)) - (_y * sin(angle));
-    double tmp_y = (_x * sin(angle)) - (_y * cos(angle));
+    double tmp_y = (_x * sin(angle)) + (_y * cos(angle));
     _x = tmp_x;
     _y = tmp_y;
 }
 
 void Vector::rotate_ref(double angle, Vector &ref)
 {
-    double tmp_x = ((_x - ref.get_x()) * cos(angle)) - ((_y - ref.get_y()) * sin(angle)) + ref.get_x();
-    double tmp_y = ((_y - ref.get_y()) * cos(angle)) + ((_x - ref.get_x()) * sin(angle)) + ref.get_y();
+    double tmp_x = (_x - ref.get_x()) * cos(angle) - (_y - ref.get_y()) * sin(angle) + ref.get_x();
+    double tmp_y = (_y - ref.get_y()) * cos(angle) + (_x - ref.get_x()) * sin(angle) + ref.get_y();
     _x = tmp_x;
     _y = tmp_y;
 }
