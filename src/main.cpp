@@ -3,6 +3,7 @@
 #include <SFML/Window.hpp>
 
 #include <iostream>
+#include "fmt/core.h"
 #include "vector_math.h"
 #include "Box.h"
 
@@ -10,7 +11,6 @@
 #define WINDOW_HEIGHT 600
 #define UNIT 1
 #define DELAY 0.1
-
 
 // Box judge(Box &box)
 // {
@@ -40,11 +40,11 @@ int main() {
     /* 向量測試 */
     // Vector vec(3, 4);
     // Vector vec2(1, 0);
-    // std::cout << vec.getLength() << '\n'; // => 5
-    // std::cout << vec.dot(vec2) << '\n';                 // => 3
-    // std::cout << vec.projectLengthOnto(vec2) << '\n';   // => 3
-    // std::cout << vec2 << '\n';                          // = (-4, 3)
-    // std::cout << vec.normalR() << '\n';                 // = (4, -3)
+    // fmt::print("{}\n", vec.getLength());             // => 5
+    // fmt::print("{}\n", vec.dot(vec2));            // => 3
+    // fmt::print("{}\n", vec.projectLengthOnto(vec2));   // => 3
+    // vec2.print_Vector();                         // = (-4, 3)
+    // vec.normalR().print_Vector();                // = (4, -3)
 
     /* Box 碰撞測試 */
     Box box1(200, 200, 100, 200);
@@ -62,33 +62,12 @@ int main() {
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-        window.clear();
-        // buffer.push_back(box1);
-        // buffer.push_back(box2);
 
+        //timer
         float unit_time = clock.getElapsedTime().asSeconds();
         clock.restart();
         timer += unit_time;
-
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-            box1.set_y(box1.get_y() - UNIT);
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-            box1.set_y(box1.get_y() + UNIT);
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-            box1.set_x(box1.get_x() - UNIT);
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-            box1.set_x(box1.get_x() + UNIT);
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-            box2.set_y(box2.get_y() - UNIT);
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-            box2.set_y(box2.get_y() + UNIT);
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-            box2.set_x(box2.get_x() - UNIT);
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-            box2.set_x(box2.get_x() + UNIT);
-
-        //std::cout << box2.get_x() << " " << box2.get_y() << '\n';
+        //rotate angle per unit_time
         if (timer > DELAY)
         {
             if (cnt == 360)
@@ -102,21 +81,48 @@ int main() {
                 cnt2 -= 1;
             timer = 0;
         }
-        box1.setAngle(cnt);
-        box2.setAngle(cnt2);
 
+        //get position data
+        sf::Vector2f box1_pos = box1.getPosition();
+        sf::Vector2f box2_pos = box2.getPosition();
 
-        //test
-        if (box1.SAT_collision(box2))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+            box1_pos.y -= UNIT;
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+            box1_pos.y += UNIT;
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+            box1_pos.x -= UNIT;
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+            box1_pos.x += UNIT;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+            box2_pos.y -= UNIT;
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            box2_pos.y += UNIT;
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+            box2_pos.x -= UNIT;
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+            box2_pos.x += UNIT;
+
+        //update position data
+        box1.setPosition(box1_pos);
+        box2.setPosition(box2_pos);
+        box1.setRotation(cnt);
+        box2.setRotation(cnt2);
+
+        // //judge test
+        if (box1.isCollide(box2))
         {
-            box1.draw(window, true);
-            box2.draw(window, true);
+            fmt::print("Collid\n");
         }
         else
         {
-            box1.draw(window, false);
-            box2.draw(window, false);
+            fmt::print("No Collide\n");
         }
+        window.clear(sf::Color::Black);
+        box1.set_draw();
+        box2.set_draw();
+        window.draw(box1);
+        window.draw(box2);
         window.display();
     }
 }

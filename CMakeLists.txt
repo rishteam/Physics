@@ -54,10 +54,19 @@ target_link_libraries(SAT_COLLISION
     ${OPENGL_LIBRARIES}
 )
 
+# Add fmt
+find_package(fmt REQUIRED)
+if(NOT fmt_FOUND)
+    message(FATAL_ERROR "fmt not found")
+endif()
+target_link_libraries(SAT_COLLISION
+    fmt::fmt
+)
+
 if(MSYS)
     target_link_libraries(SAT_COLLISION
-        -static-libgcc -static-libstdc++ -lwsock32 -lws2_32
-        -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
+        # -static-libgcc -static-libstdc++ -lwsock32 -lws2_32
+        # -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
         # -mconsole / -mwindows
     )
 endif()

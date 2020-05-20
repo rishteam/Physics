@@ -1,77 +1,55 @@
 #include "vector_math.h"
-#include <cmath>
 
-Vector::Vector(double x, double y)
+Vector::Vector(float x_, float y_)
 {
-    _x = x;
-    _y = y;
+    x = x_;
+    y = y_;
 }
 
-void Vector::set_x(double x)
+float Vector::getLength()
 {
-    _x = x;
+    return sqrt(x*x+y*y);
 }
 
-void Vector::set_y(double y)
+float Vector::dot(Vector &vec2)
 {
-    _y = y;
+    return x * vec2.x + y * vec2.y;
 }
 
-double Vector::get_x()
+float Vector::projectLengthOnto(Vector &vec2)
 {
-    return _x;
-}
-
-double Vector::get_y()
-{
-    return _y;
-}
-
-double Vector::getLength()
-{
-    return sqrt(_x*_x+_y*_y);
-}
-
-double Vector::dot(Vector &vec2)
-{
-    return _x * vec2.get_x() + _y * vec2.get_y();
-}
-
-double Vector::projectLengthOnto(Vector &vec2)
-{
-    double tmp_dot = this->dot(vec2);
-    double vec2_len = vec2.getLength();
+    float tmp_dot = this->dot(vec2);
+    float vec2_len = vec2.getLength();
     return tmp_dot / vec2_len;
 }
 
-std::ostream &operator<<(std::ostream &os, const Vector &vec)
+void Vector::print_Vector()
 {
-    os << "(" << vec._x << ", " << vec._y << ")";
-    return os;
+    fmt::print("({}, {})\n", x, y);
 }
 
 Vector Vector::normalL()
 {
-    return Vector(_y*-1, _x);
+    return Vector(y*-1, x);
 }
 
 Vector Vector::normalR()
 {
-    return Vector(_y, _x*-1);
+    return Vector(y, x*-1);
 }
 
-void Vector::rotate(double angle)
+void Vector::rotate(float angle)
 {
-    double tmp_x = (_x * cos(angle)) - (_y * sin(angle));
-    double tmp_y = (_x * sin(angle)) + (_y * cos(angle));
-    _x = tmp_x;
-    _y = tmp_y;
+    float tmp_x = (x * cos(angle)) - (y * sin(angle));
+    float tmp_y = (x * sin(angle)) + (y * cos(angle));
+    x = tmp_x;
+    y = tmp_y;
 }
 
-void Vector::rotate_ref(double angle, Vector &ref)
+void Vector::rotate_ref(float angle, Vector &ref)
 {
-    double tmp_x = (_x - ref.get_x()) * cos(angle) - (_y - ref.get_y()) * sin(angle) + ref.get_x();
-    double tmp_y = (_y - ref.get_y()) * cos(angle) + (_x - ref.get_x()) * sin(angle) + ref.get_y();
-    _x = tmp_x;
-    _y = tmp_y;
+    float tmp_x = (x - ref.x) * cos(angle) - (y - ref.y * sin(angle)) + ref.x;
+    float tmp_y = (y - ref.y) * cos(angle) + (x - ref.x * sin(angle)) + ref.y;
+    x = tmp_x;
+    y = tmp_y;
 }

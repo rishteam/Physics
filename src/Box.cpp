@@ -1,47 +1,17 @@
+
 #include "Box.h"
+#include <SFML/Graphics.hpp>
 
-
-Box::Box(double x, double y, double w, double h)
+Box::Box(float x, float y, float w, float h)
 {
-    center.set_x(x);
-    center.set_y(y);
+    this->setPosition(x, y);
     _w = w;
     _h = h;
-    _angle = 0;
+    this->setRotation(0.0f);
     corner.push_back(Vector(w / 2.0, -h / 2.0));
     corner.push_back(Vector(w / 2.0, h / 2.0));
     corner.push_back(Vector(-w / 2.0, h / 2.0));
     corner.push_back(Vector(-w / 2.0, -h / 2.0));
-}
-
-void Box::set_x(double x)
-{
-    center.set_x(x);
-}
-
-void Box::set_y(double y)
-{
-    center.set_y(y);
-}
-
-double Box::get_x()
-{
-    return center.get_x();
-}
-
-double Box::get_y()
-{
-    return center.get_y();
-}
-
-double Box::get_w()
-{
-    return _w;
-}
-
-double Box::get_h()
-{
-    return _h;
 }
 
 std::deque<Vector> Box::getSAT()
@@ -54,22 +24,22 @@ std::deque<Vector> Box::getVertices()
     return Vertices;
 }
 
-void Box::setAngle(double angle)
-{
-    _angle = angle;
-}
 
 // default: 旋轉0度
 void Box::setVertices()
 {
-    double angle_rad = degreesToRadians(_angle);
     Vertices.clear();
+    float angle_rad = degreesToRadians(getRotation());
+    sf::Vector2f center = this->getPosition();
+    Vector tmp(center.x, center.y);
+
     for (auto &idx : corner)
     {
-        Vector vec(center.get_x() + idx.get_x(), center.get_y() + idx.get_y());
-        vec.rotate_ref(angle_rad, center);
+        Vector vec(center.x + idx.x, center.y + idx.y);
+        vec.rotate_ref(angle_rad, tmp);
         Vertices.push_back(vec);
     }
+    set_draw();
 }
 
 void Box::findSAT()
@@ -77,36 +47,36 @@ void Box::findSAT()
     SAT.clear();
     for (int i = 1; i < Vertices.size(); i++)
     {
-        double tmp_x = Vertices[i].get_x() - Vertices[i-1].get_x();
-        double tmp_y = Vertices[i].get_y() - Vertices[i-1].get_y();
+        float tmp_x = Vertices[i].x - Vertices[i-1].x;
+        float tmp_y = Vertices[i].y - Vertices[i-1].y;
         Vector tmp(tmp_x, tmp_y);
         SAT.push_back(tmp.normalL());
     }
-    Vector tmp2((Vertices[0].get_x() - Vertices[3].get_x()), (Vertices[0].get_y() - Vertices[3].get_y()));
+    Vector tmp2((Vertices[0].x - Vertices[3].y), (Vertices[0].y - Vertices[3].y));
     SAT.push_back(tmp2.normalL());
 }
 
-std::pair<double, double> Box::getMinMax(Vector &axis, std::deque<Vector> Vertices)
+std::pair<float, float> Box::getMinMax(Vector &axis, std::deque<Vector> Vertices)
 {
-    // double min_dot = MAX_DOUBLE;
-    // double max_dot = MIN_DOUBLE;
+    // float min_dot = MAX_float;
+    // float max_dot = MIN_float;
 
     // for(auto idx : Vertices)
     // {
-    //     double tmp = idx.projectLengthOnto(axis);
+    //     float tmp = idx.projectLengthOnto(axis);
 
     //     min_dot = std::min(min_dot, tmp);
     //     max_dot = std::max(max_dot, tmp);
     // }
     // return std::make_pair(min_dot, max_dot);
 
-    double min_DotProduct = Vertices[0].projectLengthOnto(axis);
-    double max_DotProduct = Vertices[0].projectLengthOnto(axis);
+    float min_DotProduct = Vertices[0].projectLengthOnto(axis);
+    float max_DotProduct = Vertices[0].projectLengthOnto(axis);
     int min_index = 0, max_index = 0;
 
     for (int i = 1; i < Vertices.size(); i++)
     {
-        double temp = Vertices[i].projectLengthOnto(axis);
+        float temp = Vertices[i].projectLengthOnto(axis);
 
         if (temp < min_DotProduct)
         {
@@ -124,7 +94,7 @@ std::pair<double, double> Box::getMinMax(Vector &axis, std::deque<Vector> Vertic
     return std::make_pair(min_DotProduct, max_DotProduct);
 }
 
-bool Box::SAT_collision(Box &other)
+bool Box::isCollide(Box &other)
 {
     this->setVertices();
     other.setVertices();
@@ -189,18 +159,27 @@ bool Box::SAT_collision(Box &other)
     }
 }
 
-void Box::draw(sf::RenderWindow &window, bool coll)
+void Box::set_draw()
 {
-    sf::ConvexShape polygon;
     polygon.setPointCount(4);
-    polygon.setPoint(0, sf::Vector2f(Vertices[0].get_x(), Vertices[0].get_y()));
-    polygon.setPoint(1, sf::Vector2f(Vertices[1].get_x(), Vertices[1].get_y()));
-    polygon.setPoint(2, sf::Vector2f(Vertices[2].get_x(), Vertices[2].get_y()));
-    polygon.setPoint(3, sf::Vector2f(Vertices[3].get_x(), Vertices[3].get_y()));
-    if (coll)
-        polygon.setFillColor(sf::Color::Red);
-    else
-        polygon.setFillColor(sf::Color::White);
-
-    window.draw(polygon);
+    polygon.setPoint(0, sf::Vector2f(Vertices[0].x, Vertices[0].y));
+    polygon.setPoint(1, sf::Vector2f(Vertices[1].x, Vertices[1].y));
+    polygon.setPoint(2, sf::Vector2f(Vertices[2].x, Vertices[2].y));
+    polygon.setPoint(3, sf::Vector2f(Vertices[3].x, Vertices[3].y));
+    polygon.setFillColor(sf::Color::White);
 }
+
+// void Box::draw(sf::RenderWindow &window, bool coll)
+// {
+//     sf::ConvexShape polygon;
+//     polygon.setPointCount(4);
+//     polygon.setPoint(0, sf::Vector2f(Vertices[0].get_x(), Vertices[0].get_y()));
+//     polygon.setPoint(1, sf::Vector2f(Vertices[1].get_x(), Vertices[1].get_y()));
+//     polygon.setPoint(2, sf::Vector2f(Vertices[2].get_x(), Vertices[2].get_y()));
+//     polygon.setPoint(3, sf::Vector2f(Vertices[3].get_x(), Vertices[3].get_y()));
+//     if (coll)
+//         polygon.setFillColor(sf::Color::Red);
+//     else
+//         polygon.setFillColor(sf::Color::White);
+//     window.draw(polygon);
+// }
