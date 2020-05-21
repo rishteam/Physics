@@ -7,7 +7,7 @@
 /**
  * @file Box.h
  * @author  halloworld <william31212@gmail.com>
- * @brief Box為單位做為碰撞
+ * @brief 以四邊形(Box)為單位做為碰撞，繼承sfml::transformable與sfml::drawable
  *
  * @section LICENSE
  *
@@ -30,52 +30,85 @@
  * Vivamus pharetra purus ac diam condimentum convallis. Proin lacinia vulputate leo ut ultricies.
  */
 
-
+/**
+ * @brief 四邊形的設定，計算
+ */
 class Box : public sf::Transformable, public sf::Drawable {
 public:
     /**
-     * @brief 設定Box x, y, w, h
+     * @brief 設定四邊形之x, y, w, h
      */
     Box(float x, float y, float w, float h);
     /**
-     * @brief Destroy the Example object
+     * @brief Deconstructer
      */
     ~Box() = default;
+    /**
+     * @brief 取得分離軸
+     */
     std::deque<Vector> getSAT();
     /**
-     * @brief get corner point
-     *
+     * @brief 取得頂點陣列
+     * @retval std::deque<Vector> SAT
      */
     std::deque<Vector> getVertices();
     /**
-     * @brief setting the angle(deg) you want to rotate
-     * @param angle
+     * @brief 設定頂點陣列
+     * @retval std::deque<Vector> Vertices
      */
     void setVertices();
     /**
-     * @brief find SAT
+     * @brief 尋找分離軸
      */
     void findSAT();
     /**
-     * @brief get left min and right max point in order to judge
+     * @brief 取得頂點在分離軸上的最大值與最小值
+     * @param axis 分離軸
+     * @param corner 頂點
      */
     std::pair<float, float> getMinMax(Vector &axis, std::deque<Vector> corner);
     /**
-     * @brief judge the box collision
+     * @brief 判斷是否有碰撞
      */
     bool isCollide(Box &other);
-    void set_draw();
-    
+    /**
+     * @brief 設定畫布，設定使用sf::ConvexShape畫
+     */
+    void set_debug_draw();
 
 private:
+    /**
+     * @brief 用sf::ConvexShape畫至sf::window上
+     */
     sf::ConvexShape polygon;
+    /**
+     * @brief draw square
+     * @details 配合sf::drawable
+     */
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const
     {
-        states.transform *= getTransform();
         target.draw(polygon, states);
     };
+    /**
+     * @brief 計算前頂點
+     * @details 只存長、寬
+     */
     std::deque<Vector> corner;
+    /**
+     * @brief 計算後頂點
+     * @details 因應各個不同角度，計算出實際頂點位置
+     */
     std::deque<Vector> Vertices;
+    /**
+     * @brief 分離軸
+     */
     std::deque<Vector> SAT;
-    float _w, _h;
+    /**
+     * @brief 寬
+     */
+    float _w;
+    /**
+     * @brief 高
+     */
+    float _h;
 };

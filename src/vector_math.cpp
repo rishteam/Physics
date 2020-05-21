@@ -48,8 +48,8 @@ void Vector::rotate(float angle)
 
 void Vector::rotate_ref(float angle, Vector &ref)
 {
-    float tmp_x = (x - ref.x) * cos(angle) - (y - ref.y * sin(angle)) + ref.x;
-    float tmp_y = (y - ref.y) * cos(angle) + (x - ref.x * sin(angle)) + ref.y;
+    float tmp_x = (x - ref.x) * cos(angle) - (y - ref.y) * sin(angle) + ref.x;
+    float tmp_y = (y - ref.y) * cos(angle) + (x - ref.x) * sin(angle) + ref.y;
     x = tmp_x;
     y = tmp_y;
 }

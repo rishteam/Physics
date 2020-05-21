@@ -5,6 +5,13 @@ project(SAT_COLLISION)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE Debug) # Debug Release
 
+# enable doxygen
+option(ENABLE_DOXYGEN "Enable doxygen doc builds of source" ON)
+if(ENABLE_DOXYGEN)
+    add_subdirectory(docs)
+endif()
+
+
 # Add executable
 add_executable(SAT_COLLISION
     src/Box.cpp

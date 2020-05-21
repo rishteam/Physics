@@ -12,32 +12,13 @@
 #define UNIT 1
 #define DELAY 0.1
 
-// Box judge(Box &box)
-// {
-//     Box tmp = buffer[0];
-//     buffer.pop_front();
-//     if (box.get_x() - box.get_w() / 2 <= 0 ||
-//         box.get_x() + box.get_w() / 2 >= WINDOW_WIDTH ||
-//         box.get_y() - box.get_h() / 2 <= 0 ||
-//         box.get_y() + box.get_h() / 2 >= WINDOW_HEIGHT)
-//     {
-//         // std::cout << "out of range" << '\n';
-//         return tmp;
-//     }
-//     else
-//     {
-//         // std::cout << "Inside" << '\n';
-//         return box;
-//     }
-// }
 double timer = 0;
 int cnt = 0;
 int cnt2 = 360;
 
-
 int main() {
 
-    /* 向量測試 */
+    /* Vector Math */
     // Vector vec(3, 4);
     // Vector vec2(1, 0);
     // fmt::print("{}\n", vec.getLength());             // => 5
@@ -46,9 +27,9 @@ int main() {
     // vec2.print_Vector();                         // = (-4, 3)
     // vec.normalR().print_Vector();                // = (4, -3)
 
-    /* Box 碰撞測試 */
+    /* Box collision test */
     Box box1(200, 200, 100, 200);
-    Box box2(0, 0, 300, 150);
+    Box box2(300, 300, 300, 150);
     sf::Clock clock;
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
@@ -67,6 +48,7 @@ int main() {
         float unit_time = clock.getElapsedTime().asSeconds();
         clock.restart();
         timer += unit_time;
+
         //rotate angle per unit_time
         if (timer > DELAY)
         {
@@ -103,24 +85,26 @@ int main() {
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
             box2_pos.x += UNIT;
 
-        //update position data
+        // update position data
         box1.setPosition(box1_pos);
         box2.setPosition(box2_pos);
+        // setting rotate angle
         box1.setRotation(cnt);
         box2.setRotation(cnt2);
 
-        // //judge test
+        // judge collision
         if (box1.isCollide(box2))
         {
-            fmt::print("Collid\n");
+            fmt::print("Collide\n");
         }
         else
         {
             fmt::print("No Collide\n");
         }
+
+        // clear screen
         window.clear(sf::Color::Black);
-        box1.set_draw();
-        box2.set_draw();
+        // use SFML::drawable to draw box1, box2
         window.draw(box1);
         window.draw(box2);
         window.display();
