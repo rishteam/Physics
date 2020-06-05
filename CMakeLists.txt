@@ -14,8 +14,11 @@ endif()
 
 # Add executable
 add_executable(SAT_COLLISION
-    src/Box.cpp
     src/main.cpp
+    src/Box.cpp
+    src/Shape.cpp
+    src/Polygon.cpp
+    src/Circle.cpp
     src/vector_math.cpp
 )
 target_include_directories(SAT_COLLISION

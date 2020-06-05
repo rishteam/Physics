@@ -33,7 +33,7 @@
 /**
  * @brief 四邊形的設定，計算
  */
-class Box : public sf::Transformable, public sf::Drawable {
+class Box : public Shape {
 public:
     /**
      * @brief 設定四邊形之x, y, w, h
@@ -43,38 +43,14 @@ public:
      * @brief Deconstructer
      */
     ~Box() = default;
-    /**
-     * @brief 取得分離軸
-     */
-    std::deque<Vector> getSAT();
-    /**
-     * @brief 取得頂點陣列
-     * @retval std::deque<Vector> SAT
-     */
-    std::deque<Vector> getVertices();
-    /**
-     * @brief 設定頂點陣列
-     * @retval std::deque<Vector> Vertices
-     */
-    void setVertices();
-    /**
-     * @brief 尋找分離軸
-     */
-    void findSAT();
-    /**
-     * @brief 取得頂點在分離軸上的最大值與最小值
-     * @param axis 分離軸
-     * @param corner 頂點
-     */
-    std::pair<float, float> getMinMax(Vector &axis, std::deque<Vector> corner);
+    void setVertices(std::deque<Vector> &pt);
     /**
      * @brief 判斷是否有碰撞
      */
-    bool isCollide(Box &other);
-    /**
-     * @brief 設定畫布，設定使用sf::ConvexShape畫
-     */
-    void set_debug_draw();
+    virtual bool isCollide(const Polygon &s) const override
+    virtual bool isCollide(const Circle &c) const override
+    virtual bool isCollide(const Box &b) const override
+    void set_debug_draw() override;
 
 private:
     /**
@@ -95,15 +71,6 @@ private:
      */
     std::deque<Vector> corner;
     /**
-     * @brief 計算後頂點
-     * @details 因應各個不同角度，計算出實際頂點位置
-     */
-    std::deque<Vector> Vertices;
-    /**
-     * @brief 分離軸
-     */
-    std::deque<Vector> SAT;
-    /**
      * @brief 寬
      */
     float _w;
@@ -111,4 +78,5 @@ private:
      * @brief 高
      */
     float _h;
+    bool selected = false;
 };

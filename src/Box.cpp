@@ -13,14 +13,15 @@ Box::Box(float x, float y, float w, float h)
     corner.push_back(Vector(-w / 2.0, -h / 2.0));
 }
 
-std::deque<Vector> Box::getSAT()
+void Box::set_debug_draw()
 {
-    return SAT;
-}
-
-std::deque<Vector> Box::getVertices()
-{
-    return Vertices;
+    int cnt = Vertices.size();
+    polygon.setPointCount(cnt);
+    for (int i = 0; i < cnt; i++)
+    {
+        polygon.setPoint(i, sf::Vector2f(Vertices[i].x, Vertices[i].y));
+    }
+    polygon.setFillColor(sf::Color::White);
 }
 
 void Box::setVertices()
@@ -36,69 +37,27 @@ void Box::setVertices()
         vec.rotate_ref(angle_rad, cent);
         Vertices.push_back(vec);
     }
-    set_debug_draw();
 }
 
-void Box::findSAT()
-{
-    SAT.clear();
-    for (int i = 1; i < Vertices.size(); i++)
-    {
-        float tmp_x = Vertices[i].x - Vertices[i-1].x;
-        float tmp_y = Vertices[i].y - Vertices[i-1].y;
-
-        Vector tmp(tmp_x, tmp_y);
-        SAT.push_back(tmp.normalL());
-    }
-    Vector tmp2((Vertices[0].x - Vertices[3].x), (Vertices[0].y - Vertices[3].y));
-    SAT.push_back(tmp2.normalL());
-}
-
-std::pair<float, float> Box::getMinMax(Vector &axis, std::deque<Vector> Vertices)
-{
-    float min_DotProduct = Vertices[0].projectLengthOnto(axis);
-    float max_DotProduct = Vertices[0].projectLengthOnto(axis);
-    int min_index = 0, max_index = 0;
-
-    for (int i = 1; i < Vertices.size(); i++)
-    {
-        float temp = Vertices[i].projectLengthOnto(axis);
-
-        if (temp < min_DotProduct)
-        {
-            min_DotProduct = temp;
-            min_index = i;
-        }
-
-        if (temp > max_DotProduct)
-        {
-            max_DotProduct = temp;
-            max_index = i;
-        }
-    }
-
-    return std::make_pair(min_DotProduct, max_DotProduct);
-}
-
-bool Box::isCollide(Box &other)
+bool Box::isCollide(const Box &b)
 {
     this->setVertices();
-    other.setVertices();
+    b.setVertices();
 
     this->findSAT();
-    other.findSAT();
-    auto other_sat = other.getSAT();
+    b.findSAT();
+    auto b_sat = b.getSAT();
 
     //分離軸枚舉，只需枚舉兩個向量，因為另外兩個只是反向而已
     auto PA = getMinMax(this->SAT[0], this->Vertices);
-    auto PB = getMinMax(this->SAT[0], other.getVertices());
+    auto PB = getMinMax(this->SAT[0], b.getVertices());
     auto QA = getMinMax(this->SAT[1], this->Vertices);
-    auto QB = getMinMax(this->SAT[1], other.getVertices());
+    auto QB = getMinMax(this->SAT[1], b.getVertices());
 
-    auto WA = getMinMax(other_sat[0], this->Vertices);
-    auto WB = getMinMax(other_sat[0], other.getVertices());
-    auto XA = getMinMax(other_sat[1], this->Vertices);
-    auto XB = getMinMax(other_sat[1], other.getVertices());
+    auto WA = getMinMax(b_sat[0], this->Vertices);
+    auto WB = getMinMax(b_sat[0], b.getVertices());
+    auto XA = getMinMax(b_sat[1], this->Vertices);
+    auto XB = getMinMax(b_sat[1], b.getVertices());
 
 
     //檢查分離軸上投影區段是否分開
@@ -118,12 +77,45 @@ bool Box::isCollide(Box &other)
     }
 }
 
-void Box::set_debug_draw()
+bool Box::isCollide(const Polygon &p)
 {
-    polygon.setPointCount(4);
-    polygon.setPoint(0, sf::Vector2f(Vertices[0].x, Vertices[0].y));
-    polygon.setPoint(1, sf::Vector2f(Vertices[1].x, Vertices[1].y));
-    polygon.setPoint(2, sf::Vector2f(Vertices[2].x, Vertices[2].y));
-    polygon.setPoint(3, sf::Vector2f(Vertices[3].x, Vertices[3].y));
-    polygon.setFillColor(sf::Color::White);
+    //poly_sat
+    auto poly_sat = this->findSAT();
+
+    //Box sat
+    b.setVertices();
+    auto box_sat = b.findSAT();
+
+    bool isSeparated = false;
+
+    // poly_sat check
+    for (int i = 0; i < poly_sat.size(); i++)
+    {
+        float minMax_A = getMinMax(this.Vertices, poly_sat[i]);
+        float minMax_B = getMinMax(b.Vertices, poly_sat[i]);
+
+        isSeparated = (minMax_B.min > minMax_A.max || minMax_A.min > minMax_B.max);
+        // 只要發現有一條分離線，就代表物體沒有發生碰撞
+        if (isSeparated)
+            return true;
+    }
+
+    // box_sat check
+    for (int i = 0; i < box_sat.size(); i++)
+    {
+        float minMax_A = getMinMax(this.Vertices, box_sat[i]);
+        float minMax_B = getMinMax(b.Vertices, box_sat[i]);
+
+        isSeparated = (minMax_B.min > minMax_A.max || minMax_A.min > minMax_B.max);
+        // 只要發現有一條分離線，就代表物體沒有發生碰撞
+        if (isSeparated)
+            return true;
+    }
+
+    return false;
+}
+
+bool Box::isCollide(const Circle &c)
+{
+
 }

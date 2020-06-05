@@ -5,7 +5,7 @@
 #include <iostream>
 #include "fmt/core.h"
 #include "vector_math.h"
-#include "Box.h"
+#include "Shape.h"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
