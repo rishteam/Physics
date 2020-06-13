@@ -1,30 +1,32 @@
-#pragma once
-#include "vector_math.h"
-#include <deque>
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
+#ifndef Polygon_H
+#define Polygon_H
 
+#include "Shape.h"
 
-class Polygon : public Shape {
+class Box;
+class Polygon;
+class Circle;
+
+class Polygon : public Shape
+{
 public:
-    Polygon(std::deque<Vector> pt);
+    Polygon(std::deque<Vector> &pt, Vector pos);
     ~Polygon() = default;
-    void set_debug_draw() override;
-    void setVertices(std::deque<Vector> &point);
-    virtual bool isCollide(const Box &b) const override;
-    virtual bool isCollide(const Polygon &s) const override;
-    virtual bool isCollide(const Circle &c) const override;
+    void setVertices();
+    virtual bool isCollide(Shape &s) override
+    {
+        return s.isCollide(*this);
+    }
+    virtual bool isCollide(Box &b) override;
+    virtual bool isCollide(Polygon &p) override;
+    virtual bool isCollide(Circle &c) override;
+    virtual void set_debug_draw() override;
 private:
-    /**
-     * @brief 用sf::ConvexShape畫至sf::window上
-     */
     sf::ConvexShape polygon;
-    /**
-     * @brief draw square
-     * @details 配合sf::drawable
-     */
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const
     {
         target.draw(polygon, states);
     };
-}
+};
+
+#endif

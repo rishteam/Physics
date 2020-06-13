@@ -2,6 +2,8 @@
 #include <iostream>
 #include <limits>
 #include <cmath>
+#include <deque>
+
 #include <fmt/core.h>
 #include <SFML/Graphics.hpp>
 
@@ -98,3 +100,5 @@ public:
      */
     void rotate_ref(float angle, Vector &ref);
 };
+
+std::pair<float, float> getMinMax(Vector &axis, std::deque<Vector> corner);

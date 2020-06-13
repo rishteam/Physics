@@ -1,37 +1,64 @@
-#include "Shape.h"
+#include "Polygon.h"
+#include "Box.h"
+#include "Circle.h"
 
-Polygon::Polygon(std::deque<Vector> pt){
+Polygon::Polygon(std::deque<Vector> &pt, Vector pos){
     Vertices = pt;
+    this->setPosition(pos.x, pos.y);
 }
 
-Polygon::set_debug_draw() override
+void Polygon::set_debug_draw()
 {
+    auto pos = this->getPosition();
     polygon.setPointCount(Vertices.size());
-    for (int i = 0; i < cnt; i++)
+    polygon.setPosition(pos.x, pos.y);
+    for (int i = 0; i < Vertices.size(); i++)
     {
         polygon.setPoint(i, sf::Vector2f(Vertices[i].x, Vertices[i].y));
     }
-    polygon.setFillColor(sf::Color::White);
+    if(this->selected)
+    {
+        polygon.setFillColor(sf::Color::Red);
+    }
+    else
+    {
+        polygon.setFillColor(sf::Color::White);
+    }
 }
 
-Polygon::setVertices(std::deque<Vector> &pt)
+void Polygon::setVertices()
 {
-    Vertices = pt;
+    auto tmp = Vertices;
+    Vertices.clear();
+    float angle_rad = degreesToRadians(this->getRotation());
+    auto tmp_cent = this->getPosition();
+    Vector cent(tmp_cent.x, tmp_cent.y);
+
+    for (auto &idx : tmp)
+    {
+        Vector vec(idx.x, idx.y);
+        vec.rotate_ref(angle_rad, cent);
+        Vertices.push_back(vec);
+    }
 }
 
-virtual bool Polygon::isCollide(const Polygon &p) const override
+bool Polygon::isCollide(Polygon &p)
 {
-    auto poly_a_sat = this->findSAT();
-    auto poly_b_sat = p.findSAT();
+    this->setVertices();
+    this->findSAT();
+    auto poly_a_sat = this->getSAT();
+    p.setVertices();
+    p.findSAT();
+    auto poly_b_sat = p.getSAT();
 
     bool isSeparated = false;
     // poly_a_sat check
     for (int i = 0; i < poly_a_sat.size(); i++)
     {
-        float minMax_A = getMinMax(this.Vertices, poly_a_sat[i]);
-        float minMax_B = getMinMax(p.Vertices, poly_a_sat[i]);
+        auto minMax_A = getMinMax(poly_a_sat[i], this->Vertices);
+        auto minMax_B = getMinMax(poly_a_sat[i], p.Vertices);
 
-        isSeparated = (minMax_B.min > minMax_A.max || minMax_A.min > minMax_B.max);
+        isSeparated = (minMax_B.first > minMax_A.second || minMax_A.first > minMax_B.second);
         // 只要發現有一條分離線，就代表物體沒有發生碰撞
         if (isSeparated)
             return true;
@@ -40,10 +67,10 @@ virtual bool Polygon::isCollide(const Polygon &p) const override
     // poly_b_sat check
     for (int i = 0; i < poly_b_sat.size(); i++)
     {
-        float minMax_A = getMinMax(this.Vertices, poly_b_sat[i]);
-        float minMax_B = getMinMax(p.Vertices, poly_b_sat[i]);
+        auto minMax_A = getMinMax(poly_b_sat[i], this->Vertices);
+        auto minMax_B = getMinMax(poly_b_sat[i], p.Vertices);
 
-        isSeparated = (minMax_B.min > minMax_A.max || minMax_A.min > minMax_B.max);
+        isSeparated = (minMax_B.first > minMax_A.second || minMax_A.first > minMax_B.second);
         // 只要發現有一條分離線，就代表物體沒有發生碰撞
         if (isSeparated)
             return true;
@@ -51,45 +78,27 @@ virtual bool Polygon::isCollide(const Polygon &p) const override
     return false;
 }
 
-virtual bool Polygon::isCollide(const Circle &c) const override
-{
-    //find polygon SAT
-    auto poly_sat = this->findSAT();
-    auto C = c.getPosition();
-    Vector center(C.x, C.y);
-
-    bool isSeparated = false;
-    for (int i = 0; i < poly_sat.size(); i++)
-    {
-        auto minMax_P = getMinMax(poly_sat[i], this.Vertices);
-        auto proj_c = center.projectLengthOnto(poly_sat[i]);
-        float min_C = proj_c - c.get_radius();
-        float max_C = proj_c + c.get_radius();
-        isSeparated = (min_C > minMax_P.second || minMax_P.first > max_C);
-        // 只要發現有一條分離線，就代表物體沒有發生碰撞
-        if (isSeparated)
-            return true;
-    }
-}
-
-virtual bool Polygon::isCollide(const Box &b) const override
+bool Polygon::isCollide(Box &b)
 {
     //poly_sat
-    auto poly_sat = this->findSAT();
+    this->setVertices();
+    this->findSAT();
+    auto poly_sat = this->getSAT();
 
     //Box sat
     b.setVertices();
-    auto box_sat = b.findSAT();
+    b.findSAT();
+    auto box_sat = b.getSAT();
 
     bool isSeparated = false;
 
     // poly_sat check
     for (int i = 0; i < poly_sat.size(); i++)
     {
-        float minMax_A = getMinMax(this.Vertices, poly_sat[i]);
-        float minMax_B = getMinMax(b.Vertices, poly_sat[i]);
+        auto minMax_A = getMinMax(poly_sat[i], this->Vertices);
+        auto minMax_B = getMinMax(poly_sat[i], b.getVertices());
 
-        isSeparated = (minMax_B.min > minMax_A.max || minMax_A.min > minMax_B.max);
+        isSeparated = (minMax_B.first > minMax_A.second || minMax_A.first > minMax_B.second);
         // 只要發現有一條分離線，就代表物體沒有發生碰撞
         if (isSeparated)
             return true;
@@ -98,10 +107,35 @@ virtual bool Polygon::isCollide(const Box &b) const override
     // box_sat check
     for (int i = 0; i < box_sat.size(); i++)
     {
-        float minMax_A = getMinMax(this.Vertices, box_sat[i]);
-        float minMax_B = getMinMax(b.Vertices, box_sat[i]);
+        auto minMax_A = getMinMax(box_sat[i], this->Vertices);
+        auto minMax_B = getMinMax(box_sat[i], b.getVertices());
 
-        isSeparated = (minMax_B.min > minMax_A.max || minMax_A.min > minMax_B.max);
+        isSeparated = (minMax_B.first > minMax_A.second || minMax_A.first > minMax_B.second);
+        // 只要發現有一條分離線，就代表物體沒有發生碰撞
+        if (isSeparated)
+            return true;
+    }
+
+    return false;
+}
+
+bool Polygon::isCollide(Circle &c)
+{
+    //find polygon SAT
+    this->setVertices();
+    this->findSAT();
+    auto poly_sat = this->getSAT();
+    auto C = c.getPosition();
+    Vector center(C.x, C.y);
+
+    bool isSeparated = false;
+    for (int i = 0; i < poly_sat.size(); i++)
+    {
+        auto minMax_P = getMinMax(poly_sat[i], this->Vertices);
+        auto proj_c = center.projectLengthOnto(poly_sat[i]);
+        auto min_C = proj_c - c.get_radius();
+        auto max_C = proj_c + c.get_radius();
+        isSeparated = (min_C > minMax_P.second || minMax_P.first > max_C);
         // 只要發現有一條分離線，就代表物體沒有發生碰撞
         if (isSeparated)
             return true;

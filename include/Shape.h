@@ -1,35 +1,25 @@
 #pragma once
 
 #include "vector_math.h"
-#include "Box.h"
-#include "Polygon.h"
-#include "Circle.h"
+
+//include object
+class Circle;
+class Polygon;
+class Box;
 
 class Shape : public sf::Transformable, public sf::Drawable
 {
 public:
-    std::deque<Vector> getSAT();
-    std::deque<Vector> getVertices();
+    std::deque<Vector> getSAT() const;
+    std::deque<Vector> getVertices() const;
     void findSAT();
-    virtual bool iscollide(const Box &b) const = 0;
-    virtual bool iscollide(const Polygon &p) const = 0;
-    virtual bool iscollide(const Circle &c) const = 0;
-    /**
-     * @brief 取得頂點在分離軸上的最大值與最小值
-     * @param axis 分離軸
-     * @param corner 頂點
-     */
-    std::pair<float, float> getMinMax(Vector &axis, std::deque<Vector> corner);
-    virtual void set_debug_draw();
-
+    virtual bool isCollide(Shape &s) = 0;
+    virtual bool isCollide(Box &b) = 0;
+    virtual bool isCollide(Polygon &p) = 0;
+    virtual bool isCollide(Circle &c) = 0;
+    virtual void set_debug_draw() = 0;
+    bool selected = false;
 protected:
-    /**
-     * @brief 實際頂點位置
-     * @details 因應各個不同角度，計算出實際頂點位置
-     */
     std::deque<Vector> Vertices;
-    /**
-     * @brief 分離軸
-     */
     std::deque<Vector> SAT;
 };

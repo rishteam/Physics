@@ -53,3 +53,29 @@ void Vector::rotate_ref(float angle, Vector &ref)
     x = tmp_x;
     y = tmp_y;
 }
+
+std::pair<float, float> getMinMax(Vector &axis, std::deque<Vector> corner)
+{
+
+    float min_DotProduct = corner[0].projectLengthOnto(axis);
+    float max_DotProduct = corner[0].projectLengthOnto(axis);
+    int min_index = 0, max_index = 0;
+
+    for (int i = 1; i < corner.size(); i++)
+    {
+        float temp = corner[i].projectLengthOnto(axis);
+
+        if (temp < min_DotProduct)
+        {
+            min_DotProduct = temp;
+            min_index = i;
+        }
+
+        if (temp > max_DotProduct)
+        {
+            max_DotProduct = temp;
+            max_index = i;
+        }
+    }
+    return std::make_pair(min_DotProduct, max_DotProduct);
+}
