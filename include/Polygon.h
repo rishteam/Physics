@@ -21,8 +21,10 @@ public:
     virtual bool isCollide(Polygon &p) override;
     virtual bool isCollide(Circle &c) override;
     virtual void set_debug_draw() override;
+
 private:
     sf::ConvexShape polygon;
+    std::deque<Vector> corner;
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const
     {
         target.draw(polygon, states);

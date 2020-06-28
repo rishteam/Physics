@@ -13,6 +13,8 @@ public:
     std::deque<Vector> getSAT() const;
     std::deque<Vector> getVertices() const;
     void findSAT();
+    //算出SAT實際的點
+    virtual void setVertices(){};
     virtual bool isCollide(Shape &s) = 0;
     virtual bool isCollide(Box &b) = 0;
     virtual bool isCollide(Polygon &p) = 0;

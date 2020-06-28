@@ -21,8 +21,9 @@ bool Circle::isCollide(Circle &c)
 {
     auto circleA = c.getPosition();
     auto circleB = this->getPosition();
-
-    return sqrt(abs(circleA.x - circleB.x) * abs(circleA.y - circleB.y)) < this->get_radius() + c.get_radius();
+    auto a = abs(circleA.x - circleB.x);
+    auto b = abs(circleA.y - circleB.y);
+    return sqrt(a*a + b*b) < this->get_radius() + c.get_radius();
 }
 
 bool Circle::isCollide(Polygon &p)
@@ -44,9 +45,9 @@ bool Circle::isCollide(Polygon &p)
         isSeparated = (min_C > minMax_P.second || minMax_P.first > max_C);
         // 只要發現有一條分離線，就代表物體沒有發生碰撞
         if (isSeparated)
-            return true;
+            return false;
     }
-    return false;
+    return true;
 }
 
 bool Circle::isCollide(Box &b)
@@ -54,28 +55,33 @@ bool Circle::isCollide(Box &b)
     b.setVertices();
     b.findSAT();
     auto box_sat = b.getSAT();
+    auto tmp = b.getVertices();
     auto C = this->getPosition();
     Vector center(C.x, C.y);
 
-    bool isSeparated = false;
+    // for (int i = 0; i < box_sat.size(); i++)
+    // {
+    //     fmt::print("{} {}\n", box_sat[i].x, box_sat[i].y);
+    // }
+
 
     for (int i = 0; i < box_sat.size(); i++)
     {
-        auto minMax_A = getMinMax(box_sat[i], b.getVertices());
-        auto proj_c = center.projectLengthOnto(box_sat[i]);
+        auto minMax = getMinMax(box_sat[i], tmp);
+        float proj_c = center.projectLengthOnto(box_sat[i]);
         float min_C = proj_c - this->get_radius();
         float max_C = proj_c + this->get_radius();
 
-        isSeparated = (min_C > minMax_A.second || minMax_A.first > max_C);
-        // 只要發現有一條分離線，就代表物體沒有發生碰撞
-        if (isSeparated)
-            return true;
+        fmt::print("{} {} {} {}\n", min_C, minMax.first, minMax.second, max_C);
+        if (min_C > minMax.second || minMax.first > max_C)
+            return false;
     }
-    return false;
+    return true;
 }
 
 void Circle::set_debug_draw()
 {
+    circle.setPosition(this->getPosition());
     circle.setRadius(radius);
     if (this->selected)
     {

@@ -64,7 +64,6 @@ std::pair<float, float> getMinMax(Vector &axis, std::deque<Vector> corner)
     for (int i = 1; i < corner.size(); i++)
     {
         float temp = corner[i].projectLengthOnto(axis);
-
         if (temp < min_DotProduct)
         {
             min_DotProduct = temp;

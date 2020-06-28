@@ -14,6 +14,7 @@ Box::Box(float x, float y, float w, float h)
     corner.push_back(Vector(w / 2.0, h / 2.0));
     corner.push_back(Vector(-w / 2.0, h / 2.0));
     corner.push_back(Vector(-w / 2.0, -h / 2.0));
+    this->setVertices();
 }
 
 void Box::set_debug_draw()
@@ -37,10 +38,9 @@ void Box::set_debug_draw()
 void Box::setVertices()
 {
     this->Vertices.clear();
-    float angle_rad = degreesToRadians(this->getRotation());
     sf::Vector2f center = this->getPosition();
+    float angle_rad = degreesToRadians(this->getRotation());
     Vector cent(center.x, center.y);
-
     for (auto &idx : corner)
     {
         Vector vec(center.x + idx.x, center.y + idx.y);
@@ -100,6 +100,7 @@ bool Box::isCollide(Polygon &p)
     auto poly_sat = p.getSAT();
 
     bool isSeparated = false;
+    fmt::print("{}\n", isSeparated);
 
     // box_sat check
     for (int i = 0; i < box_sat.size(); i++)
@@ -110,7 +111,7 @@ bool Box::isCollide(Polygon &p)
         isSeparated = (minMax_B.first > minMax_A.second || minMax_A.first > minMax_B.second);
         // 只要發現有一條分離線，就代表物體沒有發生碰撞
         if (isSeparated)
-            return true;
+            return false;
     }
 
     // poly_sat check
@@ -122,10 +123,10 @@ bool Box::isCollide(Polygon &p)
         isSeparated = (minMax_B.first > minMax_A.second || minMax_A.first > minMax_B.second);
         // 只要發現有一條分離線，就代表物體沒有發生碰撞
         if (isSeparated)
-            return true;
+            return false;
     }
 
-    return false;
+    return true;
 }
 
 bool Box::isCollide(Circle &c)
@@ -133,11 +134,9 @@ bool Box::isCollide(Circle &c)
     this->setVertices();
     this->findSAT();
     auto box_sat = this->getSAT();
-    
-    // printf("cir collide box\n");
+
 
     auto C_pos = c.getPosition();
-    
     Vector center(C_pos.x, C_pos.y);
 
     bool isSeparated = false;
@@ -152,7 +151,7 @@ bool Box::isCollide(Circle &c)
         isSeparated = (min_C > minMax_A.second || minMax_A.first > max_C);
         // 只要發現有一條分離線，就代表物體沒有發生碰撞
         if (isSeparated)
-            return true;
+            return false;
     }
-    return false;
+    return true;
 }
