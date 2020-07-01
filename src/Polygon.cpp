@@ -12,10 +12,14 @@ Polygon::Polygon(std::deque<Vector> &pt, Vector pos){
 
 void Polygon::set_debug_draw()
 {
-    polygon.setPointCount(Vertices.size());
+    polygon.setPointCount(corner.size());
+    polygon.setPosition(this->getPosition().x, this->getPosition().y);
+    sf::Vector2f center = this->getPosition();
+
+    //give the offset
     for (int i = 0; i < Vertices.size(); i++)
     {
-        polygon.setPoint(i, sf::Vector2f(Vertices[i].x, Vertices[i].y));
+        polygon.setPoint(i, sf::Vector2f(Vertices[i].x - center.x, Vertices[i].y - center.y));
     }
     if(this->selected)
     {
@@ -31,14 +35,13 @@ void Polygon::setVertices()
 {
     this->Vertices.clear();
     float angle_rad = degreesToRadians(this->getRotation());
+    sf::Vector2f cent = this->getPosition();
+    Vector center(cent.x, cent.y);
 
-    auto tmp_cent = this->getPosition();
-    Vector cent(tmp_cent.x, tmp_cent.y);
-
-    for (auto idx : this->corner)
+    for (auto idx : corner)
     {
-        Vector vec(cent.x + idx.x, cent.y + idx.y);
-        vec.rotate_ref(angle_rad, cent);
+        Vector vec(center.x + idx.x, center.y + idx.y);
+        vec.rotate_ref(angle_rad, center);
         Vertices.push_back(vec);
     }
 }
@@ -57,14 +60,12 @@ bool Polygon::isCollide(Polygon &p)
     {
         auto A = getMinMax(poly_a_sat[i], this->Vertices);
         auto B = getMinMax(poly_a_sat[i], p.getVertices());
-        // fmt::print("{} {} {} {}\n", A.first, A.second, B.first, B.second);
         // 只要發現有一條分離線，就代表物體沒有發生碰撞
         if (B.first > A.second || A.first > B.second)
         {
             return false;
         }
     }
-
     // poly_b_sat check
     for (int i = 0; i < poly_b_sat.size(); i++)
     {
@@ -98,14 +99,12 @@ bool Polygon::isCollide(Box &b)
     // poly_sat check
     for (int i = 0; i < poly_sat.size(); i++)
     {
-        // poly_sat[i].print_Vector();
         auto minMax_A = getMinMax(poly_sat[i], b.getVertices());
         auto minMax_B = getMinMax(poly_sat[i], this->Vertices);
 
         isSeparated = (minMax_B.first > minMax_A.second || minMax_A.first > minMax_B.second);
-        // 只要發現有一條分離線，就代表物體沒有發生碰撞
         if (isSeparated)
-            return true;
+            return false;
     }
 
     // box_sat check
@@ -115,11 +114,10 @@ bool Polygon::isCollide(Box &b)
         auto minMax_B = getMinMax(box_sat[i], b.getVertices());
 
         isSeparated = (minMax_B.first > minMax_A.second || minMax_A.first > minMax_B.second);
-        // 只要發現有一條分離線，就代表物體沒有發生碰撞
         if (isSeparated)
-            return true;
+            return false;
     }
-    return false;
+    return true;
 }
 
 bool Polygon::isCollide(Circle &c)

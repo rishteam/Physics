@@ -16,6 +16,20 @@ float Circle::get_radius()
     return radius;
 }
 
+void Circle::set_debug_draw()
+{
+    circle.setPosition(this->getPosition().x - radius, this->getPosition().y - radius);
+    circle.setRadius(radius);
+    if (this->selected)
+    {
+        circle.setFillColor(sf::Color::Red);
+    }
+    else
+    {
+        circle.setFillColor(sf::Color::White);
+    }
+}
+
 //判斷兩園心的的距離，有沒有小於兩半徑之和
 bool Circle::isCollide(Circle &c)
 {
@@ -52,6 +66,7 @@ bool Circle::isCollide(Polygon &p)
 
 bool Circle::isCollide(Box &b)
 {
+    // fmt::print("{} {} {} {}\n", min_C, minMax.first, minMax.second, max_C);
     b.setVertices();
     b.findSAT();
     auto box_sat = b.getSAT();
@@ -59,36 +74,14 @@ bool Circle::isCollide(Box &b)
     auto C = this->getPosition();
     Vector center(C.x, C.y);
 
-    // for (int i = 0; i < box_sat.size(); i++)
-    // {
-    //     fmt::print("{} {}\n", box_sat[i].x, box_sat[i].y);
-    // }
-
-
     for (int i = 0; i < box_sat.size(); i++)
     {
         auto minMax = getMinMax(box_sat[i], tmp);
         float proj_c = center.projectLengthOnto(box_sat[i]);
         float min_C = proj_c - this->get_radius();
         float max_C = proj_c + this->get_radius();
-
-        fmt::print("{} {} {} {}\n", min_C, minMax.first, minMax.second, max_C);
         if (min_C > minMax.second || minMax.first > max_C)
             return false;
     }
     return true;
-}
-
-void Circle::set_debug_draw()
-{
-    circle.setPosition(this->getPosition());
-    circle.setRadius(radius);
-    if (this->selected)
-    {
-        circle.setFillColor(sf::Color::Red);
-    }
-    else
-    {
-        circle.setFillColor(sf::Color::White);
-    }
 }

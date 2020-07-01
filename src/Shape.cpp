@@ -1,7 +1,5 @@
 #include "Shape.h"
 
-
-
 std::deque<Vector> Shape::getSAT() const
 {
     return SAT;

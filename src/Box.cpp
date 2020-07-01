@@ -100,7 +100,6 @@ bool Box::isCollide(Polygon &p)
     auto poly_sat = p.getSAT();
 
     bool isSeparated = false;
-    fmt::print("{}\n", isSeparated);
 
     // box_sat check
     for (int i = 0; i < box_sat.size(); i++)
@@ -125,7 +124,6 @@ bool Box::isCollide(Polygon &p)
         if (isSeparated)
             return false;
     }
-
     return true;
 }
 
@@ -134,10 +132,7 @@ bool Box::isCollide(Circle &c)
     this->setVertices();
     this->findSAT();
     auto box_sat = this->getSAT();
-
-
-    auto C_pos = c.getPosition();
-    Vector center(C_pos.x, C_pos.y);
+    Vector center(c.getPosition().x, c.getPosition().y);
 
     bool isSeparated = false;
 

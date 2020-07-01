@@ -13,11 +13,22 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define UNIT 1
-#define DELAY 0.1
+#define OBJ_COUNT 10
+
 
 double timer = 0;
 int cnt = 220;
-int cnt2 = 80;
+int cnt2 = 0;
+
+sf::RenderWindow window(sf::VideoMode(800, 600), "SAT collision");
+std::deque<Shape> obj;
+
+int random(int min, int max)
+{
+    srand(time(NULL));
+    int x = rand() % (max - min + 1) + min;
+    return x;
+}
 
 void vector_math()
 {
@@ -31,13 +42,11 @@ void vector_math()
     vec.normalR().print_Vector();                // = (4, -3)
 }
 
-
 //keyboard_test
 void keyboard_move(Shape *a, Shape *b)
 {
     auto pos_a = a->getPosition();
     auto pos_b = b->getPosition();
-
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
         pos_a.y -= UNIT;
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
@@ -56,7 +65,8 @@ void keyboard_move(Shape *a, Shape *b)
         pos_b.x += UNIT;
 
     a->setPosition(pos_a);
-    b->setPosition(pos_b);
+    auto pos = sf::Mouse::getPosition(window);
+    b->setPosition(pos.x, pos.y);
 }
 
 // judge collision
@@ -66,22 +76,22 @@ void judge(Shape *a, Shape *b)
     {
         a->selected = true;
         b->selected = true;
-        // fmt::print("collide\n");
     }
     else
     {
         a->selected = false;
         b->selected = false;
-        // fmt::print("not collide\n");
     }
 }
 
-
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SAT collision");
     window.setFramerateLimit(60);
 
+    // for (int i = 0; i < OBJ_COUNT; i++)
+    //     obj.push_back(Circle(random(0,800), random(0,800), 50));
+
+    //Shape objects
     Shape *box = new Box(400, 400, 100, 200);
     Shape *box2 = new Box(500, 500, 100, 200);
     Shape *cir = new Circle(300, 300, 100);
@@ -93,13 +103,10 @@ int main()
     tmp.push_back({300, 210});
     tmp.push_back({70, 20});
     Shape *poly = new Polygon(tmp, Vector(300, 200));
-
     std::deque<Vector> tmp2;
-    tmp2.push_back({0, 0});
+    tmp2.push_back({-100, -100});
     tmp2.push_back({0, 100});
     tmp2.push_back({250, 50});
-    tmp.push_back({300, 210});
-    tmp.push_back({70, 20});
     Shape *poly2 = new Polygon(tmp2, Vector(200, 200));
 
     sf::ConvexShape polygon;
@@ -113,6 +120,11 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            if (event.type == sf::Event::Resized)
+            {
+                sf::FloatRect visibleArea(0.f, 0.f, event.size.width, event.size.height);
+                window.setView(sf::View(visibleArea));
+            }
             if (event.type == sf::Event::MouseWheelScrolled)
             {
                 if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
@@ -136,26 +148,28 @@ int main()
             }
         }
 
-        // update position data
-        // setting rotate angle
-        keyboard_move(poly, poly2);
-        judge(poly, poly2);
+        // box->setRotation(cnt);
+        // fmt::print("{}\n", cnt);
+        poly2->setRotation(cnt);
+        keyboard_move(poly2, cir);
+        judge(poly2, cir);
+
+        if (cnt == 360)
+            cnt = 0;
+        else
+            cnt += 1;
+
+        if (cnt2 == 0)
+            cnt2 = 360;
+        else
+            cnt2 -= 1;
 
         // clear screen
         window.clear(sf::Color::Black);
-        poly->set_debug_draw();
-        window.draw(*poly);
         poly2->set_debug_draw();
         window.draw(*poly2);
-        // cir2->set_debug_draw();
-        // window.draw(*cir2);
-        // box->set_debug_draw();
-        // window.draw(*box);
-        // box2->set_debug_draw();
-        // window.draw(*box2);
-        // poly->set_debug_draw();
-        // window.draw(*poly);
-        // poly->set_debug_draw();
+        cir->set_debug_draw();
+        window.draw(*cir);
         window.display();
     }
 }
