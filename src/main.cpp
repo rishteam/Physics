@@ -82,7 +82,7 @@ void draw_obj(World& world)
     for(auto &obj : world.bodies)
     {
         obj->set_debug_draw();
-        // fmt::print("{}: ({}, {})\n", idx++, obj->getPosition().x, obj->getPosition().y);
+        fmt::print("{}: ({}, {})\n", idx++, obj->getPosition().x, obj->getPosition().y);
         window.draw(*obj);
     }
 }
@@ -117,7 +117,7 @@ int main()
     window.setFramerateLimit(60);
     World world(Vec2(0.0, -9.8), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
     //Shape objects
-    Shape *box = new Box(400, 600, 800, 300, MAX_float);
+    Shape *box = new Box(400, 100, 100, 100, MAX_float);
     Shape *box2 = new Box(100, 200, 50, 25, 10);
     Shape *cir = new Circle(300, 300, 100);
     Shape *cir2 = new Circle(200, 200, 100);

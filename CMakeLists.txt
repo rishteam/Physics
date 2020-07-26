@@ -21,7 +21,6 @@ add_executable(SAT_COLLISION
     src/Circle.cpp
     src/Physics.cpp
     src/vector_math.cpp
-    src/vector_test.cpp
     src/World.cpp
         src/Helper.cpp)
 
