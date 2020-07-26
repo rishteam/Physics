@@ -10,7 +10,7 @@ class Circle;
 class Polygon : public Shape
 {
 public:
-    Polygon(std::deque<Vector> &pt, Vector pos);
+    Polygon(std::deque<Vec2> &pt, Vec2 pos);
     ~Polygon() = default;
     void setVertices();
     virtual bool isCollide(Shape &s) override
@@ -24,7 +24,7 @@ public:
 
 private:
     sf::ConvexShape polygon;
-    std::deque<Vector> corner;
+    std::deque<Vec2> corner;
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const
     {
         target.draw(polygon, states);

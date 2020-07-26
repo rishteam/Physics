@@ -4,16 +4,17 @@
 #include "Polygon.h"
 #include "Circle.h"
 
-Box::Box(float x, float y, float w, float h)
+Box::Box(float x, float y, float w, float h, float m)
 {
     this->setPosition(x, y);
     _w = w;
     _h = h;
     this->setRotation(0.0f);
-    corner.push_back(Vector(w / 2.0, -h / 2.0));
-    corner.push_back(Vector(w / 2.0, h / 2.0));
-    corner.push_back(Vector(-w / 2.0, h / 2.0));
-    corner.push_back(Vector(-w / 2.0, -h / 2.0));
+    this->initPhysics(m);
+    corner.push_back(Vec2(w / 2.0, -h / 2.0));
+    corner.push_back(Vec2(w / 2.0, h / 2.0));
+    corner.push_back(Vec2(-w / 2.0, h / 2.0));
+    corner.push_back(Vec2(-w / 2.0, -h / 2.0));
     this->setVertices();
 }
 
@@ -21,6 +22,7 @@ void Box::set_debug_draw()
 {
     int cnt = Vertices.size();
     polygon.setPointCount(cnt);
+    this->setVertices();
     for (int i = 0; i < cnt; i++)
     {
         polygon.setPoint(i, sf::Vector2f(Vertices[i].x, Vertices[i].y));
@@ -40,14 +42,39 @@ void Box::setVertices()
     this->Vertices.clear();
     sf::Vector2f center = this->getPosition();
     float angle_rad = degreesToRadians(this->getRotation());
-    Vector cent(center.x, center.y);
+    Vec2 cent(center.x, center.y);
     for (auto &idx : corner)
     {
-        Vector vec(center.x + idx.x, center.y + idx.y);
+        Vec2 vec(center.x + idx.x, center.y + idx.y);
         vec.rotate_ref(angle_rad, cent);
         Vertices.push_back(vec);
     }
 }
+
+void Box::initPhysics(float m)
+{
+    velocity.Set(0.0f, 0.0f);
+    angularVelocity = 0.0f;
+    force.Set(0.0f, 0.0f);
+    torque = 0.0f;
+    friction = 0.2f;
+    mass = m;
+
+
+    if (mass < MAX_float)
+    {
+        invMass = 1.0f / mass;
+        I = mass * (_w * _w + _h * _h) / 12.0f;
+        invI = 1.0f / I;
+    }
+    else
+    {
+        invMass = 0.0f;
+        I = MAX_float;
+        invI = 0.0f;
+    }
+}
+
 
 bool Box::isCollide(Box &b)
 {
@@ -132,7 +159,7 @@ bool Box::isCollide(Circle &c)
     this->setVertices();
     this->findSAT();
     auto box_sat = this->getSAT();
-    Vector center(c.getPosition().x, c.getPosition().y);
+    Vec2 center(c.getPosition().x, c.getPosition().y);
 
     bool isSeparated = false;
 

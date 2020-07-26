@@ -19,23 +19,18 @@ add_executable(SAT_COLLISION
     src/Shape.cpp
     src/Polygon.cpp
     src/Circle.cpp
+    src/Physics.cpp
     src/vector_math.cpp
-)
+    src/vector_test.cpp
+    src/World.cpp
+        src/Helper.cpp)
+
 target_include_directories(SAT_COLLISION
     PRIVATE ${PROJECT_SOURCE_DIR}/include
 )
 
-if(APPLE)
-    set(SFML_STATIC_LIBRARIES False)
-    set(SFML_DIR "/usr/local/Cellar/sfml/2.5.1")
-    target_compile_definitions(SAT_COLLISION PUBLIC "GL_SILENCE_DEPRECATION")
-elseif(MSYS)
-    set(SFML_STATIC_LIBRARIES True)
-    set(SFML_DIR "/mingw32/lib/cmake/SFML")
-else()
-    message(FATAL_ERROR "Not supported")
-endif()
-
+set(SFML_STATIC_LIBRARIES False)
+set(SFML_DIR "/mingw32/lib/cmake/SFML")
 
 # Add SFML
 find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)
@@ -72,11 +67,3 @@ endif()
 target_link_libraries(SAT_COLLISION
     fmt::fmt
 )
-
-if(MSYS)
-    target_link_libraries(SAT_COLLISION
-        # -static-libgcc -static-libstdc++ -lwsock32 -lws2_32
-        # -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
-        # -mconsole / -mwindows
-    )
-endif()

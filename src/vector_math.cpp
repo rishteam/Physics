@@ -1,44 +1,44 @@
 #include "vector_math.h"
 
-Vector::Vector(float x_, float y_)
+Vec2::Vec2(float x_, float y_)
 {
     x = x_;
     y = y_;
 }
 
-float Vector::getLength()
+float Vec2::getLength()
 {
     return sqrt(x*x+y*y);
 }
 
-float Vector::dot(Vector &vec2)
+float Vec2::dot(Vec2 &vec2)
 {
     return x * vec2.x + y * vec2.y;
 }
 
-float Vector::projectLengthOnto(Vector &vec2)
+float Vec2::projectLengthOnto(Vec2 &vec2)
 {
     float tmp_dot = this->dot(vec2);
     float vec2_len = vec2.getLength();
     return tmp_dot / vec2_len;
 }
 
-void Vector::print_Vector()
+void Vec2::print_Vector()
 {
     fmt::print("({}, {})\n", x, y);
 }
 
-Vector Vector::normalL()
+Vec2 Vec2::normalL()
 {
-    return Vector(y*-1, x);
+    return Vec2(y * -1, x);
 }
 
-Vector Vector::normalR()
+Vec2 Vec2::normalR()
 {
-    return Vector(y, x*-1);
+    return Vec2(y, x * -1);
 }
 
-void Vector::rotate(float angle)
+void Vec2::rotate(float angle)
 {
     float tmp_x = (x * cos(angle)) - (y * sin(angle));
     float tmp_y = (x * sin(angle)) + (y * cos(angle));
@@ -46,7 +46,7 @@ void Vector::rotate(float angle)
     y = tmp_y;
 }
 
-void Vector::rotate_ref(float angle, Vector &ref)
+void Vec2::rotate_ref(float angle, Vec2 &ref)
 {
     float tmp_x = (x - ref.x) * cos(angle) - (y - ref.y) * sin(angle) + ref.x;
     float tmp_y = (y - ref.y) * cos(angle) + (x - ref.x) * sin(angle) + ref.y;
@@ -54,7 +54,8 @@ void Vector::rotate_ref(float angle, Vector &ref)
     y = tmp_y;
 }
 
-std::pair<float, float> getMinMax(Vector &axis, std::deque<Vector> corner)
+
+std::pair<float, float> getMinMax(Vec2 &axis, std::deque<Vec2> corner)
 {
 
     float min_DotProduct = corner[0].projectLengthOnto(axis);
@@ -78,3 +79,10 @@ std::pair<float, float> getMinMax(Vector &axis, std::deque<Vector> corner)
     }
     return std::make_pair(min_DotProduct, max_DotProduct);
 }
+
+int randomint(int min, int max)
+{
+    int x = rand() % (max - min + 1) + min;
+    return x;
+}
+

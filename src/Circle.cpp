@@ -47,7 +47,7 @@ bool Circle::isCollide(Polygon &p)
     p.findSAT();
     auto poly_sat = p.getSAT();
     auto C = this->getPosition();
-    Vector center(C.x, C.y);
+    Vec2 center(C.x, C.y);
 
     bool isSeparated = false;
     for (int i = 0; i < poly_sat.size(); i++)
@@ -66,13 +66,12 @@ bool Circle::isCollide(Polygon &p)
 
 bool Circle::isCollide(Box &b)
 {
-    // fmt::print("{} {} {} {}\n", min_C, minMax.first, minMax.second, max_C);
     b.setVertices();
     b.findSAT();
     auto box_sat = b.getSAT();
     auto tmp = b.getVertices();
     auto C = this->getPosition();
-    Vector center(C.x, C.y);
+    Vec2 center(C.x, C.y);
 
     for (int i = 0; i < box_sat.size(); i++)
     {

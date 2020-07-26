@@ -6,6 +6,7 @@
 #include "fmt/core.h"
 #include "vector_math.h"
 
+#include "World.h"
 #include "Box.h"
 #include "Circle.h"
 #include "Polygon.h"
@@ -15,32 +16,14 @@
 #define UNIT 1
 #define OBJ_COUNT 10
 
-
+sf::Font font;
 double timer = 0;
 int cnt = 220;
 int cnt2 = 0;
 
-sf::RenderWindow window(sf::VideoMode(800, 600), "SAT collision");
-std::deque<Shape> obj;
+sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH,  WINDOW_HEIGHT), "physics(SAT) example");
+std::vector <Shape*> obj;
 
-int random(int min, int max)
-{
-    srand(time(NULL));
-    int x = rand() % (max - min + 1) + min;
-    return x;
-}
-
-void vector_math()
-{
-    /* Vector Math */
-    Vector vec(3, 4);
-    Vector vec2(1, 0);
-    fmt::print("{}\n", vec.getLength());             // => 5
-    fmt::print("{}\n", vec.dot(vec2));            // => 3
-    fmt::print("{}\n", vec.projectLengthOnto(vec2));   // => 3
-    vec2.print_Vector();                         // = (-4, 3)
-    vec.normalR().print_Vector();                // = (4, -3)
-}
 
 //keyboard_test
 void keyboard_move(Shape *a, Shape *b)
@@ -69,47 +52,90 @@ void keyboard_move(Shape *a, Shape *b)
     b->setPosition(pos.x, pos.y);
 }
 
+
 // judge collision
-void judge(Shape *a, Shape *b)
+void judge()
 {
-    if (a->isCollide(*b))
+    //clear all
+    for (int i = 0; i < obj.size(); i++)
     {
-        a->selected = true;
-        b->selected = true;
+        obj[i]->selected = false;
     }
-    else
+
+    //judge
+    for (int i = 0; i < obj.size(); i++)
     {
-        a->selected = false;
-        b->selected = false;
+        for(int j = 0; j < obj.size(); j++)
+        {
+            if (i != j && obj[i]->isCollide(*obj[j]))
+            {
+                obj[i]->selected = true;
+                obj[j]->selected = true;
+            }
+        }
     }
 }
+
+void draw_obj(World& world)
+{
+    int idx = 0;
+    for(auto &obj : world.bodies)
+    {
+        obj->set_debug_draw();
+        // fmt::print("{}: ({}, {})\n", idx++, obj->getPosition().x, obj->getPosition().y);
+        window.draw(*obj);
+    }
+}
+
+
+void generate_obj()
+{
+    srand(time(NULL));
+    for (int i = 0; i < OBJ_COUNT; i++)
+    {
+        obj.push_back(new Circle(randomint(0, 800), randomint(0, 600), randomint(30, 50)));
+    }
+}
+
+
+void rotate()
+{
+    if (cnt == 360)
+        cnt = 0;
+    else
+        cnt += 1;
+
+    if (cnt2 == 0)
+        cnt2 = 360;
+    else
+        cnt2 -= 1;
+}
+
 
 int main()
 {
     window.setFramerateLimit(60);
-
-    // for (int i = 0; i < OBJ_COUNT; i++)
-    //     obj.push_back(Circle(random(0,800), random(0,800), 50));
-
+    World world(Vec2(0.0, -9.8), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
     //Shape objects
-    Shape *box = new Box(400, 400, 100, 200);
-    Shape *box2 = new Box(500, 500, 100, 200);
+    Shape *box = new Box(400, 600, 800, 300, MAX_float);
+    Shape *box2 = new Box(100, 200, 50, 25, 10);
     Shape *cir = new Circle(300, 300, 100);
     Shape *cir2 = new Circle(200, 200, 100);
-    std::deque<Vector> tmp;
+    std::deque<Vec2> tmp;
     tmp.push_back({0, 0});
     tmp.push_back({0, 100});
     tmp.push_back({250, 50});
     tmp.push_back({300, 210});
     tmp.push_back({70, 20});
-    Shape *poly = new Polygon(tmp, Vector(300, 200));
-    std::deque<Vector> tmp2;
+    Shape *poly = new Polygon(tmp, Vec2(300, 200));
+    std::deque<Vec2> tmp2;
     tmp2.push_back({-100, -100});
     tmp2.push_back({0, 100});
     tmp2.push_back({250, 50});
-    Shape *poly2 = new Polygon(tmp2, Vector(200, 200));
+    Shape *poly2 = new Polygon(tmp2, Vec2(200, 200));
 
-    sf::ConvexShape polygon;
+    world.Add(box);
+    world.Add(box2);
 
     // run the program as long as the window is open
     while (window.isOpen())
@@ -148,28 +174,15 @@ int main()
             }
         }
 
-        // box->setRotation(cnt);
-        // fmt::print("{}\n", cnt);
-        poly2->setRotation(cnt);
-        keyboard_move(poly2, cir);
-        judge(poly2, cir);
+        world.Step(world.timeStep);
 
-        if (cnt == 360)
-            cnt = 0;
-        else
-            cnt += 1;
-
-        if (cnt2 == 0)
-            cnt2 = 360;
-        else
-            cnt2 -= 1;
+        // keyboard_move(poly2, cir);
+        // judge();
+        // rotate();
 
         // clear screen
         window.clear(sf::Color::Black);
-        poly2->set_debug_draw();
-        window.draw(*poly2);
-        cir->set_debug_draw();
-        window.draw(*cir);
+        draw_obj(world);
         window.display();
     }
 }

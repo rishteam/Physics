@@ -3,7 +3,7 @@
 #include "Circle.h"
 #include "windows.h"
 
-Polygon::Polygon(std::deque<Vector> &pt, Vector pos){
+Polygon::Polygon(std::deque<Vec2> &pt, Vec2 pos){
     corner = pt;
     this->setPosition(pos.x, pos.y);
     this->setRotation(0.0f);
@@ -16,7 +16,7 @@ void Polygon::set_debug_draw()
     polygon.setPosition(this->getPosition().x, this->getPosition().y);
     sf::Vector2f center = this->getPosition();
 
-    //give the offset
+    //sfml needs to give the offset for setting point
     for (int i = 0; i < Vertices.size(); i++)
     {
         polygon.setPoint(i, sf::Vector2f(Vertices[i].x - center.x, Vertices[i].y - center.y));
@@ -36,11 +36,11 @@ void Polygon::setVertices()
     this->Vertices.clear();
     float angle_rad = degreesToRadians(this->getRotation());
     sf::Vector2f cent = this->getPosition();
-    Vector center(cent.x, cent.y);
+    Vec2 center(cent.x, cent.y);
 
     for (auto idx : corner)
     {
-        Vector vec(center.x + idx.x, center.y + idx.y);
+        Vec2 vec(center.x + idx.x, center.y + idx.y);
         vec.rotate_ref(angle_rad, center);
         Vertices.push_back(vec);
     }
@@ -127,7 +127,7 @@ bool Polygon::isCollide(Circle &c)
     this->findSAT();
     auto poly_sat = this->getSAT();
     auto C = c.getPosition();
-    Vector center(C.x, C.y);
+    Vec2 center(C.x, C.y);
 
     bool isSeparated = false;
     for (int i = 0; i < poly_sat.size(); i++)

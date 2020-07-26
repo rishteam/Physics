@@ -4,16 +4,18 @@
 #include <deque>
 
 #include "Shape.h"
+#include "Physics.h"
 
 class Polygon;
 class Circle;
 
-class Box : public Shape
+class Box : public Shape, public Physics
 {
 public:
-    Box(float x, float y, float w, float h);
+    Box(float x, float y, float w, float h, float m);
     ~Box() = default;
     void setVertices();
+    void initPhysics(float m);
     virtual bool isCollide(Shape &s) override
     {
         return s.isCollide(*this);
@@ -29,7 +31,7 @@ private:
     {
         target.draw(polygon, states);
     };
-    std::deque<Vector> corner;
+    std::deque<Vec2> corner;
     float _w;
     float _h;
 };

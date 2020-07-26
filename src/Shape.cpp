@@ -1,11 +1,11 @@
 #include "Shape.h"
 
-std::deque<Vector> Shape::getSAT() const
+std::deque<Vec2> Shape::getSAT() const
 {
     return SAT;
 }
 
-std::deque<Vector> Shape::getVertices() const
+std::deque<Vec2> Shape::getVertices() const
 {
     return Vertices;
 }
@@ -19,9 +19,9 @@ void Shape::findSAT()
         float tmp_x = Vertices[i].x - Vertices[i - 1].x;
         float tmp_y = Vertices[i].y - Vertices[i - 1].y;
 
-        Vector tmp(tmp_x, tmp_y);
+        Vec2 tmp(tmp_x, tmp_y);
         this->SAT.push_back(tmp.normalL());
     }
-    Vector tmp2((Vertices[0].x - Vertices[total_pt - 1].x), (Vertices[0].y - Vertices[total_pt - 1].y));
+    Vec2 tmp2((Vertices[0].x - Vertices[total_pt - 1].x), (Vertices[0].y - Vertices[total_pt - 1].y));
     this->SAT.push_back(tmp2.normalL());
 }

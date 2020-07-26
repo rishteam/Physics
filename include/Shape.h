@@ -2,6 +2,7 @@
 
 #include "vector_math.h"
 
+
 //include object
 class Circle;
 class Polygon;
@@ -10,8 +11,8 @@ class Box;
 class Shape : public sf::Transformable, public sf::Drawable
 {
 public:
-    std::deque<Vector> getSAT() const;
-    std::deque<Vector> getVertices() const;
+    std::deque<Vec2> getSAT() const;
+    std::deque<Vec2> getVertices() const;
     void findSAT();
     //算出SAT實際的點
     virtual void setVertices(){};
@@ -22,6 +23,6 @@ public:
     virtual void set_debug_draw() = 0;
     bool selected = false;
 protected:
-    std::deque<Vector> Vertices;
-    std::deque<Vector> SAT;
+    std::deque<Vec2> Vertices;
+    std::deque<Vec2> SAT;
 };

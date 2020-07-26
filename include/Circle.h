@@ -20,6 +20,7 @@ public:
     virtual bool isCollide(Polygon &p) override;
     virtual bool isCollide(Circle &c) override;
     virtual void set_debug_draw() override;
+
 private:
     sf::CircleShape circle;
     float radius;
