@@ -7,6 +7,8 @@ public:
     ~Physics() = default;
     void print_Physics_info();
     std::pair<Vec2, float> getPhysicsData();
+    float getMass();
+    float getfriction();
     void TransformPhysicsCoordinate(const Vec2 ps, float angle_);
     void IntegrateVelocities(float delta_t);
     void ComputeForce(float delta_t, Vec2 gravity);

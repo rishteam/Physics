@@ -75,6 +75,16 @@ void Box::initPhysics(float m)
     }
 }
 
+float Box::getwidth()
+{
+    return _w;
+}
+
+float Box::getheight()
+{
+    return _h;
+}
+
 
 bool Box::isCollide(Box &b)
 {

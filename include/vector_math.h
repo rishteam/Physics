@@ -31,11 +31,7 @@
  */
 class Vec2 : public sf::Vector2<float> {
 public:
-    Vec2()
-    {
-        x = 0;
-        y = 0;
-    }
+    Vec2();
     /**
      * @brief 向量x, y
      */
@@ -46,7 +42,14 @@ public:
      */
     ~Vec2() = default;
 
-    void operator = (const Vec2 v)
+    Vec2 operator - ()  {
+        Vec2 v;
+        v.x = -x;
+        v.y = -y;
+        return v;
+    }
+
+    void operator = (const Vec2& v)
     {
         x = v.x; y = v.y;
     }

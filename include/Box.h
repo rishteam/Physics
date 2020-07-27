@@ -16,6 +16,9 @@ public:
     ~Box() = default;
     void setVertices();
     void initPhysics(float m);
+    float getwidth();
+    float getheight();
+
     virtual bool isCollide(Shape &s) override
     {
         return s.isCollide(*this);

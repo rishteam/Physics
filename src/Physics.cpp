@@ -21,6 +21,11 @@ std::pair<Vec2, float> Physics::getPhysicsData()
     return std::make_pair(position, angle);
 }
 
+float Physics::getMass()
+{
+    return mass;
+}
+
 void Physics::AddForce(const Vec2& f)
 {
     force += f;

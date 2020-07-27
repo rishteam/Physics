@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 #include <map>
 #include "vector_math.h"
@@ -5,9 +6,8 @@
 #include "Box.h"
 #include "Circle.h"
 #include "Polygon.h"
+#include "Arbiter.h"
 
-#ifndef SAT_COLLISION_WORLD_H
-#define SAT_COLLISION_WORLD_H
 
 class World
 {
@@ -35,9 +35,6 @@ public:
     float height = 0;
     Vec2 m_center = Vec2(width/2, height/2);
     std::vector<Shape*> bodies;
+    std::map<ArbiterKey, Aribiter> arbiters;
 
 };
-
-
-
-#endif //SAT_COLLISION_WORLD_H

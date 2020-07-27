@@ -22,7 +22,9 @@ add_executable(SAT_COLLISION
     src/Physics.cpp
     src/vector_math.cpp
     src/World.cpp
-        src/Helper.cpp)
+        src/Helper.cpp
+        src/Arbiter.cpp
+        src/Vclip.cpp)
 
 target_include_directories(SAT_COLLISION
     PRIVATE ${PROJECT_SOURCE_DIR}/include

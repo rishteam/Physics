@@ -1,11 +1,6 @@
 #include "World.h"
 
 
-static bool accumulateImpulses = 0;
-static bool warmStarting = 0;
-static bool positionCorrection = 0;
-
-
 World::World(Vec2 gravity_, float width_, float height_)
 {
     gravity = gravity_;
@@ -46,10 +41,39 @@ void World::Step(float delta_t)
 
 void World::BoardPhase()
 {
-//    for(int i = 0; i < bodies.size(); i++)
-//    {
-//        for(int j = i+1; j)
-//    }
+    for(int i = 0; i < bodies.size(); i++)
+    {
+        for(int j = i+1; j < bodies.size(); j++)
+        {
+            Box* box1 = dynamic_cast<Box*>(bodies.at(i));
+            Box* box2 = dynamic_cast<Box*>(bodies.at(j));
+            if(box1->getMass() == 0.0f && box2->getMass() == 0.0f)
+                continue;
+            //add in Arbiter
+
+            Arbiter newArb(bodies[i], bodies[j]);
+            ArbiterKey key(bodies[i], bodies[j]);
+            auto iter = arbiters.find(key);
+
+            if(box1->isCollide(*box2))
+            {
+                if (iter == arbiters.end())
+                {
+                    //TODO: add pair
+                    arbiters.insert()
+                }
+                else
+                {
+                    iter->second.update(newArb.contacts, newArb.numContacts);
+                }
+            }
+            else
+            {
+                arbiters.erase(key);
+            }
+        }
+
+    }
 
 }
 
