@@ -3,13 +3,16 @@
 bool World::accumulateImpulses = true;
 bool World::warmStarting = true;
 bool World::positionCorrection = true;
-
+float World::width;
+float World::height;
+Vec2 World::m_center;
 
 World::World(Vec2 gravity_, float width_, float height_)
 {
     gravity = gravity_;
     width = width_;
     height = height_;
+    m_center = Vec2(width/2, height/2);
 }
 
 void World::Clear()
@@ -41,6 +44,12 @@ void World::Step(float delta_t)
     {
         arb->second.PreStep(inv_dt);
     }
+
+    //apply impulse
+    for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb) {
+        arb->second.ApplyImpulse();
+    }
+
 
     // Integrate Velocities
     for(int i = 0; i < bodies.size(); i++)

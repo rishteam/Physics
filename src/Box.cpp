@@ -20,7 +20,7 @@ Box::Box(float x, float y, float w, float h, float m)
 
 void Box::set_debug_draw()
 {
-    sf::Color color(255, 0, 0, 100);
+    sf::Color color(255, 0, 0);
     int cnt = Vertices.size();
     polygon.setPointCount(cnt);
     this->setVertices();
@@ -29,14 +29,6 @@ void Box::set_debug_draw()
         polygon.setPoint(i, sf::Vector2f(Vertices[i].x, Vertices[i].y));
     }
     polygon.setFillColor(color);
-//    if(this->selected)
-//    {
-//        polygon.setFillColor(sf::Color::Red);
-//    }
-//    else
-//    {
-//        polygon.setFillColor(sf::Color::White);
-//    }
 }
 
 void Box::setVertices()

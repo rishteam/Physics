@@ -24,7 +24,7 @@ public:
 
     void BoardPhase();
 
-    Vec2 ChangeToPhysicsWorld(const Vec2& ps);
+    static Vec2 ChangeToPhysicsWorld(const Vec2& ps);
 
     Vec2 ConvertWorldToScreen(const Vec2& pw);
 
@@ -32,10 +32,11 @@ public:
     static bool accumulateImpulses;
     static bool warmStarting;
     static bool positionCorrection;
+    static float width;
+    static float height;
+    static Vec2 m_center;
     float timeStep = 1.0 / 60.0f;
-    float width = 0;
-    float height = 0;
-    Vec2 m_center = Vec2(width/2, height/2);
+    int iterations = 10;
     std::vector<Shape*> bodies;
     std::map<ArbiterKey, Arbiter> arbiters;
 

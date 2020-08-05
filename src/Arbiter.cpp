@@ -260,11 +260,11 @@ void Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
     auto bodyB = dynamic_cast<Box*>(b2);
 
     //setup
-    Vec2 hA = Vec2(bodyA->getwidth()* 0.5, bodyA->getheight() * 0.5);
-    Vec2 hB = Vec2(bodyB->getwidth()* 0.5, bodyB->getheight() * 0.5);
+    Vec2 hA = World::ChangeToPhysicsWorld(Vec2(bodyA->getwidth()* 0.5, bodyA->getheight() * 0.5));
+    Vec2 hB = World::ChangeToPhysicsWorld(Vec2(bodyB->getwidth()* 0.5, bodyB->getheight() * 0.5));
 
-    Vec2 posA = Vec2(bodyA->getPosition().x, bodyA->getPosition().y);
-    Vec2 posB = Vec2(bodyB->getPosition().x, bodyB->getPosition().y);
+    Vec2 posA = World::ChangeToPhysicsWorld(Vec2(bodyA->getPosition().x, bodyA->getPosition().y));
+    Vec2 posB = World::ChangeToPhysicsWorld(Vec2(bodyB->getPosition().x, bodyB->getPosition().y));
 
     //Rotate Matrix
     Mat22 RotA(bodyA->getRotation()), RotB(bodyB->getRotation());

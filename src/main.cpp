@@ -117,8 +117,8 @@ int main()
     window.setFramerateLimit(60);
     World world(Vec2(0.0, -9.8), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
     //Shape objects
-    Shape *box = new Box(400, 300, 600, 100, MAX_float);
-    Shape *box2 = new Box(300, 200, 50, 25, 10);
+    Shape *box = new Box(400, 500, 600, 100, MAX_float);
+    Shape *box2 = new Box(300, 225, 50, 25, 10);
     Shape *cir = new Circle(300, 300, 100);
     Shape *cir2 = new Circle(200, 200, 100);
     std::deque<Vec2> tmp;
