@@ -8,6 +8,8 @@
 #include "Polygon.h"
 #include "Arbiter.h"
 
+class ArbiterKey;
+class Arbiter;
 
 class World
 {
@@ -35,6 +37,6 @@ public:
     float height = 0;
     Vec2 m_center = Vec2(width/2, height/2);
     std::vector<Shape*> bodies;
-    std::map<ArbiterKey, Aribiter> arbiters;
+    std::map<ArbiterKey, Arbiter> arbiters;
 
 };

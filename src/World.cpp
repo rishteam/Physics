@@ -1,5 +1,9 @@
 #include "World.h"
 
+bool World::accumulateImpulses = true;
+bool World::warmStarting = true;
+bool World::positionCorrection = true;
+
 
 World::World(Vec2 gravity_, float width_, float height_)
 {
@@ -20,6 +24,9 @@ void World::Add(Shape* body)
 
 void World::Step(float delta_t)
 {
+    float inv_dt = delta_t > 0.0f ? 1.0f / delta_t : 0.0f;
+    BoardPhase();
+
     // Compute forces.
     for(int i = 0; i < bodies.size(); i++)
     {
@@ -28,6 +35,13 @@ void World::Step(float delta_t)
         box->TransformPhysicsCoordinate(ChangeToPhysicsWorld(tmp), box->getRotation());
         box->ComputeForce(delta_t, gravity);
     }
+
+    //pre-step arbiter
+    for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb)
+    {
+        arb->second.PreStep(inv_dt);
+    }
+
     // Integrate Velocities
     for(int i = 0; i < bodies.size(); i++)
     {
@@ -37,6 +51,7 @@ void World::Step(float delta_t)
         box->setPosition(ConvertWorldToScreen(tmp2.first));
         box->setRotation(tmp2.second);
     }
+
 }
 
 void World::BoardPhase()
@@ -50,23 +65,25 @@ void World::BoardPhase()
             if(box1->getMass() == 0.0f && box2->getMass() == 0.0f)
                 continue;
             //add in Arbiter
-
             Arbiter newArb(bodies[i], bodies[j]);
             ArbiterKey key(bodies[i], bodies[j]);
             auto iter = arbiters.find(key);
 
+            // collision
             if(box1->isCollide(*box2))
             {
+                //add new arbiter
                 if (iter == arbiters.end())
                 {
-                    //TODO: add pair
-                    arbiters.insert()
+                    arbiters.insert(std::pair<ArbiterKey, Arbiter>(key, newArb));
                 }
+                //update arbiter
                 else
                 {
                     iter->second.update(newArb.contacts, newArb.numContacts);
                 }
             }
+            //兩物體沒接觸點，代表沒碰撞
             else
             {
                 arbiters.erase(key);
@@ -101,6 +118,7 @@ Vec2 World::ConvertWorldToScreen(const Vec2& pw)
     float w = float(width/2);
     float h = float(height/2);
     float ratio = w / h;
+
     Vec2 extents(ratio * 25.0f, 25.0f);
 
     Vec2 lower = m_center - extents;

@@ -14,7 +14,6 @@ public:
     void ComputeForce(float delta_t, Vec2 gravity);
     void AddForce(const Vec2& f);
 
-protected:
     //物理世界座標
     Vec2 position;
     //角速度

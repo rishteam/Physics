@@ -28,6 +28,7 @@ public:
     virtual bool isCollide(Box &b) override;
     virtual void set_debug_draw() override;
 
+
 private:
     sf::ConvexShape polygon;
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const

@@ -246,3 +246,10 @@ inline float Clamp(float a, float low, float high)
 {
     return Max(low, Min(a, high));
 }
+
+template<typename T> inline void Swap(T& a, T& b)
+{
+    T tmp = a;
+    a = b;
+    b = tmp;
+}

@@ -2,6 +2,7 @@
 #include "Shape.h"
 #include "box.h"
 #include "VClip.h"
+#include "World.h"
 #include "vector_math.h"
 
 
@@ -40,24 +41,27 @@ public:
         }
     }
 
-    bool operator == (const ArbiterKey& rhs)
-    {
-        if (body1 == rhs.body1 && body2 == rhs.body2)
-            return true;
-        else
-            return false;
-    }
-
     Shape* body1;
     Shape* body2;
 };
+
+inline bool operator < (const ArbiterKey& a1, const ArbiterKey& a2)
+{
+    if (a1.body1 < a2.body1)
+        return true;
+
+    if (a1.body1 == a2.body1 && a1.body2 < a2.body2)
+        return true;
+
+    return false;
+}
 
 class Arbiter : public Vclip
 {
 public:
     Arbiter(Shape* b1, Shape* b2);
     ~Arbiter() = default;
-    void update(Contact& contacts, int numContacts);
+    void update(Contact* contacts, int numContacts);
     void PreStep(float inv_dt);
     void ApplyImpulse();
     void calContactPoints(Contact *contacts, Shape* b1, Shape* b2);

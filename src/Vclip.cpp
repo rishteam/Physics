@@ -1,7 +1,7 @@
 #include "Vclip.h"
 
 
-void ClipSegmentToLine(ClipVertex *vOut, ClipVertex *vIn, const Vec2& normal, float offset, char clipEdge)
+void Vclip::ClipSegmentToLine(ClipVertex *vOut, ClipVertex *vIn, const Vec2& normal, float offset, char clipEdge)
 {
     // Start with no output points
     int numOut = 0;
@@ -25,13 +25,13 @@ void ClipSegmentToLine(ClipVertex *vOut, ClipVertex *vIn, const Vec2& normal, fl
         {
             vOut[numOut].fp = vIn[0].fp;
             vOut[numOut].fp.e.inEdge1 = clipEdge;
-            vOut[numOut].fp.e.inEdge2 = NO_EDGE;
+            vOut[numOut].fp.e.inEdge2 = Vclip::NO_EDGE;
         }
         else
         {
             vOut[numOut].fp = vIn[1].fp;
             vOut[numOut].fp.e.outEdge1 = clipEdge;
-            vOut[numOut].fp.e.outEdge2 = NO_EDGE;
+            vOut[numOut].fp.e.outEdge2 = Vclip::NO_EDGE;
         }
         ++numOut;
     }

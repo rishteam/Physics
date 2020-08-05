@@ -26,6 +26,12 @@ float Physics::getMass()
     return mass;
 }
 
+float Physics::getfriction()
+{
+    return friction;
+}
+
+
 void Physics::AddForce(const Vec2& f)
 {
     force += f;
