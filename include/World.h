@@ -26,7 +26,7 @@ public:
 
     static Vec2 ChangeToPhysicsWorld(const Vec2& ps);
 
-    Vec2 ConvertWorldToScreen(const Vec2& pw);
+    static Vec2 ConvertWorldToScreen(const Vec2& pw);
 
     Vec2 gravity;
     static bool accumulateImpulses;

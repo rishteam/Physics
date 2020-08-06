@@ -140,7 +140,7 @@ void Arbiter::PreStep(float inv_dt)
 
     for (int i = 0; i < numContacts; ++i)
     {
-        Contact* c = &contacts[i];
+        Contact* c = contacts + i;
         Box* body1 = dynamic_cast<Box*>(this->body1);
         Box* body2 = dynamic_cast<Box*>(this->body2);
 
@@ -187,8 +187,12 @@ void Arbiter::ApplyImpulse()
     for (int i = 0; i < numContacts; ++i)
     {
         Contact* c = contacts + i;
+
+//        fmt::print("{}: ({}, {})\n", i, contacts->position.x, contacts->position.y);
+
         c->r1 = c->position - b1->position;
         c->r2 = c->position - b2->position;
+
 
         // Relative velocity at contact
         Vec2 dv = b2->velocity + Cross(b2->angularVelocity, c->r2) - b1->velocity - Cross(b1->angularVelocity, c->r1);
@@ -260,8 +264,8 @@ void Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
     auto bodyB = dynamic_cast<Box*>(b2);
 
     //setup
-    Vec2 hA = World::ChangeToPhysicsWorld(Vec2(bodyA->getwidth()* 0.5, bodyA->getheight() * 0.5));
-    Vec2 hB = World::ChangeToPhysicsWorld(Vec2(bodyB->getwidth()* 0.5, bodyB->getheight() * 0.5));
+    Vec2 hA = Vec2(bodyA->getwidth()* 0.5, bodyA->getheight() * 0.5);
+    Vec2 hB = Vec2(bodyB->getwidth()* 0.5, bodyB->getheight() * 0.5);
 
     Vec2 posA = World::ChangeToPhysicsWorld(Vec2(bodyA->getPosition().x, bodyA->getPosition().y));
     Vec2 posB = World::ChangeToPhysicsWorld(Vec2(bodyB->getPosition().x, bodyB->getPosition().y));
