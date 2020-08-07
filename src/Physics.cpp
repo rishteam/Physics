@@ -1,3 +1,4 @@
+
 #include "Physics.h"
 
 Physics::Physics(){
@@ -37,9 +38,15 @@ void Physics::AddForce(const Vec2& f)
     force += f;
 }
 
-void Physics::TransformPhysicsCoordinate(const Vec2 ps, float angle_)
+void Physics::TransformPhysicsCoordinate(float x, float y, float w, float h, float angle_)
 {
-    this->position = ps;
+//    this->position = ps;
+    Vec2 ur = World::ChangeToPhysicsWorld(Vec2(x + w/2, y - h/2));
+    Vec2 dl = World::ChangeToPhysicsWorld(Vec2(x - w/2, y + h/2));
+    Vec2 dr = World::ChangeToPhysicsWorld(Vec2(x + w/2, y + h/2));
+
+    position = World::ChangeToPhysicsWorld(Vec2(x,y));
+    wh = Vec2(dr.x - dl.x, ur.y - dr.y);
     this->angle = angle_;
 }
 

@@ -1,4 +1,8 @@
 #include "vector_math.h"
+#include "World.h"
+
+#ifndef Physics_H
+#define Physics_H
 
 class Physics
 {
@@ -9,13 +13,15 @@ public:
     std::pair<Vec2, float> getPhysicsData();
     float getMass();
     float getfriction();
-    void TransformPhysicsCoordinate(const Vec2 ps, float angle_);
+    void TransformPhysicsCoordinate(float x, float y, float w, float h , float angle_);
     void IntegrateVelocities(float delta_t);
     void ComputeForce(float delta_t, Vec2 gravity);
     void AddForce(const Vec2& f);
 
     //物理世界座標
     Vec2 position;
+    //寬高
+    Vec2 wh;
     //角速度
     float angularVelocity;
     //角度
@@ -33,3 +39,5 @@ public:
     //慣性矩，慣性矩倒數
     float I, invI;
 };
+
+#endif

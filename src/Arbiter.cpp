@@ -144,8 +144,9 @@ void Arbiter::PreStep(float inv_dt)
         Box* body1 = dynamic_cast<Box*>(this->body1);
         Box* body2 = dynamic_cast<Box*>(this->body2);
 
-        Vec2 r1 = c->position - body1->position;
-        Vec2 r2 = c->position - body2->position;
+
+        Vec2 r1 = World::ChangeToPhysicsWorld(c->position) - body1->position;
+        Vec2 r2 = World::ChangeToPhysicsWorld(c->position) - body2->position;
 
         // effective mass
         // Precompute normal mass, tangent mass, and bias.
@@ -186,9 +187,8 @@ void Arbiter::ApplyImpulse()
 
     for (int i = 0; i < numContacts; ++i)
     {
+        //get contact point
         Contact* c = contacts + i;
-
-//        fmt::print("{}: ({}, {})\n", i, contacts->position.x, contacts->position.y);
 
         c->r1 = c->position - b1->position;
         c->r2 = c->position - b2->position;
@@ -264,11 +264,12 @@ void Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
     auto bodyB = dynamic_cast<Box*>(b2);
 
     //setup
-    Vec2 hA = Vec2(bodyA->getwidth()* 0.5, bodyA->getheight() * 0.5);
-    Vec2 hB = Vec2(bodyB->getwidth()* 0.5, bodyB->getheight() * 0.5);
+    Vec2 hA = Vec2(bodyA->wh.x * 0.5, bodyA->wh.y * 0.5);
+    Vec2 hB = Vec2(bodyB->wh.x * 0.5, bodyB->wh.y * 0.5);
 
-    Vec2 posA = World::ChangeToPhysicsWorld(Vec2(bodyA->getPosition().x, bodyA->getPosition().y));
-    Vec2 posB = World::ChangeToPhysicsWorld(Vec2(bodyB->getPosition().x, bodyB->getPosition().y));
+
+    Vec2 posA = Vec2(bodyA->position.x, bodyA->position.y);
+    Vec2 posB = Vec2(bodyB->position.x, bodyB->position.y);
 
     //Rotate Matrix
     Mat22 RotA(bodyA->getRotation()), RotB(bodyB->getRotation());
@@ -439,6 +440,9 @@ void Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
             // slide contact point onto reference face (easy to cull)
             contacts[numContacts_].position = clipPoints2[i].v - separation * frontNormal;
             contacts[numContacts_].feature = clipPoints2[i].fp;
+
+//            Vec2 contactla = Vec2(contacts[numContacts_].position.x, contacts[numContacts_].position.y);
+//            fmt::print("{}: ({}, {})\n", i, World::ConvertWorldToScreen(contactla).x, World::ConvertWorldToScreen(contactla).y );
             if (axis == FACE_B_X || axis == FACE_B_Y)
                 Flip(contacts[numContacts].feature);
             ++numContacts_;

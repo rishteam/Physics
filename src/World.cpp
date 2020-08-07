@@ -5,7 +5,7 @@ bool World::warmStarting = true;
 bool World::positionCorrection = true;
 float World::width;
 float World::height;
-Vec2 World::m_center = Vec2(0, 0);
+Vec2 World::m_center = Vec2(0, 20);
 
 World::World(Vec2 gravity_, float width_, float height_)
 {
@@ -27,14 +27,20 @@ void World::Add(Shape* body)
 void World::Step(float delta_t)
 {
     float inv_dt = delta_t > 0.0f ? 1.0f / delta_t : 0.0f;
+
+    //change the physics coordinate
+    for(int i = 0; i < bodies.size(); i++)
+    {
+        Box* box = dynamic_cast<Box*>(bodies.at(i));
+        box->TransformPhysicsCoordinate(box->getPosition().x, box->getPosition().y, box->getwidth(), box->getheight(),box->getRotation());
+    }
+
     BoardPhase();
 
     // Compute forces.
     for(int i = 0; i < bodies.size(); i++)
     {
         Box* box = dynamic_cast<Box*>(bodies.at(i));
-        auto tmp = Vec2(box->getPosition().x, box->getPosition().y);
-        box->TransformPhysicsCoordinate(ChangeToPhysicsWorld(tmp), box->getRotation());
         box->ComputeForce(delta_t, gravity);
     }
 
@@ -70,12 +76,18 @@ void World::BoardPhase()
         {
             Box* box1 = dynamic_cast<Box*>(bodies.at(i));
             Box* box2 = dynamic_cast<Box*>(bodies.at(j));
+
+//            fmt::print("box1:{} {}\n",box1->position.x, box1->position.y);
+//            fmt::print("box2:{} {}\n",box2->position.x, box2->position.y);
+
             if(box1->getMass() == 0.0f && box2->getMass() == 0.0f)
                 continue;
+
             //add in Arbiter
             Arbiter newArb(bodies[i], bodies[j]);
             ArbiterKey key(bodies[i], bodies[j]);
             auto iter = arbiters.find(key);
+
 
             // collision
             if(box1->isCollide(*box2))
@@ -99,6 +111,7 @@ void World::BoardPhase()
         }
 
     }
+
 
 }
 
