@@ -5,7 +5,7 @@ bool World::warmStarting = true;
 bool World::positionCorrection = true;
 float World::width;
 float World::height;
-Vec2 World::m_center = Vec2(0, 20);
+Vec2 World::m_center = Vec2(0, 0);
 
 World::World(Vec2 gravity_, float width_, float height_)
 {
@@ -35,6 +35,7 @@ void World::Step(float delta_t)
         box->TransformPhysicsCoordinate(box->getPosition().x, box->getPosition().y, box->getwidth(), box->getheight(),box->getRotation());
     }
 
+    //Boardphase detection
     BoardPhase();
 
     // Compute forces.
@@ -44,17 +45,16 @@ void World::Step(float delta_t)
         box->ComputeForce(delta_t, gravity);
     }
 
-    //pre-step arbiter
+    //Pre-step arbiter
     for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb)
     {
         arb->second.PreStep(inv_dt);
     }
 
-    //apply impulse
+    //Apply impulse
     for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb) {
         arb->second.ApplyImpulse();
     }
-
 
     // Integrate Velocities
     for(int i = 0; i < bodies.size(); i++)
@@ -64,6 +64,8 @@ void World::Step(float delta_t)
         auto tmp2 = box->getPhysicsData();
         box->setPosition(ConvertWorldToScreen(tmp2.first));
         box->setRotation(tmp2.second);
+        box->force = Vec2(0.0f,0.0f);
+        box->torque = 0.0f;
     }
 
 }
@@ -76,9 +78,6 @@ void World::BoardPhase()
         {
             Box* box1 = dynamic_cast<Box*>(bodies.at(i));
             Box* box2 = dynamic_cast<Box*>(bodies.at(j));
-
-//            fmt::print("box1:{} {}\n",box1->position.x, box1->position.y);
-//            fmt::print("box2:{} {}\n",box2->position.x, box2->position.y);
 
             if(box1->getMass() == 0.0f && box2->getMass() == 0.0f)
                 continue;
@@ -109,10 +108,7 @@ void World::BoardPhase()
                 arbiters.erase(key);
             }
         }
-
     }
-
-
 }
 
 Vec2 World::ChangeToPhysicsWorld(const Vec2& ps)

@@ -144,9 +144,8 @@ void Arbiter::PreStep(float inv_dt)
         Box* body1 = dynamic_cast<Box*>(this->body1);
         Box* body2 = dynamic_cast<Box*>(this->body2);
 
-
-        Vec2 r1 = World::ChangeToPhysicsWorld(c->position) - body1->position;
-        Vec2 r2 = World::ChangeToPhysicsWorld(c->position) - body2->position;
+        Vec2 r1 = c->position - body1->position;
+        Vec2 r2 = c->position - body2->position;
 
         // effective mass
         // Precompute normal mass, tangent mass, and bias.
@@ -441,8 +440,6 @@ void Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
             contacts[numContacts_].position = clipPoints2[i].v - separation * frontNormal;
             contacts[numContacts_].feature = clipPoints2[i].fp;
 
-//            Vec2 contactla = Vec2(contacts[numContacts_].position.x, contacts[numContacts_].position.y);
-//            fmt::print("{}: ({}, {})\n", i, World::ConvertWorldToScreen(contactla).x, World::ConvertWorldToScreen(contactla).y );
             if (axis == FACE_B_X || axis == FACE_B_Y)
                 Flip(contacts[numContacts].feature);
             ++numContacts_;

@@ -11,6 +11,9 @@
 #include "Circle.h"
 #include "Polygon.h"
 
+#include "imgui.h"
+#include "imgui-SFML.h"
+
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define UNIT 1
@@ -115,10 +118,11 @@ void rotate()
 int main()
 {
     window.setFramerateLimit(60);
+    ImGui::SFML::Init(window);
     World world(Vec2(0.0, -9.8), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
     //Shape objects
-    Shape *box = new Box(400, 300, 600, 100, MAX_float);
-    Shape *box2 = new Box(400, 200, 50, 25, 1000);
+    Shape *box = new Box(400, 500, 800, 100, MAX_float);
+    Shape *box2 = new Box(400, 200, 50, 25, 1000000000);
     Shape *cir = new Circle(300, 300, 100);
     Shape *cir2 = new Circle(200, 200, 100);
     std::deque<Vec2> tmp;
@@ -137,6 +141,11 @@ int main()
     world.Add(box);
     world.Add(box2);
 
+
+
+
+
+    sf::Clock deltaClock;
     // run the program as long as the window is open
     while (window.isOpen())
     {
@@ -144,6 +153,8 @@ int main()
         sf::Event event;
         while (window.pollEvent(event))
         {
+            ImGui::SFML::ProcessEvent(event);
+
             if (event.type == sf::Event::Closed)
                 window.close();
             if (event.type == sf::Event::Resized)
@@ -174,6 +185,17 @@ int main()
             }
         }
 
+        ImGui::SFML::Update(window, deltaClock.restart());
+
+        ImGui::Begin("New object ");
+        if (ImGui::Button("click new object"))
+        {
+            float tmp_x = randomint(0, 800), tmp_y = 100, tmp_w = 25, tmp_h = 25 , tmp_mass = 100;
+            Shape *new_box = new Box(tmp_x, tmp_y, tmp_w, tmp_h, tmp_mass);
+            world.Add(new_box);
+        }
+        ImGui::End();
+
         world.Step(world.timeStep);
 
         // keyboard_move(poly2, cir);
@@ -183,6 +205,7 @@ int main()
         // clear screen
         window.clear(sf::Color::Black);
         draw_obj(world);
+        ImGui::SFML::Render(window);
         window.display();
     }
 }
