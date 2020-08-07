@@ -85,17 +85,17 @@ void Arbiter::ComputeIncidentEdge(ClipVertex *c, const Vec2& h, const Vec2& pos,
 }
 
 // update the arbiter and calculate the pulse
-void Arbiter::update(Contact* contacts, int numContacts_)
+void Arbiter::update(Contact* newContacts, int numContacts_)
 {
     Contact mergedContacts[2];
 
     for(int i = 0; i < numContacts_; i++)
     {
-        Contact* cNew = &contacts[i];
+        Contact* cNew = newContacts + i;
         int k = -1;
         for (int j = 0; j < numContacts_; ++j)
         {
-            Contact* cOld = &contacts[j];
+            Contact* cOld = contacts + j;
             if (cNew->feature.value == cOld->feature.value)
             {
                 k = j;
@@ -123,7 +123,7 @@ void Arbiter::update(Contact* contacts, int numContacts_)
         }
         else
         {
-            mergedContacts[i] = contacts[i];
+            mergedContacts[i] = newContacts[i];
         }
     }
 

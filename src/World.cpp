@@ -109,6 +109,8 @@ void World::BoardPhase()
             }
         }
     }
+    fmt::print("{}\n", arbiters.size());
+
 }
 
 Vec2 World::ChangeToPhysicsWorld(const Vec2& ps)

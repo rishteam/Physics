@@ -122,7 +122,7 @@ int main()
     World world(Vec2(0.0, -9.8), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
     //Shape objects
     Shape *box = new Box(400, 500, 800, 100, MAX_float);
-    Shape *box2 = new Box(400, 200, 50, 25, 1000000000);
+    Shape *box2 = new Box(400, 200, 50, 50, 10);
     Shape *cir = new Circle(300, 300, 100);
     Shape *cir2 = new Circle(200, 200, 100);
     std::deque<Vec2> tmp;
