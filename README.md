@@ -1,8 +1,21 @@
-# SAT_collision
+# Physics
 
-## SAT-碰撞範例
+## Collision detection
 
-- 共筆
-    - https://hackmd.io/bo-sYg9TQhyGgpWfJoWC2Q?view
-- ref
-    - http://davidhsu666.com/archives/gamecollisiondetection/#no1
+* Board-phase
+	* AABB
+	* Quad-tree(TODO)
+
+* narrow-phase
+	* SAT(Separate-Axis-Theorem)
+	* GJK(Gilbert–Johnson–Keerthi)(TODO)
+
+
+## Physics parameter
+
+* modify box2d(coordinate transform), box2d-lite(physics detail)
+
+## Note
+- https://hackmd.io/bo-sYg9TQhyGgpWfJoWC2Q?view
+
+
