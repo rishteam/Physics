@@ -1,8 +1,4 @@
-#ifndef Box_H
-#define Box_H
-
-#include <deque>
-
+#pragma once
 #include "Shape.h"
 #include "Physics.h"
 
@@ -19,10 +15,9 @@ public:
     float getwidth();
     float getheight();
 
-    virtual bool isCollide(Shape &s) override
-    {
-        return s.isCollide(*this);
-    }
+    virtual Vec2 supportPoint(Vec2 D) override;
+
+    virtual bool isCollide(Shape &s) override;
     virtual bool isCollide(Polygon &s) override;
     virtual bool isCollide(Circle &c) override;
     virtual bool isCollide(Box &b) override;
@@ -39,5 +34,3 @@ private:
     float _w;
     float _h;
 };
-
-#endif

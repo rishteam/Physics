@@ -13,6 +13,8 @@ public:
     Polygon(std::deque<Vec2> &pt, Vec2 pos);
     ~Polygon() = default;
     void setVertices();
+
+    virtual Vec2 supportPoint(Vec2 D) override;
     virtual bool isCollide(Shape &s) override
     {
         return s.isCollide(*this);

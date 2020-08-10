@@ -25,3 +25,12 @@ void Shape::findSAT()
     Vec2 tmp2((Vertices[0].x - Vertices[total_pt - 1].x), (Vertices[0].y - Vertices[total_pt - 1].y));
     this->SAT.push_back(tmp2.normalL());
 }
+
+Vec2 Shape::SupportFun(Shape &A, Shape &B, Vec2 D)
+{
+    Vec2 PA = A.supportPoint(D);
+    Vec2 PB = B.supportPoint(-D);
+
+    return PA - PB;
+}
+

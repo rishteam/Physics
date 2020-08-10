@@ -42,6 +42,18 @@ public:
      */
     ~Vec2() = default;
 
+    /**
+    * @brief Two point calculate Vector
+    */
+    Vec2(Vec2 a, Vec2 b)
+    {
+        x = b.x - a.x;
+        y = b.y - a.y;
+    }
+
+    /**
+   * @brief Reverse Vector
+   */
     Vec2 operator - ()  {
         Vec2 v;
         v.x = -x;
@@ -53,6 +65,15 @@ public:
     {
         x = v.x; y = v.y;
     }
+
+    Vec2 operator + (const Vec2& v)  {
+        return Vec2(x + v.x, y + v.y);
+    }
+
+    Vec2 operator - (const Vec2& v)  {
+        return Vec2(x - v.x, y - v.y);
+    }
+
     void operator += (const Vec2& v)
     {
         x += v.x; y += v.y;
@@ -67,35 +88,50 @@ public:
     {
         x *= a; y *= a;
     }
+    /**
+    * @brief set Vector
+    */
     void Set(float x_, float y_) { x = x_; y = y_; }
     /**
-     * @brief 印出向量
+     * @brief debug print
      */
     void print_Vector();
     /**
-     * @brief 獲得向量長度
+     * @brief get length of vector
      */
     float getLength();
     /**
-     * @brief 計算兩向量內積
-     * @param vec2 另一個向量
-     * @retval float 內積結果
+     * @brief vector dot
      */
     float dot(Vec2 &vec2);
     /**
      * @brief 計算vec在vec2上的正射影(投影長)
-     * @param vec2 另一個向量
-     * @retval float 投影長
      */
     float projectLengthOnto(Vec2 &vec2);
     /**
-     * @brief 計左法向量
+     * @brief 左法向量
      */
     Vec2 normalL();
     /**
      * @brief 右法向量
      */
     Vec2 normalR();
+    /**
+     * @brief 向量放大
+     */
+    void Times(float K){
+        x *= K;
+        y *= K;
+    }
+    /**
+    * @brief 確認是否兩項量夾角大於90度，是否同邊
+    */
+    bool AtTheSameSide(Vec2 A){
+        // vec is same side with A or not
+        if( x * A.y - y * A.x > 0.0f)
+            return true;
+        return false;
+    }
     /**
      * @brief 旋轉
      * @param angle 旋轉角度(徑度)
@@ -112,8 +148,8 @@ public:
      * @retval float 旋轉過後的向量
      */
     void rotate_ref(float angle, Vec2 &ref);
-
 };
+
 
 std::pair<float, float> getMinMax(Vec2 &axis, std::deque<Vec2> corner);
 int randomint(int min, int max);

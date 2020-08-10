@@ -16,6 +16,13 @@ float Circle::get_radius()
     return radius;
 }
 
+Vec2 Circle::supportPoint(Vec2 D){
+    float K = sqrt(radius * radius/(D.x * D.x + D.y * D.y));
+    D.Times(K);
+    Vec2 m_center = Vec2(this->getPosition().x, this->getPosition().y);
+    return m_center + Vec2(D.x, D.y);
+}
+
 void Circle::set_debug_draw()
 {
     circle.setPosition(this->getPosition().x - radius, this->getPosition().y - radius);

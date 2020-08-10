@@ -5,6 +5,7 @@ bool World::warmStarting = true;
 bool World::positionCorrection = true;
 float World::width;
 float World::height;
+COLLISION World::collision_type = COLLISION::GJK;
 Vec2 World::m_center = Vec2(0, 0);
 
 World::World(Vec2 gravity_, float width_, float height_)
@@ -109,7 +110,7 @@ void World::BoardPhase()
             }
         }
     }
-    fmt::print("{}\n", arbiters.size());
+//    fmt::print("{}\n", arbiters.size());
 
 }
 

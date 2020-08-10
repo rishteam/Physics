@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(SAT_COLLISION)
+project(Physcis)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE Debug) # Debug Release
@@ -13,7 +13,7 @@ set(CMAKE_BUILD_TYPE Debug) # Debug Release
 
 
 # Add executable
-add_executable(SAT_COLLISION
+add_executable(Physics
     src/main.cpp
     src/Box.cpp
     src/Shape.cpp
@@ -26,7 +26,7 @@ add_executable(SAT_COLLISION
         src/Arbiter.cpp
         src/Vclip.cpp)
 
-target_include_directories(SAT_COLLISION
+target_include_directories(Physics
     PRIVATE ${PROJECT_SOURCE_DIR}/include
 )
 
@@ -35,7 +35,7 @@ set(SFML_DIR "/mingw32/lib/cmake/SFML")
 
 # Add SFML
 find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)
-target_link_libraries(SAT_COLLISION
+target_link_libraries(Physics
     sfml-system sfml-window sfml-graphics sfml-network sfml-audio
 )
 
@@ -44,7 +44,7 @@ find_package(ImGui-SFML REQUIRED)
 if(NOT ImGui-SFML_FOUND)
     message(FATAL_ERROR "ImGui-SFML not found")
 endif()
-target_link_libraries(SAT_COLLISION
+target_link_libraries(Physics
     ImGui-SFML::ImGui-SFML
 )
 
@@ -53,10 +53,10 @@ find_package(OpenGL REQUIRED)
 if(NOT OpenGL_FOUND)
     message(FATAL_ERROR "OpenGL not found")
 endif()
-target_include_directories(SAT_COLLISION
+target_include_directories(Physics
     PUBLIC ${OPENGL_INCLUDE_DIRS}
 )
-target_link_libraries(SAT_COLLISION
+target_link_libraries(Physics
     ${OPENGL_LIBRARIES}
 )
 
@@ -65,6 +65,6 @@ find_package(fmt REQUIRED)
 if(NOT fmt_FOUND)
     message(FATAL_ERROR "fmt not found")
 endif()
-target_link_libraries(SAT_COLLISION
+target_link_libraries(Physics
     fmt::fmt
 )

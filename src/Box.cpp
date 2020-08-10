@@ -20,7 +20,7 @@ Box::Box(float x, float y, float w, float h, float m)
 
 void Box::set_debug_draw()
 {
-    sf::Color color(255, 0, 0);
+    sf::Color color(255, 0, 0, 122);
     int cnt = Vertices.size();
     polygon.setPointCount(cnt);
     this->setVertices();
@@ -77,6 +77,90 @@ float Box::getwidth()
 float Box::getheight()
 {
     return _h;
+}
+
+Vec2 Box::supportPoint(Vec2 D)
+{
+    this->setVertices();
+
+    Vec2 MAXP = Vertices[0];
+    float MAXN = MAXP.dot(D);
+
+    for(int i = 1 ; i < 4 ; i++ ){
+        Vec2 P = Vertices[i];
+        float tmpF = P.dot(D);
+        if( tmpF > MAXN ){
+            MAXN =tmpF;
+            MAXP = P;
+        }
+    }
+    return MAXP;
+}
+
+bool Box::isCollide(Shape &s)
+{
+    if (World::collision_type == COLLISION::SAT)
+    {
+        return s.isCollide(*this);
+    }
+    else if(World::collision_type == COLLISION::GJK)
+    {
+        int PointNum = 0;
+        Vec2 Simplex[3];
+        Vec2 A_center(this->getPosition().x, this->getPosition().y);
+        Vec2 B_center(s.getPosition().x, s.getPosition().y);
+        Vec2 D(A_center, B_center);
+        if( D.x == 0 && D.y == 0 )
+        {
+            D = Vec2(1.0f, 0.0f);
+        }
+        Simplex[PointNum++] = SupportFun(*this, s, D);
+        Simplex[PointNum++] = SupportFun(*this, s, -D);
+
+        while( true ) {
+            Vec2 V(Simplex[0], Simplex[1]);
+            if (V.AtTheSameSide(-Vec2(Simplex[0]))) {
+                D = Vec2(-V.y, V.x);
+            } else {
+                D = Vec2(V.y, -V.x);
+            }
+
+            Simplex[PointNum++] = SupportFun(*this, s, D);
+
+            if (Simplex[2].dot(D) < 0) {
+                return false;
+            }
+
+            Vec2 AB(Simplex[2], Simplex[1]);
+            Vec2 AC(Simplex[2], Simplex[0]);
+
+            Vec2 DAB, DAC;
+            if (AB.AtTheSameSide(-Vec2(Simplex[2]))) {
+                DAB = Vec2(-AB.y, AB.x);
+            } else {
+                DAB = Vec2(AB.y, -AB.x);
+            }
+
+            if (AC.AtTheSameSide(-Vec2(Simplex[2])))
+                DAC = Vec2(-AC.y, AC.x);
+            else DAC = Vec2(AC.y, -AC.x);
+
+            if (DAB.dot(AC) >= 0.0f) {
+                if (DAC.dot(AB) >= 0.0f)
+                    return true;
+                Simplex[1] = Simplex[2];
+                PointNum--;
+                continue;
+            }
+            if (DAC.dot(AB) >= 0.0f) {
+                Simplex[0] = Simplex[2];
+                PointNum--;
+                continue;
+            }
+            return false;
+        }
+    }
+    return false;
 }
 
 

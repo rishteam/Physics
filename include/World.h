@@ -11,6 +11,11 @@
 class ArbiterKey;
 class Arbiter;
 
+enum class COLLISION {
+    SAT,
+    GJK
+};
+
 class World
 {
 public:
@@ -29,6 +34,7 @@ public:
     static Vec2 ConvertWorldToScreen(const Vec2& pw);
 
     Vec2 gravity;
+    static COLLISION collision_type;
     static bool accumulateImpulses;
     static bool warmStarting;
     static bool positionCorrection;
@@ -37,6 +43,8 @@ public:
     static Vec2 m_center;
     float timeStep = 1.0 / 60.0f;
     int iterations = 10;
+
+//    QuadTree QT;
     std::vector<Shape*> bodies;
     std::map<ArbiterKey, Arbiter> arbiters;
 

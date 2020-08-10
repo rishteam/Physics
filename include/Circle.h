@@ -12,6 +12,8 @@ public:
     Circle(float x, float y, float radius_);
     ~Circle() = default;
     float get_radius();
+
+    virtual Vec2 supportPoint(Vec2 D) override;
     virtual bool isCollide(Shape &s) override
     {
         return s.isCollide(*this);

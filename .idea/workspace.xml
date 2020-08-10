@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="Physcis" targetName="Physics" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ee5b9e61-eebb-42ec-8a09-272d3c8b0cc7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/Physics.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/SAT_collision.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/c_cpp_properties.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Box.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Box.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Circle.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Circle.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Polygon.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Polygon.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Shape.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Shape.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/World.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/World.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/vector_math.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/vector_math.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Box.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/Box.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Circle.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/Circle.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Polygon.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/Polygon.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Shape.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shape.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/World.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/World.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1fr3kt6uScq973YkIWz3ajlAXKn" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="settings.editor.selected.configurable" value="preferences.general" />
+  </component>
+  <component name="RunManager">
+    <configuration name="Physics" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Physcis" TARGET_NAME="Physics" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Physcis" RUN_TARGET_NAME="Physics">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ee5b9e61-eebb-42ec-8a09-272d3c8b0cc7" name="Default Changelist" comment="" />
+      <created>1596962531385</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1596962531385</updated>
+      <workItem from="1596962545072" duration="23970000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="2660" y="295" key="FileChooserDialogImpl" timestamp="1596962623508">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2660" y="295" key="FileChooserDialogImpl/0.0.1536.834/1920.0.1920.1080@1920.0.1920.1080" timestamp="1596962623508" />
+    <state width="1877" height="295" key="GridCell.Tab.0.bottom" timestamp="1597067388434">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="295" key="GridCell.Tab.0.bottom/0.0.1536.834/1920.0.1920.1080@1920.0.1920.1080" timestamp="1597067388434" />
+    <state width="1877" height="295" key="GridCell.Tab.0.center" timestamp="1597067388434">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="295" key="GridCell.Tab.0.center/0.0.1536.834/1920.0.1920.1080@1920.0.1920.1080" timestamp="1597067388434" />
+    <state width="1877" height="295" key="GridCell.Tab.0.left" timestamp="1597067388434">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="295" key="GridCell.Tab.0.left/0.0.1536.834/1920.0.1920.1080@1920.0.1920.1080" timestamp="1597067388434" />
+    <state width="1877" height="295" key="GridCell.Tab.0.right" timestamp="1597067388434">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="295" key="GridCell.Tab.0.right/0.0.1536.834/1920.0.1920.1080@1920.0.1920.1080" timestamp="1597067388434" />
+    <state x="-1039" y="604" key="SettingsEditor" timestamp="1596980017135">
+      <screen x="-1080" y="0" width="1080" height="1920" />
+    </state>
+    <state x="-1039" y="604" key="SettingsEditor/0.0.1536.834/-1080.0.1080.1920@-1080.0.1080.1920" timestamp="1596980017135" />
+    <state x="2489" y="154" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1597064778784">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2489" y="154" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1536.834/1920.0.1920.1080@1920.0.1920.1080" timestamp="1597064778784" />
+    <state x="2536" y="250" key="run.anything.popup" timestamp="1597045671737">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2536" y="250" key="run.anything.popup/0.0.1536.834/1920.0.1920.1080@1920.0.1920.1080" timestamp="1597045671737" />
+    <state x="2543" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1597041676856">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2543" y="235" width="672" height="678" key="search.everywhere.popup/0.0.1536.834/1920.0.1920.1080@1920.0.1920.1080" timestamp="1597041676856" />
+  </component>
+</project>

@@ -1,21 +1,27 @@
 #pragma once
 
 #include "vector_math.h"
-
+#include <deque>
 
 //include object
 class Circle;
 class Polygon;
 class Box;
+class World;
+enum class COLLISION;
 
 class Shape : public sf::Transformable, public sf::Drawable
 {
 public:
+    //for SAT
     std::deque<Vec2> getSAT() const;
     std::deque<Vec2> getVertices() const;
     void findSAT();
-    //算出SAT實際的點
     virtual void setVertices(){};
+
+    Vec2 SupportFun(Shape &A, Shape &B, Vec2 D);
+    virtual Vec2 supportPoint(Vec2 D) = 0;
+
     virtual bool isCollide(Shape &s) = 0;
     virtual bool isCollide(Box &b) = 0;
     virtual bool isCollide(Polygon &p) = 0;

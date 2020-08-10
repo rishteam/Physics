@@ -24,7 +24,7 @@ double timer = 0;
 int cnt = 220;
 int cnt2 = 0;
 
-sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH,  WINDOW_HEIGHT), "physics(SAT) example");
+sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH,  WINDOW_HEIGHT), "Physics");
 std::vector <Shape*> obj;
 
 
@@ -119,6 +119,8 @@ int main()
 {
     window.setFramerateLimit(60);
     ImGui::SFML::Init(window);
+    sf::Clock deltaClock;
+
     World world(Vec2(0.0, -9.8), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
     //Shape objects
     Shape *box = new Box(400, 500, 800, 100, MAX_float);
@@ -142,10 +144,6 @@ int main()
     world.Add(box2);
 
 
-
-
-
-    sf::Clock deltaClock;
     // run the program as long as the window is open
     while (window.isOpen())
     {

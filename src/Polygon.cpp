@@ -46,6 +46,25 @@ void Polygon::setVertices()
     }
 }
 
+Vec2 Polygon::supportPoint(Vec2 D){
+
+    this->setVertices();
+    Vec2 MAXP = Vertices[0];
+    float MAXN = MAXP.dot(D);
+
+    for(int i = 1 ; i < Vertices.size() ; i++ )
+    {
+        float tmp = Vertices[i].dot(D);
+        if( tmp > MAXN )
+        {
+            MAXN = tmp;
+            MAXP = Vertices[i];
+        }
+    }
+    return MAXP;
+}
+
+
 bool Polygon::isCollide(Polygon &p)
 {
     this->setVertices();
