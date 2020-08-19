@@ -9,14 +9,6 @@ Physics::Physics(){
     torque = 0;
 }
 
-void Physics::print_Physics_info()
-{
-    fmt::print("[Physics]\nVelocity:\n");
-    velocity.print_Vector();
-    fmt::print("mass: {}\n", mass);
-    fmt::print("angularVelocity: {}\n", angularVelocity);
-}
-
 std::pair<Vec2, float> Physics::getPhysicsData()
 {
     return std::make_pair(position, angle);
@@ -25,6 +17,11 @@ std::pair<Vec2, float> Physics::getPhysicsData()
 float Physics::getMass()
 {
     return mass;
+}
+
+Vec2 Physics::getwh()
+{
+    return wh;
 }
 
 float Physics::getfriction()
@@ -40,15 +37,14 @@ void Physics::AddForce(const Vec2& f)
 
 void Physics::TransformPhysicsCoordinate(float x, float y, float w, float h, float angle_)
 {
-//    this->position = ps;
     Vec2 ul = World::ChangeToPhysicsWorld(Vec2(x - w/2, y - h/2));
     Vec2 ur = World::ChangeToPhysicsWorld(Vec2(x + w/2, y - h/2));
     Vec2 dl = World::ChangeToPhysicsWorld(Vec2(x - w/2, y + h/2));
     Vec2 dr = World::ChangeToPhysicsWorld(Vec2(x + w/2, y + h/2));
 
-    position = World::ChangeToPhysicsWorld(Vec2(x,y));
+    position = World::ChangeToPhysicsWorld(Vec2(x, y));
     wh = Vec2(ur.x - ul.x, ur.y - dr.y);
-    this->angle = angle_;
+    this->angle = -degreesToRadians(angle_);
 }
 
 void Physics::ComputeForce(float delta_t, Vec2 gravity)

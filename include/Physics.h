@@ -9,8 +9,8 @@ class Physics
 public:
     Physics();
     ~Physics() = default;
-    void print_Physics_info();
     std::pair<Vec2, float> getPhysicsData();
+    Vec2 getwh();
     float getMass();
     float getfriction();
     void TransformPhysicsCoordinate(float x, float y, float w, float h , float angle_);

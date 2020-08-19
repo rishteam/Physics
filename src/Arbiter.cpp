@@ -13,75 +13,9 @@ Arbiter::Arbiter(Shape* b1, Shape* b2)
         body2 = b1;
     }
 
-    calContactPoints(this->contacts, b1, b2);
+    numContacts = calContactPoints(this->contacts, b1, b2);
 
     friction = sqrtf( dynamic_cast<Box*>(body1)->getfriction() * dynamic_cast<Box*>(body2)->getfriction());
-}
-
-void Arbiter::ComputeIncidentEdge(ClipVertex *c, const Vec2& h, const Vec2& pos,
-                                       const Mat22& Rot, const Vec2& normal)
-
-{
-   // The normal is from the reference box. Convert it
-   // to the incident boxe's frame and flip sign.
-   Mat22 RotT = Rot.Transpose();
-   // n is inverse of reference face vector
-   // -normal * RotT
-   Vec2 n = -(RotT * normal);
-   // change positive
-   Vec2 nAbs = Abs(n);
-
-   if (nAbs.x > nAbs.y)
-   {
-       if (Sign(n.x) > 0.0f)
-       {
-           //V_4
-           c[0].v.Set(h.x, -h.y);
-           c[0].fp.e.inEdge2 = EDGE3;
-           c[0].fp.e.outEdge2 = EDGE4;
-           //V_1
-           c[1].v.Set(h.x, h.y);
-           c[1].fp.e.inEdge2 = EDGE4;
-           c[1].fp.e.outEdge2 = EDGE1;
-       }
-       else
-       {
-           //V_2
-           c[0].v.Set(-h.x, h.y);
-           c[0].fp.e.inEdge2 = EDGE1;
-           c[0].fp.e.outEdge2 = EDGE2;
-           //V_3
-           c[1].v.Set(-h.x, -h.y);
-           c[1].fp.e.inEdge2 = EDGE2;
-           c[1].fp.e.outEdge2 = EDGE3;
-       }
-   }
-   else
-   {
-       if (Sign(n.y) > 0.0f)
-       {
-           c[0].v.Set(h.x, h.y);
-           c[0].fp.e.inEdge2 = EDGE4;
-           c[0].fp.e.outEdge2 = EDGE1;
-
-           c[1].v.Set(-h.x, h.y);
-           c[1].fp.e.inEdge2 = EDGE1;
-           c[1].fp.e.outEdge2 = EDGE2;
-       }
-       else
-       {
-           c[0].v.Set(-h.x, -h.y);
-           c[0].fp.e.inEdge2 = EDGE2;
-           c[0].fp.e.outEdge2 = EDGE3;
-
-           c[1].v.Set(h.x, -h.y);
-           c[1].fp.e.inEdge2 = EDGE3;
-           c[1].fp.e.outEdge2 = EDGE4;
-       }
-   }
-   //旋轉和轉換clip點到original vertex position
-   c[0].v = pos + Rot * c[0].v;
-   c[1].v = pos + Rot * c[1].v;
 }
 
 // update the arbiter and calculate the pulse
@@ -93,7 +27,7 @@ void Arbiter::update(Contact* newContacts, int numContacts_)
     {
         Contact* cNew = newContacts + i;
         int k = -1;
-        for (int j = 0; j < numContacts_; ++j)
+        for (int j = 0; j < numContacts; ++j)
         {
             Contact* cOld = contacts + j;
             if (cNew->feature.value == cOld->feature.value)
@@ -127,7 +61,7 @@ void Arbiter::update(Contact* newContacts, int numContacts_)
         }
     }
 
-    for (int i = 0; i < numContacts; ++i)
+    for (int i = 0; i < numContacts_; ++i)
         contacts[i] = mergedContacts[i];
 
     this->numContacts = numContacts_;
@@ -256,7 +190,7 @@ void Arbiter::ApplyImpulse()
     }
 }
 
-void Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
+int Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
 {
     //get the box
     auto bodyA = dynamic_cast<Box*>(b1);
@@ -271,8 +205,8 @@ void Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
     Vec2 posB = Vec2(bodyB->position.x, bodyB->position.y);
 
     //Rotate Matrix
-    Mat22 RotA(bodyA->getRotation()), RotB(bodyB->getRotation());
-
+//    Mat22 RotA(degreesToRadians(360 - bodyA->getRotation())), RotB(degreesToRadians(360 -bodyB->getRotation()));
+    Mat22 RotA(bodyA->getPhysicsData().second), RotB(bodyB->getPhysicsData().second);
     //Transpose Matrix
     Mat22 RotAT = RotA.Transpose();
     Mat22 RotBT = RotB.Transpose();
@@ -339,7 +273,7 @@ void Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
     Vec2 frontNormal, sideNormal;
     //與人碰撞的edge
     // Vec2 v; (點點)
-    // FeaturePair fp; (點點夾的兩邊)
+    FeaturePair fp; //(點點夾的兩邊)
     ClipVertex incidentEdge[2];
     float front, negSide, posSide;
     char negEdge, posEdge;
@@ -416,13 +350,15 @@ void Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
 
     // Clip to box side 1
     // 先測試negtive-side，決定候選點
-    ClipSegmentToLine(clipPoints1, incidentEdge, -sideNormal, negSide, negEdge);
-
+    np = ClipSegmentToLine(clipPoints1, incidentEdge, -sideNormal, negSide, negEdge);
+    if (np < 2)
+        return 0;
 
     // Clip to negative box side 1
     // 再放入positive-side，進行第二次的過濾
-    ClipSegmentToLine(clipPoints2, clipPoints1, sideNormal, posSide, posEdge);
-
+    np = ClipSegmentToLine(clipPoints2, clipPoints1, sideNormal, posSide, posEdge);
+    if (np < 2)
+        return 0;
 
     // Now clipPoints2 contains the clipping points.
     // Due to roundoff, it is possible that clipping removes all points.
@@ -441,9 +377,9 @@ void Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
             contacts[numContacts_].feature = clipPoints2[i].fp;
 
             if (axis == FACE_B_X || axis == FACE_B_Y)
-                Flip(contacts[numContacts].feature);
+                Flip(contacts[numContacts_].feature);
             ++numContacts_;
         }
     }
-    this->numContacts = numContacts_;
+    return numContacts_;
 }

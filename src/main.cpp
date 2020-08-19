@@ -24,6 +24,7 @@ double timer = 0;
 int cnt = 220;
 int cnt2 = 0;
 
+World world(Vec2(0.0, -9.8), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
 sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH,  WINDOW_HEIGHT), "Physics");
 std::vector <Shape*> obj;
 
@@ -85,9 +86,24 @@ void draw_obj(World& world)
     for(auto &obj : world.bodies)
     {
         obj->set_debug_draw();
-//        fmt::print("{}: ({}, {})\n", idx++, obj->getPosition().x, obj->getPosition().y);
         window.draw(*obj);
     }
+
+    for (auto iter = world.arbiters.begin(); iter != world.arbiters.end(); ++iter)
+    {
+        const Arbiter& arbiter = iter->second;
+        for (int i = 0; i < arbiter.numContacts; ++i)
+        {
+            sf::CircleShape circle;
+            Vec2 p = arbiter.contacts[i].position;
+            Vec2 w = World::ConvertWorldToScreen(p);
+            circle.setPosition(w.x - 3, w.y - 3);
+            circle.setRadius(3);
+            circle.setFillColor(sf::Color::White);
+            window.draw(circle);
+        }
+    }
+
 }
 
 
@@ -114,6 +130,57 @@ void rotate()
         cnt2 -= 1;
 }
 
+void demo1()
+{
+    world.Clear();
+    Shape *floor = new Box(400, 500, 800, 100, MAX_float);
+    Shape *box2 = new Box(400, 300, 30, 30, 100);
+    box2->rotate(30);
+    world.Add(floor);
+    world.Add(box2);
+}
+
+void demo2()
+{
+    world.Clear();
+    Shape *skew = new Box(200, 300, 300, 100, MAX_float);
+    skew->rotate(30);
+    world.Add(skew);
+
+    Shape *floor = new Box(400, 500, 800, 100, MAX_float);
+    world.Add(floor);
+
+
+    float friction[5] = {0.75f, 0.5f, 0.35f, 0.1f, 0.0f};
+    for (int i = 0; i < 5; ++i)
+    {
+        Shape *tmp = new Box(100*(float)i, 20, 30, 30, 10);
+        Box* box = dynamic_cast<Box*>(tmp);
+        box->friction = friction[i];
+        world.Add(box);
+    }
+//    Shape *tmp = new Box(200, 20, 30, 30, 10);
+//    Box* box = dynamic_cast<Box*>(tmp);
+//    box->friction = friction[2];
+//    world.Add(box);
+}
+
+void demo3()
+{
+    world.Clear();
+    Shape *floor = new Box(400, 500, 800, 100, MAX_float);
+    world.Add(floor);
+
+    for(int i = 0; i < 10; ++i)
+    {
+        float idx = i*70;
+        Shape *tmp = new Box(80 + idx, 400, 50, 50, 100);
+        Box* box = dynamic_cast<Box*>(tmp);
+        box->friction =0.5;
+        world.Add(box);
+    }
+}
+
 
 int main()
 {
@@ -121,10 +188,7 @@ int main()
     ImGui::SFML::Init(window);
     sf::Clock deltaClock;
 
-    World world(Vec2(0.0, -9.8), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
     //Shape objects
-    Shape *box = new Box(400, 500, 800, 100, MAX_float);
-    Shape *box2 = new Box(400, 200, 50, 50, 10);
     Shape *cir = new Circle(300, 300, 100);
     Shape *cir2 = new Circle(200, 200, 100);
     std::deque<Vec2> tmp;
@@ -139,10 +203,6 @@ int main()
     tmp2.push_back({0, 100});
     tmp2.push_back({250, 50});
     Shape *poly2 = new Polygon(tmp2, Vec2(200, 200));
-
-    world.Add(box);
-    world.Add(box2);
-
 
     // run the program as long as the window is open
     while (window.isOpen())
@@ -174,28 +234,79 @@ int main()
             }
             if (event.type == sf::Event::MouseButtonPressed)
             {
-                if (event.mouseButton.button == sf::Mouse::Left)
-                {
-                    std::cout << "the right button was pressed" << std::endl;
-                    std::cout << "mouse x: " << event.mouseButton.x << std::endl;
-                    std::cout << "mouse y: " << event.mouseButton.y << std::endl;
-                }
+                std::cout << "the right button was pressed" << std::endl;
+                std::cout << "mouse x: " << event.mouseButton.x << std::endl;
+                std::cout << "mouse y: " << event.mouseButton.y << std::endl;
             }
         }
 
-        ImGui::SFML::Update(window, deltaClock.restart());
 
-        ImGui::Begin("New object ");
-        if (ImGui::Button("click new object"))
+        //Render IMGUI
+        ImGui::SFML::Update(window, deltaClock.restart());
+        ImGui::Begin("Debug");
+
+        if (ImGui::Button("New box"))
         {
-            float tmp_x = randomint(0, 800), tmp_y = 100, tmp_w = 25, tmp_h = 25 , tmp_mass = 100;
+            float tmp_x = randomint(0, 800), tmp_y = 100, tmp_w = 50, tmp_h = 50 , tmp_mass = 100;
             Shape *new_box = new Box(tmp_x, tmp_y, tmp_w, tmp_h, tmp_mass);
             world.Add(new_box);
         }
+        ImGui::SameLine();
+        if (ImGui::Button("clear"))
+        {
+            world.Clear();
+        }
+
+        static bool f_keepSimulate = true;
+        ImGui::Checkbox("Keep Simulate", &f_keepSimulate);
+
+        if (ImGui::CollapsingHeader("Box's Data"))
+        {
+            for(int i = 0; i < world.bodies.size(); i++)
+            {
+                Box* box = dynamic_cast<Box*>(world.bodies.at(i));
+                ImGui::Text("Box%d:", i);
+                ImGui::Text("[Physics] Center: (%f, %f)", box->getPhysicsData().first.x, box->getPhysicsData().first.y);
+                ImGui::Text("[Physics] width:%f, height:%f", box->getwh().x, box->getwh().y);
+                ImGui::Text("[Physics] mass: %f", box->getMass());
+                ImGui::Text("[Physics] angle: %f", box->getPhysicsData().second );
+                ImGui::Text("[Physics] friction: %f", box->getfriction());
+                ImGui::Text("[Screen] Center: (%f, %f)", box->getPosition().x, box->getPosition().y);
+                ImGui::Text("[Screen] Angle: %f", radiansToDegrees(box->getRotation()));
+                ImGui::Separator();
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Arbiters"))
+        {
+            ImGui::Text("Arbiters size: %d", world.arbiters.size());
+            for(auto arbiter : world.arbiters)
+            {
+                ImGui::Text("Arbiters: Contact %d", arbiter.second.numContacts);
+                ImGui::Separator();
+            }
+        }
         ImGui::End();
 
-        world.Step(world.timeStep);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+        {
+            demo1();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+        {
+            demo2();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+        {
+            demo3();
+        }
 
+        if(f_keepSimulate || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+        {
+            world.Step(world.timeStep);
+        }
+
+        // OLD
         // keyboard_move(poly2, cir);
         // judge();
         // rotate();
