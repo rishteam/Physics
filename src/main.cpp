@@ -306,7 +306,6 @@ int main()
             world.Step(world.timeStep);
         }
 
-        // OLD
         // keyboard_move(poly2, cir);
         // judge();
         // rotate();

@@ -202,8 +202,6 @@ public:
     void PreStep(float inv_dt);
     void ApplyImpulse();
     int calContactPoints(Contact *contacts, Shape* b1, Shape* b2);
-//    void ComputeIncidentEdge(ClipVertex c[2], const Vec2& h, const Vec2& pos,
-//                             const Mat22& Rot, const Vec2& normal);
 
     Contact contacts[2];
     int numContacts;

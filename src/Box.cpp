@@ -18,6 +18,7 @@ Box::Box(float x, float y, float w, float h, float m)
     this->setVertices();
 }
 
+
 void Box::set_debug_draw()
 {
     sf::Color color(255, 0, 0, 122);

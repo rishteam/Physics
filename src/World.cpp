@@ -73,7 +73,7 @@ void World::Step(float delta_t)
         box->IntegrateVelocities(delta_t);
         auto tmp2 = World::ConvertWorldToScreen(box->position);
         box->setPosition(tmp2.x, tmp2.y);
-        box->setRotation(radiansToDegrees(-box->angle));
+        box->setRotation(-radiansToDegrees(box->angle));
         box->force = Vec2(0.0f,0.0f);
         box->torque = 0.0f;
     }
@@ -82,7 +82,6 @@ void World::Step(float delta_t)
 
 void World::BoardPhase()
 {
-//    printf("%d\n", arbiters.size());
     for(int i = 0; i < bodies.size(); i++)
     {
         Box* box1 = dynamic_cast<Box*>(bodies.at(i));

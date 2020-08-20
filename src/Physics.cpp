@@ -44,6 +44,8 @@ void Physics::TransformPhysicsCoordinate(float x, float y, float w, float h, flo
 
     position = World::ChangeToPhysicsWorld(Vec2(x, y));
     wh = Vec2(ur.x - ul.x, ur.y - dr.y);
+    I = mass * (wh.x * wh.x + wh.y * wh.y) / 12.0f;
+    invI = 1.0f / I;
     this->angle = -degreesToRadians(angle_);
 }
 
