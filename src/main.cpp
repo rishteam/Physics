@@ -14,8 +14,8 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 #define UNIT 1
 #define OBJ_COUNT 10
 
@@ -23,6 +23,8 @@ sf::Font font;
 double timer = 0;
 int cnt = 220;
 int cnt2 = 0;
+static bool f_keepSimulate = true;
+static bool f_showCotactPoints = true;
 
 World world(Vec2(0.0, -9.8), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
 sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH,  WINDOW_HEIGHT), "Physics");
@@ -89,18 +91,21 @@ void draw_obj(World& world)
         window.draw(*obj);
     }
 
-    for (auto iter = world.arbiters.begin(); iter != world.arbiters.end(); ++iter)
+    if(f_showCotactPoints)
     {
-        const Arbiter& arbiter = iter->second;
-        for (int i = 0; i < arbiter.numContacts; ++i)
+        for (auto iter = world.arbiters.begin(); iter != world.arbiters.end(); ++iter)
         {
-            sf::CircleShape circle;
-            Vec2 p = arbiter.contacts[i].position;
-            Vec2 w = World::ConvertWorldToScreen(p);
-            circle.setPosition(w.x - 3, w.y - 3);
-            circle.setRadius(3);
-            circle.setFillColor(sf::Color::White);
-            window.draw(circle);
+            const Arbiter& arbiter = iter->second;
+            for (int i = 0; i < arbiter.numContacts; ++i)
+            {
+                sf::CircleShape circle;
+                Vec2 p = arbiter.contacts[i].position;
+                Vec2 w = World::ConvertWorldToScreen(p);
+                circle.setPosition(w.x - 3, w.y - 3);
+                circle.setRadius(3);
+                circle.setFillColor(sf::Color::White);
+                window.draw(circle);
+            }
         }
     }
 
@@ -143,26 +148,26 @@ void demo1()
 void demo2()
 {
     world.Clear();
-    Shape *skew = new Box(200, 300, 300, 100, MAX_float);
+    Shape *skew = new Box(200, 350, 300, 50, MAX_float);
     skew->rotate(30);
     world.Add(skew);
 
-    Shape *floor = new Box(400, 500, 800, 100, MAX_float);
+    Shape *skew2 = new Box(500, 250, 300, 50, MAX_float);
+    skew2->rotate(330);
+    world.Add(skew2);
+
+    Shape *floor = new Box(400, 500, 800, 50, MAX_float);
     world.Add(floor);
 
 
     float friction[5] = {0.75f, 0.5f, 0.35f, 0.1f, 0.0f};
     for (int i = 0; i < 5; ++i)
     {
-        Shape *tmp = new Box(100*(float)i, 20, 30, 30, 10);
+        Shape *tmp = new Box(200 + (float)i * 100, 20, 30, 30, 10);
         Box* box = dynamic_cast<Box*>(tmp);
         box->friction = friction[i];
         world.Add(box);
     }
-//    Shape *tmp = new Box(200, 20, 30, 30, 10);
-//    Box* box = dynamic_cast<Box*>(tmp);
-//    box->friction = friction[2];
-//    world.Add(box);
 }
 
 void demo3()
@@ -245,20 +250,24 @@ int main()
         ImGui::SFML::Update(window, deltaClock.restart());
         ImGui::Begin("Debug");
 
+        static float x,y,w,h,m;
+        ImGui::InputFloat("X", &x, 1.0f, 10.0f, "%.3f");
+        ImGui::InputFloat("Y", &y, 1.0f, 10.0f, "%.3f");
+        ImGui::InputFloat("W", &w, 1.0f, 10.0f, "%.3f");
+        ImGui::InputFloat("H", &h, 1.0f, 10.0f, "%.3f");
+        ImGui::InputFloat("Mass", &m, 1.0f, 10.0f, "%.3f");
+
+
         if (ImGui::Button("New box"))
         {
-            float tmp_x = randomint(0, 800), tmp_y = 100, tmp_w = 50, tmp_h = 50 , tmp_mass = 100;
-            Shape *new_box = new Box(tmp_x, tmp_y, tmp_w, tmp_h, tmp_mass);
+            Shape *new_box = new Box(x, y, w, h, m);
             world.Add(new_box);
         }
-        ImGui::SameLine();
-        if (ImGui::Button("clear"))
-        {
-            world.Clear();
-        }
 
-        static bool f_keepSimulate = true;
+        ImGui::Separator();
         ImGui::Checkbox("Keep Simulate", &f_keepSimulate);
+        ImGui::SameLine();
+        ImGui::Checkbox("Show contact Points", &f_showCotactPoints);
 
         if (ImGui::CollapsingHeader("Box's Data"))
         {
@@ -286,20 +295,22 @@ int main()
                 ImGui::Separator();
             }
         }
-        ImGui::End();
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
-        {
-            demo1();
+        if (ImGui::CollapsingHeader("Demo")) {
+            if (ImGui::Button("Demo1")) {
+                demo1();
+            }
+            if (ImGui::Button("Demo2")) {
+                demo2();
+            }
+            if (ImGui::Button("Demo3")) {
+                demo3();
+            }
+            if (ImGui::Button("Clear")) {
+                world.Clear();
+            }
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
-        {
-            demo2();
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
-        {
-            demo3();
-        }
+        ImGui::End();
 
         if(f_keepSimulate || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
         {

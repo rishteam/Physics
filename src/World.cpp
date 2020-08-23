@@ -77,7 +77,6 @@ void World::Step(float delta_t)
         box->force = Vec2(0.0f,0.0f);
         box->torque = 0.0f;
     }
-
 }
 
 void World::BoardPhase()

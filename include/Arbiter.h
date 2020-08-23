@@ -1,6 +1,6 @@
 #pragma once
 #include "Shape.h"
-#include "box.h"
+#include "Box.h"
 #include "VClip.h"
 #include "World.h"
 #include "vector_math.h"

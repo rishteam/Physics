@@ -23,8 +23,7 @@ add_executable(Physics
     src/vector_math.cpp
     src/World.cpp
         src/Helper.cpp
-        src/Arbiter.cpp
-        src/Vclip.cpp)
+        src/Arbiter.cpp)
 
 target_include_directories(Physics
     PRIVATE ${PROJECT_SOURCE_DIR}/include
