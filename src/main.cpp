@@ -204,22 +204,34 @@ void demo2()
 void demo3()
 {
     world.Clear();
-    Shape *skew = new Box(200, 350, 300, 50, MAX_float);
-    skew->rotate(30);
+    Shape *skew = new Box(300, 370, 300, 10, MAX_float);
+    skew->rotate(20);
     world.Add(skew);
 
-    Shape *skew2 = new Box(500, 250, 300, 50, MAX_float);
-    skew2->rotate(330);
+    Shape *skew2 = new Box(500, 230, 300, 10, MAX_float);
+    skew2->rotate(-20);
     world.Add(skew2);
+
+    Shape *skew3 = new Box(300, 100, 300, 10, MAX_float);
+    skew3->rotate(20);
+    world.Add(skew3);
+
+    Shape *obst1 = new Box(300, 280, 10, 50, MAX_float);
+    world.Add(obst1);
+
+    Shape *obst2 = new Box(500, 150, 10, 50, MAX_float);
+    world.Add(obst2);
 
     Shape *floor = new Box(400, 500, 800, 50, MAX_float);
     world.Add(floor);
 
 
+
+
     float friction[5] = {0.75f, 0.5f, 0.35f, 0.1f, 0.0f};
     for (int i = 0; i < 5; ++i)
     {
-        Shape *tmp = new Box(200 + (float)i * 100, 20, 30, 30, 10);
+        Shape *tmp = new Box(200 + (float)i * 25, 20, 20, 20, 10);
         Box* box = dynamic_cast<Box*>(tmp);
         box->friction = friction[i];
         world.Add(box);
