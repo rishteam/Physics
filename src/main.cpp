@@ -24,11 +24,11 @@ double timer = 0;
 int cnt = 220;
 int cnt2 = 0;
 static bool f_keepSimulate = true;
-static bool f_showCotactPoints = true;
+static bool f_showContactPoints = true;
 
 World world(Vec2(0.0, -9.8), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
 sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH,  WINDOW_HEIGHT), "Physics");
-std::vector <Shape*> obj;
+//std::vector <Shape*> obj;
 
 
 //keyboard_test
@@ -60,27 +60,27 @@ void keyboard_move(Shape *a, Shape *b)
 
 
 // judge collision
-void judge()
-{
-    //clear all
-    for (int i = 0; i < obj.size(); i++)
-    {
-        obj[i]->selected = false;
-    }
-
-    //judge
-    for (int i = 0; i < obj.size(); i++)
-    {
-        for(int j = 0; j < obj.size(); j++)
-        {
-            if (i != j && obj[i]->isCollide(*obj[j]))
-            {
-                obj[i]->selected = true;
-                obj[j]->selected = true;
-            }
-        }
-    }
-}
+//void judge()
+//{
+//    //clear all
+//    for (int i = 0; i < obj.size(); i++)
+//    {
+//        obj[i]->selected = false;
+//    }
+//
+//    //judge
+//    for (int i = 0; i < obj.size(); i++)
+//    {
+//        for(int j = 0; j < obj.size(); j++)
+//        {
+//            if (i != j && obj[i]->isCollide(*obj[j]))
+//            {
+//                obj[i]->selected = true;
+//                obj[j]->selected = true;
+//            }
+//        }
+//    }
+//}
 
 void draw_obj(World& world)
 {
@@ -128,7 +128,7 @@ void draw_obj(World& world)
 
 
     // show contact points
-    if(f_showCotactPoints)
+    if(f_showContactPoints)
     {
         for (auto iter = world.arbiters.begin(); iter != world.arbiters.end(); ++iter)
         {
@@ -149,34 +149,34 @@ void draw_obj(World& world)
 }
 
 
-void generate_obj()
-{
-    srand(time(NULL));
-    for (int i = 0; i < OBJ_COUNT; i++)
-    {
-        obj.push_back(new Circle(randomint(0, 800), randomint(0, 600), randomint(30, 50)));
-    }
-}
+//void generate_obj()
+//{
+//    srand(time(NULL));
+//    for (int i = 0; i < OBJ_COUNT; i++)
+//    {
+//        obj.push_back(new Circle(randomint(0, 800), randomint(0, 600), randomint(30, 50)));
+//    }
+//}
 
 
-void rotate()
-{
-    if (cnt == 360)
-        cnt = 0;
-    else
-        cnt += 1;
-
-    if (cnt2 == 0)
-        cnt2 = 360;
-    else
-        cnt2 -= 1;
-}
+//void rotate()
+//{
+//    if (cnt == 360)
+//        cnt = 0;
+//    else
+//        cnt += 1;
+//
+//    if (cnt2 == 0)
+//        cnt2 = 360;
+//    else
+//        cnt2 -= 1;
+//}
 
 void demo1()
 {
     world.Clear();
     Shape *floor = new Box(400, 500, 800, 100, MAX_float);
-    Shape *box2 = new Box(400, 300, 30, 30, 100);
+    Shape *box2 = new Box(400, 300, 30, 30, 10);
     box2->rotate(30);
     world.Add(floor);
     world.Add(box2);
@@ -185,18 +185,20 @@ void demo1()
 void demo2()
 {
     world.Clear();
-    //箱子
-    Shape* tmp = new Box(700, 100, 50, 50, 10);
-    Box* box = dynamic_cast<Box*>(tmp);
-    box->friction = 0.2f;
-    world.Add(box);
     //地板
     Shape *floor = new Box(400, 500, 800, 100, MAX_float);
     world.Add(floor);
+
+    //箱子
+    Shape* tmp = new Box(500, 100, 25, 25, 10);
+    Box* box = dynamic_cast<Box*>(tmp);
+    box->friction = 1.0f;
+    world.Add(box);
+
     //關節點
     Joint* j = new Joint();
     j->Set(box, floor, Vec2(400, 200));
-    world.Addjoints(j);
+    world.AddJoints(j);
 }
 
 void demo3()
@@ -224,21 +226,29 @@ void demo3()
     }
 }
 
-void demo4()
-{
+void demo4() {
     world.Clear();
     Shape *floor = new Box(400, 500, 800, 100, MAX_float);
     world.Add(floor);
 
-    for(int i = 0; i < 10; ++i)
-    {
-        float idx = i*70;
-        Shape *tmp = new Box(80 + idx, 400, 50, 50, 100);
-        Box* box = dynamic_cast<Box*>(tmp);
-        box->friction =0.5;
-        world.Add(box);
+    for (int j = 0; j < 10; j++) {
+        for (int i = 0; i < 10-j; ++i) {
+            float x_idx = i * 70;
+            float y_idx = j * 55;
+
+            Shape *tmp = new Box((80 + 30 * j ) + x_idx, 400 - y_idx , 50, 50, 10);
+            Box *box = dynamic_cast<Box *>(tmp);
+            box->friction = 0.5;
+            world.Add(box);
+        }
     }
 }
+
+void demo5()
+{
+
+}
+
 
 int main()
 {
@@ -311,7 +321,7 @@ int main()
         ImGui::Separator();
         ImGui::Checkbox("Keep Simulate", &f_keepSimulate);
         ImGui::SameLine();
-        ImGui::Checkbox("Show contact Points", &f_showCotactPoints);
+        ImGui::Checkbox("Show contact Points", &f_showContactPoints);
 
         if (ImGui::CollapsingHeader("Box's Data"))
         {

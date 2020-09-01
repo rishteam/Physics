@@ -1,21 +1,21 @@
 #include "Arbiter.h"
 
-Arbiter::Arbiter(Shape* b1, Shape* b2)
+Arbiter::Arbiter(Shape* b1_, Shape* b2_)
 {
-    if (b1 < b2)
+    if (b1_ < b2_)
     {
-        body1 = b1;
-        body2 = b2;
+        b1 = b1_;
+        b2 = b2_;
     }
     else
     {
-        body1 = b2;
-        body2 = b1;
+        b1 = b2_;
+        b2 = b1_;
     }
 
     numContacts = calContactPoints(this->contacts, b1, b2);
 
-    friction = sqrtf( dynamic_cast<Box*>(body1)->getfriction() * dynamic_cast<Box*>(body2)->getfriction());
+    friction = sqrtf( dynamic_cast<Box*>(b1)->getfriction() * dynamic_cast<Box*>(b2)->getfriction());
 }
 
 // update the arbiter and calculate the pulse
@@ -75,8 +75,8 @@ void Arbiter::PreStep(float inv_dt)
     for (int i = 0; i < numContacts; ++i)
     {
         Contact* c = contacts + i;
-        Box* body1 = dynamic_cast<Box*>(this->body1);
-        Box* body2 = dynamic_cast<Box*>(this->body2);
+        Box* body1 = dynamic_cast<Box*>(this->b1);
+        Box* body2 = dynamic_cast<Box*>(this->b2);
 
         Vec2 r1 = c->position - body1->position;
         Vec2 r2 = c->position - body2->position;
@@ -111,24 +111,25 @@ void Arbiter::PreStep(float inv_dt)
             body2->angularVelocity += body2->invI * Cross(r2, P);
         }
     }
+
 }
 
 void Arbiter::ApplyImpulse()
 {
-    Box* b1 = dynamic_cast<Box*>(this->body1);
-    Box* b2 = dynamic_cast<Box*>(this->body2);
+    Box* body1 = dynamic_cast<Box*>(this->b1);
+    Box* body2 = dynamic_cast<Box*>(this->b2);
 
     for (int i = 0; i < numContacts; ++i)
     {
         //get contact point
         Contact* c = contacts + i;
 
-        c->r1 = c->position - b1->position;
-        c->r2 = c->position - b2->position;
+        c->r1 = c->position - body1->position;
+        c->r2 = c->position - body2->position;
 
 
         // Relative velocity at contact
-        Vec2 dv = b2->velocity + Cross(b2->angularVelocity, c->r2) - b1->velocity - Cross(b1->angularVelocity, c->r1);
+        Vec2 dv = body2->velocity + Cross(body2->angularVelocity, c->r2) - body1->velocity - Cross(body1->angularVelocity, c->r1);
 
         // Compute normal impulse
         float vn = Dot(dv, c->normal);
@@ -150,14 +151,14 @@ void Arbiter::ApplyImpulse()
         // Apply contact impulse
         Vec2 Pn = dPn * c->normal;
 
-        b1->velocity -= b1->invMass * Pn;
-        b1->angularVelocity -= b1->invI * Cross(c->r1, Pn);
+        body1->velocity -= body1->invMass * Pn;
+        body1->angularVelocity -= body1->invI * Cross(c->r1, Pn);
 
-        b2->velocity += b2->invMass * Pn;
-        b2->angularVelocity += b2->invI * Cross(c->r2, Pn);
+        body2->velocity += body2->invMass * Pn;
+        body2->angularVelocity += body2->invI * Cross(c->r2, Pn);
 
         // Relative velocity at contact
-        dv = b2->velocity + Cross(b2->angularVelocity, c->r2) - b1->velocity - Cross(b1->angularVelocity, c->r1);
+        dv = body2->velocity + Cross(body2->angularVelocity, c->r2) - body1->velocity - Cross(body1->angularVelocity, c->r1);
 
         Vec2 tangent = Cross(c->normal, 1.0f);
         float vt = Dot(dv, tangent);
@@ -182,11 +183,11 @@ void Arbiter::ApplyImpulse()
         // Apply contact impulse
         Vec2 Pt = dPt * tangent;
 
-        b1->velocity -= b1->invMass * Pt;
-        b1->angularVelocity -= b1->invI * Cross(c->r1, Pt);
+        body1->velocity -= body1->invMass * Pt;
+        body1->angularVelocity -= body1->invI * Cross(c->r1, Pt);
 
-        b2->velocity += b2->invMass * Pt;
-        b2->angularVelocity += b2->invI * Cross(c->r2, Pt);
+        body2->velocity += body2->invMass * Pt;
+        body2->angularVelocity += body2->invI * Cross(c->r2, Pt);
     }
 }
 

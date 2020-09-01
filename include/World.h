@@ -24,7 +24,7 @@ public:
 
     void Add(Shape* body);
 
-    void Addjoints(Joint* joint);
+    void AddJoints(Joint* joint);
 
     void Clear();
 

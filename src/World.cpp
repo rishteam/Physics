@@ -1,7 +1,7 @@
 #include "World.h"
 
 bool World::accumulateImpulses = true;
-bool World::warmStarting = false;
+bool World::warmStarting = true;
 bool World::positionCorrection = true;
 float World::width;
 float World::height;
@@ -33,7 +33,7 @@ void World::Add(Shape* body)
     bodies.push_back(body);
 }
 
-void World::Addjoints(Joint* joint)
+void World::AddJoints(Joint* joint)
 {
     joints.push_back(joint);
 }

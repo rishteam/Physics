@@ -196,7 +196,7 @@ static void ComputeIncidentEdge(ClipVertex c[2], const Vec2& h, const Vec2& pos,
 class Arbiter
 {
 public:
-    Arbiter(Shape* b1, Shape* b2);
+    Arbiter(Shape* b1_, Shape* b2_);
     ~Arbiter() = default;
     void update(Contact* contacts, int numContacts);
     void PreStep(float inv_dt);
@@ -206,8 +206,8 @@ public:
     Contact contacts[2];
     int numContacts;
 
-    Shape* body1;
-    Shape* body2;
+    Shape* b1;
+    Shape* b2;
 
     //combined friction
     float friction;
