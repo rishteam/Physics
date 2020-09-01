@@ -20,16 +20,22 @@ void World::Clear()
     //release space
     for(auto ptr : bodies)
     {
-        delete ptr;
+        Box* box = dynamic_cast<Box*>(ptr);
+        delete box;
     }
-
     bodies.clear();
+    joints.clear();
     arbiters.clear();
 }
 
 void World::Add(Shape* body)
 {
     bodies.push_back(body);
+}
+
+void World::Addjoints(Joint* joint)
+{
+    joints.push_back(joint);
 }
 
 void World::Step(float delta_t)
@@ -56,6 +62,11 @@ void World::Step(float delta_t)
     }
 
     //Pre-step arbiter
+    for (auto jit : joints)
+    {
+        jit->PreStep(inv_dt);
+    }
+
     for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb)
     {
         arb->second.PreStep(inv_dt);
@@ -64,6 +75,10 @@ void World::Step(float delta_t)
     //Apply impulse
     for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb) {
         arb->second.ApplyImpulse();
+    }
+    for (auto jit : joints)
+    {
+        jit->ApplyImpulse();
     }
 
     // Integrate Velocities

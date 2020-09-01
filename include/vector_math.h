@@ -186,8 +186,14 @@ public:
         float a = col1.x, b = col2.x, c = col1.y, d = col2.y;
         Mat22 B;
         float det = a * d - b * c;
-        assert(det != 0.0f);
-        det = 1.0f / det;
+        if(det == 0.0f)
+        {
+            det = 0;
+        }
+        else
+        {
+            det = 1.0f / det;
+        }
         B.col1.x = det * d;
         B.col2.x = -det * b;
         B.col1.y = -det * c;

@@ -101,12 +101,10 @@ bool Box::isCollide(Shape &s)
 {
     if (World::collision_type == COLLISION::SAT)
     {
-//        printf("SAT\n");
         return s.isCollide(*this);
     }
     else if(World::collision_type == COLLISION::GJK)
     {
-//        printf("GJK\n");
         int PointNum = 0;
         Vec2 Simplex[3];
         Vec2 A_center(this->getPosition().x, this->getPosition().y);

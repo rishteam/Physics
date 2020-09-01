@@ -1,14 +1,26 @@
 #include "Joint.h"
 
-void Joint::Set(Shape *b1, Shape *b2, const Vec2& anchor)
+Joint::Joint()
 {
-    body1 = b1;
-    body2 = b2;
+    P.Set(0.0f, 0.0f);
+    softness = 0.0f;
+    biasFactor = 0.2f;
+}
 
-    Mat22 Rot1(body1.angle);
-    Mat22 Rot2(body.angle);
+
+void Joint::Set(Shape *b1_, Shape *b2_, const Vec2& anchor_screen)
+{
+    b1 = b1_;
+    b2 = b2_;
+    Box* body1 = dynamic_cast<Box*>(b1);
+    Box* body2 = dynamic_cast<Box*>(b2);
+
+    Mat22 Rot1(body1->angle);
+    Mat22 Rot2(body2->angle);
     Mat22 Rot1T = Rot1.Transpose();
     Mat22 Rot2T = Rot2.Transpose();
+
+    Vec2 anchor = World::ChangeToPhysicsWorld(anchor_screen);
 
     localAnchor1 = Rot1T * (anchor - body1->position);
     localAnchor2 = Rot2T * (anchor - body2->position);
@@ -22,6 +34,8 @@ void Joint::Set(Shape *b1, Shape *b2, const Vec2& anchor)
 void Joint::PreStep(float inv_dt)
 {
     // Pre-compute anchors, mass matrix, and bias.
+    Box* body1 = dynamic_cast<Box*>(b1);
+    Box* body2 = dynamic_cast<Box*>(b2);
     Mat22 Rot1(body1->angle);
     Mat22 Rot2(body2->angle);
 
@@ -80,9 +94,11 @@ void Joint::PreStep(float inv_dt)
 
 void Joint::ApplyImpulse()
 {
+    Box* body1 = dynamic_cast<Box*>(b1);
+    Box* body2 = dynamic_cast<Box*>(b2);
     Vec2 dv = body2->velocity + Cross(body2->angularVelocity, r2) - body1->velocity - Cross(body1->angularVelocity, r1);
 
-    Vec2 impulse;
+    Vec2 impulse(0.0f, 0.0f);
 
     impulse = M * (bias - dv - softness * P);
 

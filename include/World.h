@@ -7,6 +7,7 @@
 #include "Circle.h"
 #include "Polygon.h"
 #include "Arbiter.h"
+#include "Joint.h"
 
 class ArbiterKey;
 class Arbiter;
@@ -22,6 +23,8 @@ public:
     World(Vec2 gravity_, float width_, float height_);
 
     void Add(Shape* body);
+
+    void Addjoints(Joint* joint);
 
     void Clear();
 
@@ -46,6 +49,7 @@ public:
 
 //    QuadTree QT;
     std::vector<Shape*> bodies;
+    std::vector<Joint*> joints;
     std::map<ArbiterKey, Arbiter> arbiters;
 
 };

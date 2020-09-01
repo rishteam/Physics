@@ -85,12 +85,49 @@ void judge()
 void draw_obj(World& world)
 {
     int idx = 0;
+    //show world bodies
     for(auto &obj : world.bodies)
     {
         obj->set_debug_draw();
         window.draw(*obj);
+   }
+
+    for(auto &jit : world.joints)
+    {
+        Box* box1 = dynamic_cast<Box*>(jit->b1);
+        Box* box2 = dynamic_cast<Box*>(jit->b2);
+
+        Mat22 R1(box1->angle);
+        Mat22 R2(box2->angle);
+
+        Vec2 x1 = box1->position;
+        Vec2 p1 = x1 + R1 * jit->localAnchor1;
+
+        Vec2 x2 = box2->position;
+        Vec2 p2 = x2 + R2 * jit->localAnchor2;
+
+        Vec2 screen_x1 = World::ConvertWorldToScreen(x1);
+        Vec2 screen_p1 = World::ConvertWorldToScreen(p1);
+
+        Vec2 screen_x2 = World::ConvertWorldToScreen(x2);
+        Vec2 screen_p2 = World::ConvertWorldToScreen(p2);
+
+        sf::Vertex conn1[] = {
+            sf::Vector2f(screen_x1.x, screen_x1.y),
+            sf::Vector2f(screen_p1.x, screen_p1.y)
+        };
+
+        sf::Vertex conn2[] = {
+            sf::Vector2f(screen_x2.x, screen_x2.y),
+            sf::Vector2f(screen_p2.x, screen_p2.y)
+        };
+
+        window.draw(conn1, 2, sf::Lines);
+        window.draw(conn2, 2, sf::Lines);
     }
 
+
+    // show contact points
     if(f_showCotactPoints)
     {
         for (auto iter = world.arbiters.begin(); iter != world.arbiters.end(); ++iter)
@@ -148,6 +185,23 @@ void demo1()
 void demo2()
 {
     world.Clear();
+    //箱子
+    Shape* tmp = new Box(700, 100, 50, 50, 10);
+    Box* box = dynamic_cast<Box*>(tmp);
+    box->friction = 0.2f;
+    world.Add(box);
+    //地板
+    Shape *floor = new Box(400, 500, 800, 100, MAX_float);
+    world.Add(floor);
+    //關節點
+    Joint* j = new Joint();
+    j->Set(box, floor, Vec2(400, 200));
+    world.Addjoints(j);
+}
+
+void demo3()
+{
+    world.Clear();
     Shape *skew = new Box(200, 350, 300, 50, MAX_float);
     skew->rotate(30);
     world.Add(skew);
@@ -170,7 +224,7 @@ void demo2()
     }
 }
 
-void demo3()
+void demo4()
 {
     world.Clear();
     Shape *floor = new Box(400, 500, 800, 100, MAX_float);
@@ -186,33 +240,23 @@ void demo3()
     }
 }
 
-
 int main()
 {
     window.setFramerateLimit(60);
     ImGui::SFML::Init(window);
     sf::Clock deltaClock;
 
-    //Shape objects
+    //Shape-circle objects use example
     Shape *cir = new Circle(300, 300, 100);
-    Shape *cir2 = new Circle(200, 200, 100);
+
+    //Shape-polygon objects use example
     std::deque<Vec2> tmp;
     tmp.push_back({0, 0});
-    tmp.push_back({0, 100});
-    tmp.push_back({250, 50});
-    tmp.push_back({300, 210});
-    tmp.push_back({70, 20});
     Shape *poly = new Polygon(tmp, Vec2(300, 200));
-    std::deque<Vec2> tmp2;
-    tmp2.push_back({-100, -100});
-    tmp2.push_back({0, 100});
-    tmp2.push_back({250, 50});
-    Shape *poly2 = new Polygon(tmp2, Vec2(200, 200));
 
-    // run the program as long as the window is open
+
     while (window.isOpen())
     {
-        //detect close event
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -297,14 +341,17 @@ int main()
         }
 
         if (ImGui::CollapsingHeader("Demo")) {
-            if (ImGui::Button("Demo1")) {
+            if (ImGui::Button("Demo1: A single box")) {
                 demo1();
             }
-            if (ImGui::Button("Demo2")) {
+            if (ImGui::Button("Demo2: Simple Pendulum")) {
                 demo2();
             }
-            if (ImGui::Button("Demo3")) {
+            if (ImGui::Button("Demo3: Varying Friction coefficients")) {
                 demo3();
+            }
+            if (ImGui::Button("Demo4: Randomized Stacking")) {
+                demo4();
             }
             if (ImGui::Button("Clear")) {
                 world.Clear();
@@ -316,10 +363,6 @@ int main()
         {
             world.Step(world.timeStep);
         }
-
-        // keyboard_move(poly2, cir);
-        // judge();
-        // rotate();
 
         // clear screen
         window.clear(sf::Color::Black);

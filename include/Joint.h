@@ -1,15 +1,15 @@
-#pragma once
 #include "vector_math.h"
 #include "Shape.h"
-#include "World.h"
 #include "Box.h"
 
+#ifndef Joint_H
+#define Joint_H
 
 class Joint{
-
+public:
     Joint();
     ~Joint() = default;
-    void Set(Shape *b1, Shape *b2, const Vec2& anchor);
+    void Set(Shape *b1_, Shape *b2_, const Vec2& anchor);
     void PreStep(float inv_dt);
     void ApplyImpulse();
 
@@ -18,8 +18,10 @@ class Joint{
     Vec2 r1, r2;
     Vec2 bias;
     Vec2 P;		// accumulated impulse
-    Shape* body1;
-    Shape* body2;
+    Shape* b1;
+    Shape* b2;
     float biasFactor;
     float softness;
 };
+
+#endif
