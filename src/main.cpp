@@ -191,7 +191,7 @@ void demo2()
     world.Add(floor);
 
     //方塊
-    Shape* tmp = new Box(600, 200, 25, 25, 10);
+    Shape* tmp = new Box(800, 200, 25, 25, 10);
     Box* box = dynamic_cast<Box*>(tmp);
     box->friction = 1.0f;
     world.Add(box);
@@ -268,6 +268,31 @@ void demo5()
             world.Add(box);
         }
     }
+}
+
+void demo6()
+{
+    world.Clear();
+    Shape *floor = new Box(400, 500, 800, 100, MAX_float);
+    world.Add(floor);
+
+    Shape *teer = new Box(400, 400, 300, 10, 100);
+    world.Add(teer);
+
+    Shape *lef1 = new Box(275, 300, 25, 25, 10);
+    world.Add(lef1);
+
+    Shape *lef2 = new Box(310, 300, 25, 25, 10);
+    world.Add(lef2);
+
+    Shape *rig1 = new Box(525, 100, 50, 50, 100);
+    world.Add(rig1);
+
+
+    Joint* j = new Joint();
+    j->Set(teer, floor, Vec2(400, 400));
+    world.AddJoints(j);
+
 }
 
 
@@ -386,6 +411,9 @@ int main()
             }
             if (ImGui::Button("Demo5: Pyramid Stacking")){
                 demo5();
+            }
+            if (ImGui::Button("Demo6: A Teeter")){
+                demo6();
             }
             if (ImGui::Button("Clear")) {
                 world.Clear();

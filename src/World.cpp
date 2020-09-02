@@ -126,7 +126,7 @@ void World::BoardPhase()
                     iter->second.update(newArb.contacts, newArb.numContacts);
                 }
             }
-                //兩物體沒接觸點，代表沒碰撞
+            //no collision
             else
             {
                 arbiters.erase(key);
