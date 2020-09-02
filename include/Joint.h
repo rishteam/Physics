@@ -9,7 +9,7 @@ class Joint{
 public:
     Joint();
     ~Joint() = default;
-    void Set(Shape *b1_, Shape *b2_, const Vec2& anchor);
+    void Set(Shape *b1_, Shape *b2_, const Vec2 &anchor);
     void PreStep(float inv_dt);
     void ApplyImpulse();
 

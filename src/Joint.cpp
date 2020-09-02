@@ -22,6 +22,7 @@ void Joint::Set(Shape *b1_, Shape *b2_, const Vec2& anchor_screen)
 
     Vec2 anchor = World::ChangeToPhysicsWorld(anchor_screen);
 
+
     localAnchor1 = Rot1T * (anchor - body1->position);
     localAnchor2 = Rot2T * (anchor - body2->position);
 

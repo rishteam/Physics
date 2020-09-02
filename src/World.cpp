@@ -6,7 +6,7 @@ bool World::positionCorrection = true;
 float World::width;
 float World::height;
 COLLISION World::collision_type = COLLISION::SAT;
-Vec2 World::m_center = Vec2(0, 20);
+Vec2 World::m_center = Vec2(0, 0);
 
 World::World(Vec2 gravity_, float width_, float height_)
 {

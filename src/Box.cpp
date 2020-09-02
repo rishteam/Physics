@@ -11,6 +11,7 @@ Box::Box(float x, float y, float w, float h, float m)
     _h = h;
     this->setRotation(0.0f);
     this->initPhysics(m);
+    this->TransformPhysicsCoordinate(this->getPosition().x, this->getPosition().y, this->getwidth(), this->getheight(), this->getRotation());
     corner.push_back(Vec2(w / 2.0, -h / 2.0));
     corner.push_back(Vec2(w / 2.0, h / 2.0));
     corner.push_back(Vec2(-w / 2.0, h / 2.0));
@@ -58,7 +59,7 @@ void Box::initPhysics(float m)
     if (mass < MAX_float)
     {
         invMass = 1.0f / mass;
-        I = mass * (_w * _w + _h * _h) / 12.0f;
+        I = mass * (wh.x * wh.x + wh.y * wh.y) / 12.0f;
         invI = 1.0f / I;
     }
     else

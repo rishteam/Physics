@@ -26,7 +26,7 @@ int cnt2 = 0;
 static bool f_keepSimulate = true;
 static bool f_showContactPoints = true;
 
-World world(Vec2(0.0, -9.8), (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
+World world(Vec2(0.0, -9.8), 800.0f, 600.0f);
 sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH,  WINDOW_HEIGHT), "Physics");
 //std::vector <Shape*> obj;
 
@@ -175,11 +175,12 @@ void draw_obj(World& world)
 void demo1()
 {
     world.Clear();
+    //地板
     Shape *floor = new Box(400, 500, 800, 100, MAX_float);
-    Shape *box2 = new Box(400, 300, 30, 30, 10);
-    box2->rotate(30);
     world.Add(floor);
-    world.Add(box2);
+    //方塊
+    Shape *box = new Box(400, 300, 30, 30, 1000);
+    world.Add(box);
 }
 
 void demo2()
@@ -189,8 +190,8 @@ void demo2()
     Shape *floor = new Box(400, 500, 800, 100, MAX_float);
     world.Add(floor);
 
-    //箱子
-    Shape* tmp = new Box(500, 100, 25, 25, 10);
+    //方塊
+    Shape* tmp = new Box(600, 200, 25, 25, 10);
     Box* box = dynamic_cast<Box*>(tmp);
     box->friction = 1.0f;
     world.Add(box);
@@ -225,9 +226,6 @@ void demo3()
     Shape *floor = new Box(400, 500, 800, 50, MAX_float);
     world.Add(floor);
 
-
-
-
     float friction[5] = {0.75f, 0.5f, 0.35f, 0.1f, 0.0f};
     for (int i = 0; i < 5; ++i)
     {
@@ -238,7 +236,23 @@ void demo3()
     }
 }
 
-void demo4() {
+void demo4()
+{
+    world.Clear();
+    Shape *floor = new Box(400, 500, 800, 100, MAX_float);
+    world.Add(floor);
+
+    for (int j = 0; j < 5; j++) {
+        float y_idx = j * 55;
+        Shape *tmp = new Box(400, 425 - y_idx, 50, 50, 10);
+        Box *box = dynamic_cast<Box *>(tmp);
+        box->friction = 0.5;
+        world.Add(box);
+    }
+}
+
+void demo5()
+{
     world.Clear();
     Shape *floor = new Box(400, 500, 800, 100, MAX_float);
     world.Add(floor);
@@ -248,17 +262,12 @@ void demo4() {
             float x_idx = i * 70;
             float y_idx = j * 55;
 
-            Shape *tmp = new Box((80 + 30 * j ) + x_idx, 400 - y_idx , 50, 50, 10);
+            Shape *tmp = new Box((75 + 35 * j ) + x_idx, 400 - y_idx , 50, 50, 10);
             Box *box = dynamic_cast<Box *>(tmp);
             box->friction = 0.5;
             world.Add(box);
         }
     }
-}
-
-void demo5()
-{
-
 }
 
 
@@ -374,6 +383,9 @@ int main()
             }
             if (ImGui::Button("Demo4: Randomized Stacking")) {
                 demo4();
+            }
+            if (ImGui::Button("Demo5: Pyramid Stacking")){
+                demo5();
             }
             if (ImGui::Button("Clear")) {
                 world.Clear();

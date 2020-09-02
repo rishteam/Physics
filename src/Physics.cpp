@@ -2,7 +2,7 @@
 #include "Physics.h"
 
 Physics::Physics(){
-    mass = 10;
+    mass = 0;
     velocity = Vec2(1.0, -1.0);
     angularVelocity = 0;
     force = Vec2(0.0, 0.0);
