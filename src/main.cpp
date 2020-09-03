@@ -191,7 +191,7 @@ void demo2()
     world.Add(floor);
 
     //方塊
-    Shape* tmp = new Box(800, 200, 25, 25, 10);
+    Shape* tmp = new Box(600, 200, 25, 25, 10);
     Box* box = dynamic_cast<Box*>(tmp);
     box->friction = 1.0f;
     world.Add(box);
@@ -279,10 +279,10 @@ void demo6()
     Shape *teer = new Box(400, 400, 300, 10, 100);
     world.Add(teer);
 
-    Shape *lef1 = new Box(275, 300, 25, 25, 10);
+    Shape *lef1 = new Box(275, 300, 25, 25, 25);
     world.Add(lef1);
 
-    Shape *lef2 = new Box(310, 300, 25, 25, 10);
+    Shape *lef2 = new Box(310, 300, 25, 25, 25);
     world.Add(lef2);
 
     Shape *rig1 = new Box(525, 100, 50, 50, 100);
@@ -292,7 +292,60 @@ void demo6()
     Joint* j = new Joint();
     j->Set(teer, floor, Vec2(400, 400));
     world.AddJoints(j);
+}
 
+void demo7()
+{
+    world.Clear();
+    Shape *floor = new Box(400, 500, 800, 100, MAX_float);
+    world.Add(floor);
+
+    const int numPlanks = 11;
+    float mass = 50.0f;
+
+    for (int i = 0; i < numPlanks; ++i)
+    {
+        Shape *tmp = new Box(200 + i * 40, 300, 30, 15, 10);
+        Box *plank = dynamic_cast<Box *>(tmp);
+        plank->friction = 0.2f;
+        world.Add(plank);
+    }
+
+    // Tuning
+    float frequencyHz = 2.0f;
+    float dampingRatio = 0.7f;
+
+    // frequency in radians
+    float omega = 2.0f * M_PI * frequencyHz;
+
+    // damping coefficient
+    float d = 2.0f * mass * dampingRatio * omega;
+
+    // spring stifness
+    float k = mass * omega * omega;
+
+    // magic formulas
+    float softness = 1.0f / (d + world.timeStep * k);
+    float biasFactor = world.timeStep * k / (d + world.timeStep * k);
+
+    for (int i = 0; i < numPlanks ; ++i)
+    {
+        Joint* j1 = new Joint();
+        Box* box1 = dynamic_cast<Box*>(world.bodies.at(i));
+        Box* box2 = dynamic_cast<Box*>(world.bodies.at(i+1));
+        j1->Set(box1, box2, Vec2(180 + 40 * i, 300.0f));
+        printf("%d ", 180+40*i);
+        j1->softness = softness;
+        j1->biasFactor = biasFactor;
+        world.AddJoints(j1);
+    }
+
+    Joint* j2 = new Joint();
+    Box* box_last = dynamic_cast<Box*>(world.bodies.at(numPlanks));
+    j2->Set(floor , box_last, Vec2(620,300));
+    j2->softness = softness;
+    j2->biasFactor = biasFactor;
+    world.AddJoints(j2);
 }
 
 
@@ -414,6 +467,9 @@ int main()
             }
             if (ImGui::Button("Demo6: A Teeter")){
                 demo6();
+            }
+            if (ImGui::Button("Demo7: A Suspension Bridge")){
+                demo7();
             }
             if (ImGui::Button("Clear")) {
                 world.Clear();

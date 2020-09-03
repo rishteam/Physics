@@ -79,7 +79,7 @@ float Box::getheight()
 {
     return _h;
 }
-
+//TODO::for GJK
 Vec2 Box::supportPoint(Vec2 D)
 {
     this->setVertices();
@@ -98,6 +98,7 @@ Vec2 Box::supportPoint(Vec2 D)
     return MAXP;
 }
 
+//TODO::for GJK
 bool Box::isCollide(Shape &s)
 {
     if (World::collision_type == COLLISION::SAT)

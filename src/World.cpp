@@ -1,7 +1,7 @@
 #include "World.h"
 
 bool World::accumulateImpulses = true;
-bool World::warmStarting = true;
+bool World::warmStarting = false;
 bool World::positionCorrection = true;
 float World::width;
 float World::height;
@@ -76,6 +76,8 @@ void World::Step(float delta_t)
     for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb) {
         arb->second.ApplyImpulse();
     }
+
+
     for (auto jit : joints)
     {
         jit->ApplyImpulse();
