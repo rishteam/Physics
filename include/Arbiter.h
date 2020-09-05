@@ -204,7 +204,7 @@ public:
     int calContactPoints(Contact *contacts, Shape* b1, Shape* b2);
 
     Contact contacts[2];
-    int numContacts;
+    int numContacts = 0;
 
     Shape* b1;
     Shape* b2;

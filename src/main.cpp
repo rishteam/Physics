@@ -421,6 +421,12 @@ int main()
         ImGui::Checkbox("Keep Simulate", &f_keepSimulate);
         ImGui::SameLine();
         ImGui::Checkbox("Show contact Points", &f_showContactPoints);
+        ImGui::SameLine();
+        ImGui::Checkbox("AccumulateImpulses", &World::accumulateImpulses);
+        ImGui::SameLine();
+        ImGui::Checkbox("WarmStarting", &World::warmStarting);
+        ImGui::SameLine();
+        ImGui::Checkbox("positionCorrection", &World::positionCorrection);
 
         if (ImGui::CollapsingHeader("Box's Data"))
         {

@@ -18,58 +18,12 @@ Arbiter::Arbiter(Shape* b1_, Shape* b2_)
     friction = sqrtf( dynamic_cast<Box*>(b1)->getfriction() * dynamic_cast<Box*>(b2)->getfriction());
 }
 
-// update the arbiter and calculate the pulse
-void Arbiter::update(Contact* newContacts, int numContacts_)
-{
-    Contact mergedContacts[2];
-
-    for(int i = 0; i < numContacts_; i++)
-    {
-        Contact* cNew = newContacts + i;
-        int k = -1;
-        for (int j = 0; j < numContacts; ++j)
-        {
-            Contact* cOld = contacts + j;
-            if (cNew->feature.value == cOld->feature.value)
-            {
-                k = j;
-                break;
-            }
-        }
-
-        if (k > -1)
-        {
-            Contact* c = mergedContacts + i;
-            Contact* cOld = contacts + k;
-            *c = *cNew;
-            if (World::warmStarting)
-            {
-                c->Pn = cOld->Pn;
-                c->Pt = cOld->Pt;
-                c->Pnb = cOld->Pnb;
-            }
-            else
-            {
-                c->Pn = 0.0f;
-                c->Pt = 0.0f;
-                c->Pnb = 0.0f;
-            }
-        }
-        else
-        {
-            mergedContacts[i] = newContacts[i];
-        }
-    }
-
-    for (int i = 0; i < numContacts_; ++i)
-        contacts[i] = mergedContacts[i];
-
-    this->numContacts = numContacts_;
-}
 
 void Arbiter::PreStep(float inv_dt)
 {
-    const float k_allowedPenetration = 0.01f;
+
+    const float k_allowedPenetration = 0.1f;
+    //beta
     float k_biasFactor = World::positionCorrection ? 0.2f : 0.0f;
 
     for (int i = 0; i < numContacts; ++i)
@@ -81,15 +35,16 @@ void Arbiter::PreStep(float inv_dt)
         Vec2 r1 = c->position - body1->position;
         Vec2 r2 = c->position - body2->position;
 
-        // effective mass
-        // Precompute normal mass, tangent mass, and bias.
-        // 計算有效質量，切線質量，少部分物理誤差
+        //實際計算出兩接觸點法向量的衝量
         float rn1 = Dot(r1, c->normal);
         float rn2 = Dot(r2, c->normal);
+        //算出effective mass
         float kNormal = body1->invMass + body2->invMass;
         kNormal += body1->invI * (Dot(r1, r1) - rn1 * rn1) + body2->invI * (Dot(r2, r2) - rn2 * rn2);
         c->massNormal = 1.0f / kNormal;
 
+
+        //算出切線的法向量衝量
         Vec2 tangent = Cross(c->normal, 1.0f);
         float rt1 = Dot(r1, tangent);
         float rt2 = Dot(r2, tangent);
@@ -97,11 +52,12 @@ void Arbiter::PreStep(float inv_dt)
         kTangent += body1->invI * (Dot(r1, r1) - rt1 * rt1) + body2->invI * (Dot(r2, r2) - rt2 * rt2);
         c->massTangent = 1.0f /  kTangent;
 
+        // Bias velocity and impulse
         c->bias = -k_biasFactor * inv_dt * Min(0.0f, c->separation + k_allowedPenetration);
 
+        // Apply normal + friction impulse
         if (World::accumulateImpulses)
         {
-            // Apply normal + friction impulse
             Vec2 P = c->Pn * c->normal + c->Pt * tangent;
 
             body1->velocity -= body1->invMass * P;
@@ -189,6 +145,55 @@ void Arbiter::ApplyImpulse()
         body2->velocity += body2->invMass * Pt;
         body2->angularVelocity += body2->invI * Cross(c->r2, Pt);
     }
+}
+
+// update the arbiter and calculate the pulse
+void Arbiter::update(Contact* newContacts, int numContacts_)
+{
+    Contact mergedContacts[2];
+
+    for(int i = 0; i < numContacts_; i++)
+    {
+        Contact* cNew = newContacts + i;
+        int k = -1;
+        for (int j = 0; j < numContacts; ++j)
+        {
+            Contact* cOld = contacts + j;
+            if (cNew->feature.value == cOld->feature.value)
+            {
+                k = j;
+                break;
+            }
+        }
+
+        if (k > -1)
+        {
+            Contact* c = mergedContacts + i;
+            Contact* cOld = contacts + k;
+            *c = *cNew;
+            if (World::warmStarting)
+            {
+                c->Pn = cOld->Pn;
+                c->Pt = cOld->Pt;
+                c->Pnb = cOld->Pnb;
+            }
+            else
+            {
+                c->Pn = 0.0f;
+                c->Pt = 0.0f;
+                c->Pnb = 0.0f;
+            }
+        }
+        else
+        {
+            mergedContacts[i] = newContacts[i];
+        }
+    }
+
+    for (int i = 0; i < numContacts_; ++i)
+        this->contacts[i] = mergedContacts[i];
+
+    this->numContacts = numContacts_;
 }
 
 int Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
