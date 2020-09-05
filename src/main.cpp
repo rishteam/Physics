@@ -334,7 +334,6 @@ void demo7()
         Box* box1 = dynamic_cast<Box*>(world.bodies.at(i));
         Box* box2 = dynamic_cast<Box*>(world.bodies.at(i+1));
         j1->Set(box1, box2, Vec2(180 + 40 * i, 300.0f));
-        printf("%d ", 180+40*i);
         j1->softness = softness;
         j1->biasFactor = biasFactor;
         world.AddJoints(j1);
@@ -347,6 +346,60 @@ void demo7()
     j2->biasFactor = biasFactor;
     world.AddJoints(j2);
 }
+
+void demo8()
+{
+
+}
+
+void demo9()
+{
+    //floor
+    world.Clear();
+    Shape *floor = new Box(380, 500, 800, 100, MAX_float);
+    world.Add(floor);
+
+
+    const int numPlanks = 12;
+    float mass = 10.0f;
+
+    for (int i = 0; i < numPlanks; ++i)
+    {
+        Shape *tmp = new Box(400 + i * 40, 100, 30, 15, 10);
+        Box *plank = dynamic_cast<Box *>(tmp);
+        plank->friction = 0.2f;
+        world.Add(plank);
+    }
+
+    // Tuning
+    float frequencyHz = 4.0f;
+    float dampingRatio = 0.7f;
+
+    // frequency in radians
+    float omega = 2.0f * M_PI * frequencyHz;
+
+    // damping coefficient
+    float d = 2.0f * mass * dampingRatio * omega;
+
+    // spring stifness
+    float k = mass * omega * omega;
+
+    // magic formulas
+    float softness = 1.0f / (d + world.timeStep * k);
+    float biasFactor = world.timeStep * k / (d + world.timeStep * k);
+
+    for (int i = 0; i < numPlanks ; ++i)
+    {
+        Joint* j1 = new Joint();
+        Box* box1 = dynamic_cast<Box*>(world.bodies.at(i));
+        Box* box2 = dynamic_cast<Box*>(world.bodies.at(i+1));
+        j1->Set(box1, box2, Vec2(380 + 40 * i, 100.0f));
+        j1->softness = softness;
+        j1->biasFactor = biasFactor;
+        world.AddJoints(j1);
+    }
+}
+
 
 
 int main()
@@ -421,7 +474,9 @@ int main()
         ImGui::Checkbox("Keep Simulate", &f_keepSimulate);
         ImGui::SameLine();
         ImGui::Checkbox("Show contact Points", &f_showContactPoints);
-        ImGui::SameLine();
+
+
+        ImGui::Separator();
         ImGui::Checkbox("AccumulateImpulses", &World::accumulateImpulses);
         ImGui::SameLine();
         ImGui::Checkbox("WarmStarting", &World::warmStarting);
@@ -476,6 +531,12 @@ int main()
             }
             if (ImGui::Button("Demo7: A Suspension Bridge")){
                 demo7();
+            }
+            if (ImGui::Button("Demo8: Dominos")){
+                demo8();
+            }
+            if (ImGui::Button("Demo9: Multi - pendulum")){
+                demo9();
             }
             if (ImGui::Button("Clear")) {
                 world.Clear();

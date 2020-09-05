@@ -118,7 +118,7 @@ void World::BoardPhase()
             ArbiterKey key(box1, box2);
             auto iter = arbiters.find(key);
 
-            // collision
+            // SAT collision
             if(bodies[i]->isCollide(*bodies[j]))
             {
                 //add new arbiter
