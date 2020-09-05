@@ -349,6 +349,61 @@ void demo7()
 
 void demo8()
 {
+    //floor
+    world.Clear();
+    Shape *floor = new Box(400, 500, 800, 100, MAX_float);
+    world.Add(floor);
+
+    Shape *plat = new Box(275, 150, 350, 10, MAX_float);
+    world.Add(plat);
+
+    Shape *pend = new Box(80, 300, 20, 150, MAX_float);
+    world.Add(pend);
+
+    Joint* j = new Joint();
+    Shape *box = new Box(-20, 30, 15, 15, 1000);
+    j->Set(pend , box, Vec2(70,20));
+    world.Add(box);
+    world.AddJoints(j);
+
+    for(int i = 0; i < 10; i++)
+    {
+        Shape *tmp = new Box(150 + i * 30, 80, 10, 100, 20);
+        Box *domino = dynamic_cast<Box*>(tmp);
+        if(i == 9)
+        {
+            domino->friction = 0.1f;
+        }
+        world.Add(domino);
+    }
+
+
+    Shape *skew = new Box(400, 250, 400, 10, MAX_float);
+    skew->rotate(-20);
+    world.Add(skew);
+
+    Shape *teeter = new Box(300, 400, 525, 10, 100);
+    world.Add(teeter);
+
+    Joint* j2 = new Joint();
+    j2->Set(floor , teeter, Vec2(300,400));
+    world.AddJoints(j2);
+
+    Shape *floor_box = new Box(575, 350, 75, 75, 5);
+    world.Add(floor_box);
+
+    Shape *floor_box_cap = new Box(575, 305.5, 75, 15, 5);
+    world.Add(floor_box_cap);
+
+    Joint* j3 = new Joint();
+    j3->Set(floor_box_cap , floor_box, Vec2(612,312));
+    world.AddJoints(j3);
+
+    Joint* j4 = new Joint();
+    j4->Set(floor_box , floor, Vec2(575,350));
+    world.AddJoints(j4);
+
+
 
 }
 
@@ -449,12 +504,14 @@ int main()
                 std::cout << "mouse x: " << event.mouseButton.x << std::endl;
                 std::cout << "mouse y: " << event.mouseButton.y << std::endl;
             }
-        }
 
+        }
 
         //Render IMGUI
         ImGui::SFML::Update(window, deltaClock.restart());
         ImGui::Begin("Debug");
+
+        ImGui::Text("[Event] click Center: (%d, %d)", event.mouseButton.x, event.mouseButton.y);
 
         static float x,y,w,h,m;
         ImGui::InputFloat("X", &x, 1.0f, 10.0f, "%.3f");
