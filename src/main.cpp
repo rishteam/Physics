@@ -413,8 +413,7 @@ void demo9()
     world.Clear();
     Shape *floor = new Box(380, 500, 800, 100, MAX_float);
     world.Add(floor);
-
-
+    
     const int numPlanks = 12;
     float mass = 10.0f;
 
@@ -500,9 +499,17 @@ int main()
             }
             if (event.type == sf::Event::MouseButtonPressed)
             {
-                std::cout << "the right button was pressed" << std::endl;
-                std::cout << "mouse x: " << event.mouseButton.x << std::endl;
-                std::cout << "mouse y: " << event.mouseButton.y << std::endl;
+                int cnt = 0;
+                for(auto body : world.bodies)
+                {
+                    Shape *click = new Box(event.mouseButton.x, event.mouseButton.y, 0, 0, 0);
+                    if (body->isCollide(*click))
+                    {
+                        printf("Collide %d\n", cnt);
+                    }
+                    delete click;
+                    cnt++;
+                }
             }
 
         }
