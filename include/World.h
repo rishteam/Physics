@@ -43,7 +43,7 @@ public:
     float timeStep = 1.0 / 60.0f;
     int iterations = 10;
 
-//    QuadTree QT;
+//   TODO: implement QuadTree
     std::vector<Shape*> bodies;
     std::vector<Joint*> joints;
     std::map<ArbiterKey, Arbiter> arbiters;
