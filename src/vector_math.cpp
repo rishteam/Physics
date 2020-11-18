@@ -92,3 +92,8 @@ int randomint(int min, int max)
     return x;
 }
 
+float DistSqr( Vec2& a, Vec2& b )
+{
+    Vec2 c = a - b;
+    return c.dot(c);
+}

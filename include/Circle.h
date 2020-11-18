@@ -1,27 +1,27 @@
-#ifndef Circle_H
-#define Circle_H
-
+#pragma once
 #include "Shape.h"
 
 class Box;
 class Polygon;
+class Manifold;
 
 class Circle : public Shape
 {
 public:
-    Circle(float x, float y, float radius_);
+    Circle(float x_, float y_, float radius_);
     ~Circle() = default;
-    float get_radius();
 
-    virtual Vec2 supportPoint(Vec2 D) override;
-    virtual bool isCollide(Shape &s) override
+    float getRadius();
+    void setPosition(Vec2 mouse);
+    virtual void setDebugDraw() override;
+
+    virtual bool Collide(Manifold *m, Shape *s) override
     {
-        return s.isCollide(*this);
+        return s->Collide(m, this);
     }
-    virtual bool isCollide(Box &b) override;
-    virtual bool isCollide(Polygon &p) override;
-    virtual bool isCollide(Circle &c) override;
-    virtual void set_debug_draw() override;
+    virtual bool Collide(Manifold *m, Box *b) override;
+    virtual bool Collide(Manifold *m, Polygon *p) override;
+    virtual bool Collide(Manifold *m, Circle *c) override;
 
 private:
     sf::CircleShape circle;
@@ -31,5 +31,3 @@ private:
         target.draw(circle, states);
     };
 };
-
-#endif

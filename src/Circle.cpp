@@ -1,32 +1,36 @@
-#include <cmath>
-
 #include "Circle.h"
 #include "Polygon.h"
 #include "Box.h"
+#include "Manifold.h"
 
-Circle::Circle(float x, float y, float radius_)
+Circle::Circle(float x_, float y_, float radius_)
 {
-    this->setPosition(x, y);
-    this->setRotation(0.0f);
+    type = Shape::Type::Box;
+    position.x = x_;
+    position.y = y_;
     radius = radius_;
 }
 
-float Circle::get_radius()
+float Circle::getRadius()
 {
     return radius;
 }
 
-Vec2 Circle::supportPoint(Vec2 D){
-    float K = sqrt(radius * radius/(D.x * D.x + D.y * D.y));
-    D.Times(K);
-    Vec2 m_center = Vec2(this->getPosition().x, this->getPosition().y);
-    return m_center + Vec2(D.x, D.y);
+void Circle::setPosition(Vec2 mouse)
+{
+    Vec2 update = World::ChangeToPhysicsWorld(mouse);
+    position = update;
 }
 
-void Circle::set_debug_draw()
+void Circle::setDebugDraw()
 {
-    circle.setPosition(this->getPosition().x - radius, this->getPosition().y - radius);
-    circle.setRadius(radius);
+    Vec2 calRadiusLeftCoordinate = World::ConvertWorldToScreen(Vec2(position.x - radius, position.y));
+    Vec2 center = World::ConvertWorldToScreen(Vec2(position.x , position.y));
+    Vec2 screenRadiusVector = calRadiusLeftCoordinate - center;
+    float screenRadius = screenRadiusVector.getLength();
+    circle.setPosition(center.x, center.y);
+    circle.setOrigin(screenRadius, screenRadius);
+    circle.setRadius(screenRadius);
     if (this->selected)
     {
         circle.setFillColor(sf::Color::Red);
@@ -37,57 +41,17 @@ void Circle::set_debug_draw()
     }
 }
 
-//判斷兩園心的的距離，有沒有小於兩半徑之和
-bool Circle::isCollide(Circle &c)
+bool Circle::Collide(Manifold *m, Box *b)
 {
-    auto circleA = c.getPosition();
-    auto circleB = this->getPosition();
-    auto a = abs(circleA.x - circleB.x);
-    auto b = abs(circleA.y - circleB.y);
-    return sqrt(a*a + b*b) < this->get_radius() + c.get_radius();
+    return false;
 }
 
-bool Circle::isCollide(Polygon &p)
+bool Circle::Collide(Manifold *m, Polygon *p)
 {
-    //find polygon SAT
-    p.setVertices();
-    p.findSAT();
-    auto poly_sat = p.getSAT();
-    auto C = this->getPosition();
-    Vec2 center(C.x, C.y);
-
-    bool isSeparated = false;
-    for (int i = 0; i < poly_sat.size(); i++)
-    {
-        auto minMax_P = getMinMax(poly_sat[i], p.getVertices());
-        auto proj_c = center.projectLengthOnto(poly_sat[i]);
-        float min_C = proj_c - this->get_radius();
-        float max_C = proj_c + this->get_radius();
-        isSeparated = (min_C > minMax_P.second || minMax_P.first > max_C);
-        // 只要發現有一條分離線，就代表物體沒有發生碰撞
-        if (isSeparated)
-            return false;
-    }
-    return true;
+    return false;
 }
 
-bool Circle::isCollide(Box &b)
+bool Circle::Collide(Manifold *m, Circle *c)
 {
-    b.setVertices();
-    b.findSAT();
-    auto box_sat = b.getSAT();
-    auto tmp = b.getVertices();
-    auto C = this->getPosition();
-    Vec2 center(C.x, C.y);
-
-    for (int i = 0; i < box_sat.size(); i++)
-    {
-        auto minMax = getMinMax(box_sat[i], tmp);
-        float proj_c = center.projectLengthOnto(box_sat[i]);
-        float min_C = proj_c - this->get_radius();
-        float max_C = proj_c + this->get_radius();
-        if (min_C > minMax.second || minMax.first > max_C)
-            return false;
-    }
-    return true;
+    return false;
 }

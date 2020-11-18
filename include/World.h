@@ -3,10 +3,6 @@
 #include <map>
 #include "vector_math.h"
 #include "Shape.h"
-#include "Box.h"
-#include "Circle.h"
-#include "Polygon.h"
-#include "Arbiter.h"
 #include "Joint.h"
 
 class ArbiterKey;

@@ -1,34 +1,61 @@
 #pragma once
 
-#include "vector_math.h"
+#include <SFML/Graphics.hpp>
 #include <deque>
+#include <cmath>
+
+#include "Manifold.h"
+#include "Physics.h"
+#include "vector_math.h"
+
+#define MaxVertexCount 64
 
 //include object
 class Circle;
 class Polygon;
 class Box;
 class World;
-enum class COLLISION;
 
-class Shape : public sf::Transformable, public sf::Drawable
+class Shape : public sf::Drawable, public Physics
 {
 public:
-    //for SAT
-    std::deque<Vec2> getSAT() const;
-    std::deque<Vec2> getVertices() const;
-    void findSAT();
-    virtual void setVertices(){};
 
-    Vec2 SupportFun(Shape &A, Shape &B, Vec2 D);
-    virtual Vec2 supportPoint(Vec2 D) = 0;
+    enum class Type{
+        Circle,
+        Box,
+        Polygon
+    } type;
 
-    virtual bool isCollide(Shape &s) = 0;
-    virtual bool isCollide(Box &b) = 0;
-    virtual bool isCollide(Polygon &p) = 0;
-    virtual bool isCollide(Circle &c) = 0;
-    virtual void set_debug_draw() = 0;
+    // Helper Function
+    virtual void setDebugDraw() = 0;
+    /// 找向量的最遠點
+    virtual Vec2 GetSupport(const Vec2 dir);
+    /// 設定旋轉矩陣
+    virtual void SetMatrix(float radians);
+
+
+    // ManiFold Helper Function
+    /// 找最小穿透軸
+    float FindAxisLeastPenetration(int *faceIdx, Shape *A, Shape *B);
+    /// 找IncidentFace
+    void FindIncidentFace(Vec2 *v, Shape *Ref, Shape *Inc, int refIdx);
+    /// 面切除決定點
+    int Clip(Vec2 n, float c, Vec2 *face);
+    /// 最小穿透軸比較計算公式
+    bool BiasGreaterThan( float a, float b );
+
+    // Detect Collision
+    virtual bool Collide(Manifold *m, Shape *s) = 0;
+    virtual bool Collide(Manifold *m, Box *b) = 0;
+    virtual bool Collide(Manifold *m, Polygon *p) = 0;
+    virtual bool Collide(Manifold *m, Circle *c) = 0;
+
+
+    int m_vertexCount = 0;
+    // Vertices(只有位移量的點), Normal(法向量), u(旋轉矩陣)
     bool selected = false;
-protected:
-    std::deque<Vec2> Vertices;
-    std::deque<Vec2> SAT;
+    Mat22 u;
+    Vec2 m_vertices[MaxVertexCount];
+    Vec2 m_normals[MaxVertexCount];
+
 };

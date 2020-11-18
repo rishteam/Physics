@@ -1,6 +1,6 @@
 #include "vector_math.h"
-#include "Shape.h"
-#include "Box.h"
+
+class Shape;
 
 #ifndef Joint_H
 #define Joint_H

@@ -1,4 +1,6 @@
 #include "Joint.h"
+#include "Box.h"
+#include "Shape.h"
 
 Joint::Joint()
 {

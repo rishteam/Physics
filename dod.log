@@ -1,0 +1,8 @@
+[16:54:11] [Engine/info] [VFS] Initialized
+[16:54:12] [Engine/info] Initializating the RishEngine
+[16:54:13] [Engine/info] OpenGL Version: 4.6
+[16:54:13] [Engine/info] Vender: NVIDIA Corporation. Video Device: GeForce GT 730/PCIe/SSE2
+[16:54:13] [Engine/info] Depth=24 Stencil=8 Antialiasing=4
+[16:54:13] [Engine/trace] assets/shader/quadTexture.vs
+[16:54:13] [Engine/error] [VFS]: File is not found /shader/quadTexture.vs
+[16:54:13] [Engine/error] Assertion Failed: [Shader] Failed to open File

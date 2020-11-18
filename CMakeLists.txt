@@ -24,7 +24,7 @@ add_executable(Physics
     src/World.cpp
     src/Helper.cpp
     src/Arbiter.cpp
-    src/Joint.cpp)
+    src/Joint.cpp src/Manifold.cpp)
 
 target_include_directories(Physics
     PRIVATE ${PROJECT_SOURCE_DIR}/include

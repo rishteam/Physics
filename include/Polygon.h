@@ -1,36 +1,35 @@
-#ifndef Polygon_H
-#define Polygon_H
-
+#pragma once
 #include "Shape.h"
 
 class Box;
-class Polygon;
 class Circle;
+class Manifold;
 
 class Polygon : public Shape
 {
 public:
     Polygon(std::deque<Vec2> &pt, Vec2 pos);
     ~Polygon() = default;
-    void setVertices();
 
-    virtual Vec2 supportPoint(Vec2 D) override;
-    virtual bool isCollide(Shape &s) override
+    int getVertexCount();
+    // Helper function
+    sf::ConvexShape& getPolygonDraw(){ return polygon; };
+    virtual void setDebugDraw() override;
+
+    // Physics Collision Detection
+    virtual bool Collide(Manifold *m, Shape *s) override
     {
-        return s.isCollide(*this);
+        return s->Collide(m, this);
     }
-    virtual bool isCollide(Box &b) override;
-    virtual bool isCollide(Polygon &p) override;
-    virtual bool isCollide(Circle &c) override;
-    virtual void set_debug_draw() override;
+    virtual bool Collide(Manifold *m, Box *b) override;
+    virtual bool Collide(Manifold *m, Polygon *p) override;
+    virtual bool Collide(Manifold *m, Circle *c) override;
 
 private:
     sf::ConvexShape polygon;
-    std::deque<Vec2> corner;
+    std::deque<Vec2> cordTranslate;
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const
     {
         target.draw(polygon, states);
     };
 };
-
-#endif

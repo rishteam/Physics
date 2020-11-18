@@ -17,6 +17,7 @@
 
 /** @brief 徑度與度度量的轉換 */
 #define M_PI 3.14159265358979323846
+const float EPSILON = 0.0001f;
 #define degreesToRadians(angleDegrees) (angleDegrees * M_PI / 180.0)
 #define radiansToDegrees(angleRadians) (angleRadians * 180.0 / M_PI)
 
@@ -28,7 +29,7 @@
  * @brief 補足sf::Vector2f無法做的計算，自行建立一個特化的Vector
  * @details 包括向量長度、內積、左右法向量等數學基本工具
  */
-class Vec2 : public sf::Vector2<float> {
+class Vec2 {
 public:
     Vec2();
     /**
@@ -53,17 +54,28 @@ public:
     /**
    * @brief Reverse Vector
    */
-    Vec2 operator - ()  {
-        Vec2 v;
-        v.x = -x;
-        v.y = -y;
-        return v;
+    Vec2& operator - ()  {
+        x = -x;
+        y = -y;
+        return *this;
+    }
+
+    Vec2& operator * (float scale)  {
+        x *= scale;
+        y *= scale;
+        return *this;
+    }
+
+    float LenSqr( ) const
+    {
+        return x * x + y * y;
     }
 
     void operator = (const Vec2& v)
     {
         x = v.x; y = v.y;
     }
+
 
     Vec2 operator + (const Vec2& v)  {
         return Vec2(x + v.x, y + v.y);
@@ -98,6 +110,11 @@ public:
     /**
      * @brief get length of vector
      */
+    float DistSqr( const Vec2& a, const Vec2& b )
+    {
+        Vec2 c = Vec2(a.x - b.x,  a.y - b.y);
+        return c.dot(c);
+    }
     float getLength();
     /**
      * @brief vector dot
@@ -108,6 +125,20 @@ public:
      */
     float projectLengthOnto(Vec2 &vec2);
     /**
+     * @brief 轉單位向量
+     */
+    void Normalize()
+    {
+        float len = getLength( );
+
+        if(len > 0.0001f)
+        {
+            float invLen = 1.0f / len;
+            x *= invLen;
+            y *= invLen;
+        }
+    }
+    /**
      * @brief 左法向量
      */
     Vec2 normalL();
@@ -115,9 +146,10 @@ public:
      * @brief 右法向量
      */
     Vec2 normalR();
+
     /**
-     * @brief 向量放大
-     */
+    * @brief 向量放大
+    */
     void Times(float K){
         x *= K;
         y *= K;
@@ -147,11 +179,15 @@ public:
      * @retval float 旋轉過後的向量
      */
     void rotate_ref(float angle, Vec2 &ref);
+
+    float x;
+    float y;
 };
 
 
 std::pair<float, float> getMinMax(Vec2 &axis, std::deque<Vec2> corner);
 int randomint(int min, int max);
+float DistSqr( Vec2& a, Vec2& b );
 
 
 class Mat22 {
@@ -174,6 +210,15 @@ public:
     }
 
     Mat22(const Vec2 &col1, const Vec2 &col2) : col1(col1), col2(col2) {}
+
+    void SetRotateMatrix(float angle)
+    {
+        float c = cosf(angle), s = sinf(angle);
+        col1.x = c;
+        col2.x = -s;
+        col1.y = s;
+        col2.y = c;
+    }
 
     //轉至矩陣
     Mat22 Transpose() const
