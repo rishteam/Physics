@@ -26,6 +26,12 @@ void Shape::SetMatrix(float radians)
     u.SetRotateMatrix(radians);
 }
 
+void Shape::setPosition(Vec2 mouse)
+{
+    Vec2 update = World::ChangeToPhysicsWorld(mouse);
+    position = update;
+}
+
 float Shape::FindAxisLeastPenetration(int *faceIdx, Shape *A, Shape *B)
 {
     float bestDistance = -FLT_MAX;

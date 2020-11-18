@@ -12,7 +12,7 @@ public:
     ~Circle() = default;
 
     float getRadius();
-    void setPosition(Vec2 mouse);
+
     virtual void setDebugDraw() override;
 
     virtual bool Collide(Manifold *m, Shape *s) override

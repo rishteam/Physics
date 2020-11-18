@@ -16,12 +16,6 @@ float Circle::getRadius()
     return radius;
 }
 
-void Circle::setPosition(Vec2 mouse)
-{
-    Vec2 update = World::ChangeToPhysicsWorld(mouse);
-    position = update;
-}
-
 void Circle::setDebugDraw()
 {
     Vec2 calRadiusLeftCoordinate = World::ConvertWorldToScreen(Vec2(position.x - radius, position.y));

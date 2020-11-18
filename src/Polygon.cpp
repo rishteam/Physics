@@ -128,7 +128,15 @@ void Polygon::setDebugDraw()
         polygon.setPoint(i, sf::Vector2f(corner.x - center.x, corner.y - center.y));
         i++;
     }
-    polygon.setFillColor(sf::Color::White);
+    if (this->selected)
+    {
+        polygon.setFillColor(sf::Color::Red);
+    }
+    else
+    {
+        polygon.setFillColor(sf::Color::White);
+    }
+
 }
 
 bool Polygon::Collide(Manifold *m, Box *b)

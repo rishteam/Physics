@@ -32,6 +32,7 @@ public:
     virtual Vec2 GetSupport(const Vec2 dir);
     /// 設定旋轉矩陣
     virtual void SetMatrix(float radians);
+    virtual void setPosition(Vec2 mouse);
 
 
     // ManiFold Helper Function
