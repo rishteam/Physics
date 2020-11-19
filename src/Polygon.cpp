@@ -27,7 +27,7 @@ Polygon::Polygon(std::deque<Vec2> &pt, Vec2 pos)
             rightMost = i;
         }
 
-            // If matching x then take farthest negative y
+        // If matching x then take farthest negative y
         else if(x == highestXCoord)
             if(pt[i].y < pt[rightMost].y)
                 rightMost = i;
@@ -100,7 +100,9 @@ Polygon::Polygon(std::deque<Vec2> &pt, Vec2 pos)
         m_normals[i1].Normalize( );
     }
 
-     position = pos;
+    position = pos;
+    this->SetMatrix(0.0f);
+    angle = 0.0f;
 
 }
 
@@ -268,7 +270,7 @@ bool Polygon::Collide(Manifold *m, Polygon *p)
     m->contactCounter = 0;
 
     // Check for a separating axis with A's face planes
-    int faceA;
+    int faceA = 0;
     float penetrationA = FindAxisLeastPenetration(&faceA, this, p);
     if(penetrationA >= 0.0f)
         return false;

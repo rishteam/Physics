@@ -5,7 +5,7 @@
 
 Circle::Circle(float x_, float y_, float radius_)
 {
-    type = Shape::Type::Box;
+    type = Shape::Type::Circle;
     position.x = x_;
     position.y = y_;
     radius = radius_;

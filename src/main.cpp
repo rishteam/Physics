@@ -32,7 +32,12 @@ sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH,  WINDOW_HEIGHT), "Physics");
 // Polygon-Polygon contact Point
 void PolygonToPolygonContactPoint(sf::Event event)
 {
+
     std::deque<Vec2> tmp;
+//    tmp.push_back({-10, 10});
+//    tmp.push_back({10, 10});
+//    tmp.push_back({10, -10});
+//    tmp.push_back({-10, -10});
     tmp.push_back({-10, 10});
     tmp.push_back({10, 10});
     tmp.push_back({10, -10});
@@ -40,7 +45,7 @@ void PolygonToPolygonContactPoint(sf::Event event)
     tmp.push_back({-10, -10});
 
     Shape *poly = new Polygon(tmp, Vec2(0, 0));
-    poly->SetMatrix(0.6666f);
+    poly->SetMatrix(0.0f);
 
     std::deque<Vec2> tmp2;
     tmp2.push_back({-10, 10});
@@ -49,7 +54,7 @@ void PolygonToPolygonContactPoint(sf::Event event)
     tmp2.push_back({0, -20});
     tmp2.push_back({-10, -10});
 
-    Shape *poly2 = new Polygon(tmp2, Vec2(0, 0));
+    Shape *poly2 = new Polygon(tmp, Vec2(0, 0));
 
     poly2->setPosition(Vec2(event.mouseMove.x, event.mouseMove.y));
 
@@ -78,6 +83,10 @@ void PolygonToPolygonContactPoint(sf::Event event)
         circle.setPosition(cp.x, cp.y);
         window.draw(circle);
     }
+    printf("Penetration: %.f\n", tmpM.penetration);
+    printf("Contacts Counter: %d\n", tmpM.contactCounter);
+    printf("Contacts[0]: (%.f, %.f)\n", tmpM.Contacts[0].x, tmpM.Contacts[0].y);
+    printf("Contacts[1]: (%.f, %.f)\n", tmpM.Contacts[1].x, tmpM.Contacts[1].y);
 }
 
 // Circle-Polygon contact Point
@@ -177,6 +186,7 @@ int main()
             window.clear(sf::Color::Black);
         }
         PolygonToPolygonContactPoint(event);
+//        CircleToPolygonContactPoint(event);
         ImGui::SFML::Update(window, deltaClock.restart());
         ImGui::Begin("Contact Points Detection");
         if (ImGui::CollapsingHeader("Cases")) {

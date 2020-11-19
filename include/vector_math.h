@@ -54,16 +54,12 @@ public:
     /**
    * @brief Reverse Vector
    */
-    Vec2& operator - ()  {
-        x = -x;
-        y = -y;
-        return *this;
+    Vec2 operator - ()  {
+        return Vec2(-x, -y);
     }
 
-    Vec2& operator * (float scale)  {
-        x *= scale;
-        y *= scale;
-        return *this;
+    Vec2 operator * (float scale)  {
+        return Vec2(x * scale, y * scale);
     }
 
     float LenSqr( ) const
