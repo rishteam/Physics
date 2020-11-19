@@ -297,7 +297,6 @@ bool Polygon::Collide(Manifold *m, Polygon *p)
         referenceIndex = faceA;
         flip = false;
     }
-
     else
     {
         RefPoly = p;
@@ -393,7 +392,7 @@ bool Polygon::Collide(Manifold *m, Circle *c)
 
     // Transform circle center to Polygon model space
     // 找最小穿透軸
-    Vec2 center = dynamic_cast<Shape*>(c)->position;
+    Vec2 center = c->position;
     center = this->u.Transpose( ) * (center - this->position);
 
     // Find edge with minimum penetration

@@ -62,16 +62,10 @@ public:
         return Vec2(x * scale, y * scale);
     }
 
-    float LenSqr( ) const
-    {
-        return x * x + y * y;
-    }
-
     void operator = (const Vec2& v)
     {
         x = v.x; y = v.y;
     }
-
 
     Vec2 operator + (const Vec2& v)  {
         return Vec2(x + v.x, y + v.y);
@@ -80,17 +74,23 @@ public:
     Vec2 operator - (const Vec2& v)  {
         return Vec2(x - v.x, y - v.y);
     }
-
+    /**
+    * @brief add vector
+    */
     void operator += (const Vec2& v)
     {
         x += v.x; y += v.y;
     }
-
+    /**
+    * @brief sub vector
+    */
     void operator -= (const Vec2& v)
     {
         x -= v.x; y -= v.y;
     }
-
+    /**
+    * @brief scale vector
+    */
     void operator *= (float a)
     {
         x *= a; y *= a;
@@ -110,6 +110,13 @@ public:
     {
         Vec2 c = Vec2(a.x - b.x,  a.y - b.y);
         return c.dot(c);
+    }
+    /**
+     * @brief vector square
+     */
+    float LenSqr( ) const
+    {
+        return x * x + y * y;
     }
     float getLength();
     /**

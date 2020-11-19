@@ -34,10 +34,6 @@ void PolygonToPolygonContactPoint(sf::Event event)
 {
 
     std::deque<Vec2> tmp;
-//    tmp.push_back({-10, 10});
-//    tmp.push_back({10, 10});
-//    tmp.push_back({10, -10});
-//    tmp.push_back({-10, -10});
     tmp.push_back({-10, 10});
     tmp.push_back({10, 10});
     tmp.push_back({10, -10});
@@ -83,10 +79,6 @@ void PolygonToPolygonContactPoint(sf::Event event)
         circle.setPosition(cp.x, cp.y);
         window.draw(circle);
     }
-    printf("Penetration: %.f\n", tmpM.penetration);
-    printf("Contacts Counter: %d\n", tmpM.contactCounter);
-    printf("Contacts[0]: (%.f, %.f)\n", tmpM.Contacts[0].x, tmpM.Contacts[0].y);
-    printf("Contacts[1]: (%.f, %.f)\n", tmpM.Contacts[1].x, tmpM.Contacts[1].y);
 }
 
 // Circle-Polygon contact Point
@@ -135,7 +127,7 @@ void CircleToPolygonContactPoint(sf::Event event)
 // Circle-Circle contact Point
 void CircleToCircleContactPoints(sf::Event event)
 {
-
+    
 
 };
 
