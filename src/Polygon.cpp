@@ -5,7 +5,7 @@
 
 #define MaxPolyVertexCount 64
 
-Polygon::Polygon(std::deque<Vec2> &pt, Vec2 pos)
+Polygon::Polygon(std::deque<Vec2> &pt, Vec2 pos, float mass_)
 {
     type = Shape::Type::Polygon;
 
@@ -104,6 +104,7 @@ Polygon::Polygon(std::deque<Vec2> &pt, Vec2 pos)
     position = pos;
     this->SetMatrix(0.0f);
     angle = 0.0f;
+    mass = mass_;
 
 
     // Calculate centroid and moment of interia
@@ -144,7 +145,6 @@ Polygon::Polygon(std::deque<Vec2> &pt, Vec2 pos)
     float density = 1.0f;
     if (mass < FLT_MAX)
     {
-        mass = density * area;
         I = I * density;
         invI = 1.0f / I;
     }

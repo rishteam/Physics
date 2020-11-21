@@ -3,7 +3,7 @@
 #include "Polygon.h"
 #include "Arbiter.h"
 
-Box::Box(float x, float y, float w, float h)
+Box::Box(float x, float y, float w, float h, float mass_)
 {
     type = Shape::Type::Box;
     m_vertexCount = 4;
@@ -24,13 +24,13 @@ Box::Box(float x, float y, float w, float h)
         Vec2 face = m_vertices[i2] - m_vertices[i1];
 
         // Ensure no zero-length edges, because that's bad
-        assert( face.LenSqr( ) > 0.00001 * 0.00001 );
+        assert( face.LenSqr( ) > EPSILON * EPSILON );
 
         // Calculate normal with 2D cross product between vector and scalar
         m_normals[i1] = Vec2( face.y, -face.x );
         m_normals[i1].Normalize( );
     }
-
+    mass = mass_;
     if (mass < FLT_MAX)
     {
         invMass = 1.0f / mass;

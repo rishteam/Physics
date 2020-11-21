@@ -40,7 +40,7 @@ void PolygonToPolygonContactPoint(sf::Event event)
     tmp.push_back({0, -20});
     tmp.push_back({-10, -10});
 
-    Shape *poly = new Polygon(tmp, Vec2(0, 0));
+    Shape *poly = new Polygon(tmp, Vec2(0, 0), 10.0f);
     poly->SetMatrix(0.0f);
 
     std::deque<Vec2> tmp2;
@@ -50,7 +50,7 @@ void PolygonToPolygonContactPoint(sf::Event event)
     tmp2.push_back({0, -20});
     tmp2.push_back({-10, -10});
 
-    Shape *poly2 = new Polygon(tmp, Vec2(0, 0));
+    Shape *poly2 = new Polygon(tmp, Vec2(0, 0), 10.0f);
 
     poly2->setPosition(Vec2(event.mouseMove.x, event.mouseMove.y));
 
@@ -90,7 +90,7 @@ void CircleToPolygonContactPoint(sf::Event event)
     tmp2.push_back({10, -10});
     tmp2.push_back({-10, -10});
 
-    Shape *poly = new Polygon(tmp2, Vec2(0, 0));
+    Shape *poly = new Polygon(tmp2, Vec2(0, 0), 10.0f);
     poly->SetMatrix(0.6666f);
 
     Circle *circle = new Circle(10, 10, 10);
@@ -161,10 +161,10 @@ void CircleToCircleContactPoints(sf::Event event)
 
 void BoxToBox(sf::Event event)
 {
-    Shape *box = new Box(0, 0, 10, 10);
+    Shape *box = new Box(0, 0, 10, 10, 10);
     box->SetMatrix(0.6666f);
 
-    Shape *box2 = new Box(0, 0, 10, 10);
+    Shape *box2 = new Box(0, 0, 10, 10, 10);
 
     // Update with mouse
     box2->setPosition(Vec2(event.mouseMove.x, event.mouseMove.y));
@@ -206,20 +206,20 @@ void PhysicsDemo1()
     tmp.push_back({5, -5});
     tmp.push_back({-5, -5});
 
-    Shape *poly = new Polygon(tmp, Vec2(0, 0));
+    Shape *poly = new Box(0, -20, 30, 5, FLT_MAX);
     poly->SetMatrix(0.6666f);
-
-    std::deque<Vec2> tmp2;
-    tmp2.push_back({-30, 10});
-    tmp2.push_back({30, 10});
-    tmp2.push_back({30, -10});
-    tmp2.push_back({-30, -10});
-
-    Shape *poly2 = new Polygon(tmp2, Vec2(0, -20));
-    poly2->mass = FLT_MAX;
-
+//
+//    std::deque<Vec2> tmp2;
+//    tmp2.push_back({-30, 10});
+//    tmp2.push_back({30, 10});
+//    tmp2.push_back({30, -10});
+//    tmp2.push_back({-30, -10});
+//
+//    Shape *poly2 = new Box(0, -20, 10, 10, FLT_MAX);
+    Circle *circle = new Circle(0, 10, 5);
     world.Add(poly);
-    world.Add(poly2);
+//    world.Add(poly2);
+    world.Add(circle);
 }
 
 void drawObject()
@@ -228,6 +228,23 @@ void drawObject()
     {
         bd->setDebugDraw();
         window.draw(*bd);
+    }
+}
+
+void drawContact()
+{
+    int i = 0;
+    for(auto arb : world.arbiters)
+    {
+        sf::CircleShape circle;
+        circle.setRadius(5);
+        circle.setFillColor(sf::Color::Green);
+        auto a = arb.second;
+        Vec2 cp = World::ConvertWorldToScreen(Vec2(a.contacts[i].position.x, a.contacts[i].position.y));
+        i += 1;
+        circle.setOrigin(5, 5);
+        circle.setPosition(cp.x, cp.y);
+        window.draw(circle);
     }
 }
 
@@ -315,12 +332,14 @@ int main()
         }
         ImGui::End();
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        {
-            world.Step(world.timeStep);
-        }
+//        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+//        {
+//            world.Step(world.timeStep);
+//        }
+        world.Step(world.timeStep);
         window.clear(sf::Color::Black);
         drawObject();
+        drawContact();
         ImGui::SFML::Render(window);
         window.display();
     }

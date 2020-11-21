@@ -2,21 +2,10 @@
 
 Physics::Physics(){
     mass = 0;
-    velocity = Vec2(1.0, -1.0);
+    velocity = Vec2(0.0f, 0.0f);
     angularVelocity = 0;
     force = Vec2(0.0, 0.0);
     torque = 0;
-//    if (mass < FLT_MAX)
-//    {
-//        invMass = 1.0f / mass;
-//        invI = 1.0f / I;
-//    }
-//    else
-//    {
-//        invMass = 0.0f;
-//        I = FLT_MAX;
-//        invI = 0.0f;
-//    }
 
 }
 
@@ -74,9 +63,9 @@ void Physics::ComputeForce(float delta_t, Vec2 gravity)
 void Physics::IntegrateVelocities(float delta_t)
 {
     auto tmp = delta_t * velocity;
-    position += tmp;
+    this->position += tmp;
     auto tmp2 = delta_t * angularVelocity;
-    angle += tmp2;
+    this->angle += tmp2;
 
     this->force.Set(0.0f, 0.0f);
     this->torque = 0.0f;

@@ -2,7 +2,7 @@
 
 Arbiter::Arbiter(Shape* b1_, Shape* b2_)
 {
-    if (b1_ < b2_)
+    if (b1_ > b2_)
     {
         b1 = b1_;
         b2 = b2_;
@@ -14,6 +14,8 @@ Arbiter::Arbiter(Shape* b1_, Shape* b2_)
     }
 
     // Calculate Contact point
+    b1->SetMatrix(b1->angle);
+    b2->SetMatrix(b2->angle);
     b1->Collide(this, *b2);
 
 }
@@ -77,8 +79,8 @@ void Arbiter::PreStep(float inv_dt)
 //透過衝量，計算出速度
 void Arbiter::ApplyImpulse()
 {
-    auto body1 = b1;
-    auto body2 = b2;
+    auto body1 = b2;
+    auto body2 = b1;
     b1->Collide(this, *b2);
 
     for (int i = 0; i < contactCounter; ++i)
@@ -87,6 +89,7 @@ void Arbiter::ApplyImpulse()
         // 撈出接觸點
         Contact* c = contacts + i;
 
+
         // 找出直心與接觸點的向量(r1, r2)
         c->r1 = c->position - body1->position;
         c->r2 = c->position - body2->position;
@@ -94,10 +97,14 @@ void Arbiter::ApplyImpulse()
         // 修正衝量的計算 dot(dv, n)/ kn (p.21)
 
         // Relative velocity at contact
-        Vec2 dv = body2->velocity + Cross(body2->angularVelocity, c->r2) - body1->velocity - Cross(body1->angularVelocity, c->r1);
+        Vec2 dv = body2->velocity + Cross(body2->angularVelocity, c->r2)
+                - body1->velocity - Cross(body1->angularVelocity, c->r1);
 
         // Compute normal impulse
         float vn = Dot(dv, c->normal);
+
+//        if(vn > 0)
+//            return;
 
         // massNormal = 1 / kn
         float dPn = c->massNormal * (-vn + c->bias);
@@ -170,13 +177,21 @@ void Arbiter::ApplyImpulse()
 
 // update the arbiter and calculate the pulse
 // 更新arbiter中contact point的數量，以及其中的衝量大小
-void Arbiter::update(Contact* newContacts, int numContacts_)
+void Arbiter::Update()
 {
-//
-//    b1->Collide(this, *b2);
-//
+      if(!b1->Collide(this, *b2))
+    {
+        contactCounter = 0;
+    }
+//    for(int i = 0; i < contactCounter; i++)
+//    {
+//        Contact* c = contacts + i;
+//        c->Pn = 0.0f;
+//        c->Pt = 0.0f;
+//        c->Pnb = 0.0f;
+//    }
 //    for(int i = 0; i < numContacts_; i++)
-////    {
+//    {
 //        Contact* cNew = newContacts + i;
 //        int k = -1;
 //        if (k > -1)

@@ -8,7 +8,7 @@ class Arbiter;
 class Polygon : public Shape
 {
 public:
-    Polygon(std::deque<Vec2> &pt, Vec2 pos);
+    Polygon(std::deque<Vec2> &pt, Vec2 pos, float mass_);
     ~Polygon() = default;
 
     int getVertexCount();

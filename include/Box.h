@@ -10,7 +10,7 @@ class Arbiter;
 class Box : public Shape
 {
 public:
-    Box(float x, float y, float w, float h);
+    Box(float x, float y, float w, float h, float mass_);
     ~Box() = default;
 
     virtual void setDebugDraw() override;

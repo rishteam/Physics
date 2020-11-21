@@ -67,7 +67,7 @@ class Arbiter
 public:
     Arbiter(Shape* b1_, Shape* b2_);
     ~Arbiter() = default;
-    void update(Contact* contacts, int numContacts);
+    void Update();
     void PreStep(float inv_dt);
     void ApplyImpulse();
     int calContactPoints(Contact *contacts, Shape* b1, Shape* b2);

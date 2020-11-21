@@ -3,8 +3,8 @@
 #include "Circle.h"
 #include "Polygon.h"
 
-bool World::accumulateImpulses = true;
-bool World::warmStarting = true;
+bool World::accumulateImpulses = false;
+bool World::warmStarting = false;
 bool World::positionCorrection = true;
 float World::width = 1280;
 float World::height = 720;
@@ -88,11 +88,11 @@ void World::Step(float delta_t)
 
     for (int i = 0; i < this->iterations; ++i)
     {
-        //Apply impulse
+        // Apply impulse
         for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb) {
             arb->second.ApplyImpulse();
         }
-
+        // Joint
 //        for (auto jit : joints)
 //        {
 //            jit->ApplyImpulse();
@@ -120,23 +120,19 @@ void World::BoardPhase()
             //add in Arbiter
             Arbiter newArb(b1, b2);
             ArbiterKey key(b1, b2);
-            auto iter = arbiters.find(key);
 
-            // SAT collision
-            if(b1->Collide(&newArb, *b2))
+            if (newArb.contactCounter > 0)
             {
-                //add new arbiter
+                auto iter = arbiters.find(key);
                 if (iter == arbiters.end())
                 {
-                    arbiters.insert(std::pair<ArbiterKey, Arbiter>(key, newArb));
+                    arbiters.insert(std::make_pair(key, newArb));
                 }
-                //update arbiter
                 else
                 {
-                    iter->second.update(newArb.contacts, newArb.contactCounter);
+                    iter->second.Update();
                 }
             }
-            //no collision
             else
             {
                 arbiters.erase(key);
