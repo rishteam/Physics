@@ -9,7 +9,7 @@
 #include "Box.h"
 #include "Circle.h"
 #include "Polygon.h"
-#include "Manifold.h"
+#include "Arbiter.h"
 
 #include "imgui.h"
 #include "imgui-SFML.h"
@@ -54,7 +54,7 @@ void PolygonToPolygonContactPoint(sf::Event event)
 
     poly2->setPosition(Vec2(event.mouseMove.x, event.mouseMove.y));
 
-    Manifold tmpM(poly, poly2);
+    Arbiter tmpM(poly, poly2);
 
     // Collide Detection
     if (poly->Collide(&tmpM, *poly2))
@@ -74,7 +74,7 @@ void PolygonToPolygonContactPoint(sf::Event event)
         sf::CircleShape circle;
         circle.setRadius(5);
         circle.setFillColor(sf::Color::Green);
-        Vec2 cp = World::ConvertWorldToScreen(Vec2(tmpM.Contacts[i].x, tmpM.Contacts[i].y));
+        Vec2 cp = World::ConvertWorldToScreen(Vec2(tmpM.contacts[i].position.x, tmpM.contacts[i].position.y));
         circle.setOrigin(5, 5);
         circle.setPosition(cp.x, cp.y);
         window.draw(circle);
@@ -94,7 +94,7 @@ void CircleToPolygonContactPoint(sf::Event event)
     poly->SetMatrix(0.6666f);
 
     Circle *circle = new Circle(10, 10, 10);
-    Manifold tmpM(poly, circle);
+    Arbiter tmpM(poly, circle);
 
     // Update with mouse
     circle->setPosition(Vec2(event.mouseMove.x, event.mouseMove.y));
@@ -117,7 +117,7 @@ void CircleToPolygonContactPoint(sf::Event event)
         sf::CircleShape circle;
         circle.setRadius(5);
         circle.setFillColor(sf::Color::Green);
-        Vec2 cp = World::ConvertWorldToScreen(Vec2(tmpM.Contacts[i].x, tmpM.Contacts[i].y));
+        Vec2 cp = World::ConvertWorldToScreen(Vec2(tmpM.contacts[i].position.x, tmpM.contacts[i].position.y));
         circle.setOrigin(5, 5);
         circle.setPosition(cp.x, cp.y);
         window.draw(circle);
@@ -129,7 +129,7 @@ void CircleToCircleContactPoints(sf::Event event)
 {
     Circle *circle = new Circle(10, 10, 10);
     Circle *circle2 = new Circle(10, 10, 5);
-    Manifold tmpM(circle, circle2);
+    Arbiter tmpM(circle, circle2);
 
     // Update with mouse
     circle2->setPosition(Vec2(event.mouseMove.x, event.mouseMove.y));
@@ -152,7 +152,7 @@ void CircleToCircleContactPoints(sf::Event event)
         sf::CircleShape circle;
         circle.setRadius(5);
         circle.setFillColor(sf::Color::Green);
-        Vec2 cp = World::ConvertWorldToScreen(Vec2(tmpM.Contacts[i].x, tmpM.Contacts[i].y));
+        Vec2 cp = World::ConvertWorldToScreen(Vec2(tmpM.contacts[i].position.x, tmpM.contacts[i].position.y));
         circle.setOrigin(5, 5);
         circle.setPosition(cp.x, cp.y);
         window.draw(circle);
@@ -169,7 +169,7 @@ void BoxToBox(sf::Event event)
     // Update with mouse
     box2->setPosition(Vec2(event.mouseMove.x, event.mouseMove.y));
 
-    Manifold tmpM(box, box2);
+    Arbiter tmpM(box, box2);
 
 
     // Collide Detection
@@ -190,7 +190,7 @@ void BoxToBox(sf::Event event)
         sf::CircleShape circle;
         circle.setRadius(5);
         circle.setFillColor(sf::Color::Green);
-        Vec2 cp = World::ConvertWorldToScreen(Vec2(tmpM.Contacts[i].x, tmpM.Contacts[i].y));
+        Vec2 cp = World::ConvertWorldToScreen(Vec2(tmpM.contacts[i].position.x, tmpM.contacts[i].position.y));
         circle.setOrigin(5, 5);
         circle.setPosition(cp.x, cp.y);
         window.draw(circle);

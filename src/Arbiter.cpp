@@ -13,9 +13,9 @@ Arbiter::Arbiter(Shape* b1_, Shape* b2_)
         b2 = b1_;
     }
 
-    numContacts = calContactPoints(this->contacts, b1, b2);
-
-    friction = sqrtf( dynamic_cast<Box*>(b1)->getfriction() * dynamic_cast<Box*>(b2)->getfriction());
+    // Calculate Contact point
+    b1->Collide(this, *b2);
+    
 }
 
 //預備好所需要的參數，包含k, delta_v, n, bias
@@ -26,11 +26,12 @@ void Arbiter::PreStep(float inv_dt)
     // bangar 修正，是一個介於0~1之間的數字，越小則越慢才修正
     float k_biasFactor = World::positionCorrection ? 0.2f : 0.0f;
 
-    for (int i = 0; i < numContacts; ++i)
+    for (int i = 0; i < contactCounter; ++i)
     {
         Contact* c = contacts + i;
-        Box* body1 = dynamic_cast<Box*>(this->b1);
-        Box* body2 = dynamic_cast<Box*>(this->b2);
+
+        auto body1 = b1;
+        auto body2 = b2;
 
         Vec2 r1 = c->position - body1->position;
         Vec2 r2 = c->position - body2->position;
@@ -54,7 +55,7 @@ void Arbiter::PreStep(float inv_dt)
 
         // Bias velocity and impulse
         // (bargar / delta_t)
-        c->bias = -k_biasFactor * inv_dt * Min(0.0f, c->separation + k_allowedPenetration);
+        c->bias = -k_biasFactor * inv_dt * Min(0.0f, c->penetration + k_allowedPenetration);
 
         // Apply normal + friction impulse
         // 修正衝量大小 + 修正方向(能將兩物體最有效分開的向量)，切線衝量大小 + 切線方向修正
@@ -76,10 +77,11 @@ void Arbiter::PreStep(float inv_dt)
 //透過衝量，計算出速度
 void Arbiter::ApplyImpulse()
 {
-    Box* body1 = dynamic_cast<Box*>(this->b1);
-    Box* body2 = dynamic_cast<Box*>(this->b2);
+    auto body1 = b1;
+    auto body2 = b2;
+    b1->Collide(this, *b2);
 
-    for (int i = 0; i < numContacts; ++i)
+    for (int i = 0; i < contactCounter; ++i)
     {
         // Get contact point
         // 撈出接觸點
@@ -177,10 +179,10 @@ void Arbiter::update(Contact* newContacts, int numContacts_)
         Contact* cNew = newContacts + i;
         int k = -1;
         // 如果前一幀與這一幀的feature value不一樣，才更新下一幀的速率
-        for (int j = 0; j < numContacts; ++j)
+        for (int j = 0; j < contactCounter; ++j)
         {
             Contact* cOld = contacts + j;
-            if (cNew->feature.value == cOld->feature.value)
+            if (cNew->penetration == cOld->penetration)
             {
                 k = j;
                 break;
@@ -214,200 +216,5 @@ void Arbiter::update(Contact* newContacts, int numContacts_)
     for (int i = 0; i < numContacts_; ++i)
         this->contacts[i] = mergedContacts[i];
 
-    this->numContacts = numContacts_;
 }
 
-//計算接觸點(V-clip算法)
-int Arbiter::calContactPoints(Contact* contacts, Shape* b1, Shape* b2)
-{
-    //get the box
-    auto bodyA = dynamic_cast<Box*>(b1);
-    auto bodyB = dynamic_cast<Box*>(b2);
-
-    //setup
-    Vec2 hA = Vec2(bodyA->wh.x * 0.5, bodyA->wh.y * 0.5);
-    Vec2 hB = Vec2(bodyB->wh.x * 0.5, bodyB->wh.y * 0.5);
-
-
-    Vec2 posA = Vec2(bodyA->position.x, bodyA->position.y);
-    Vec2 posB = Vec2(bodyB->position.x, bodyB->position.y);
-
-    //Rotate Matrix
-    //Mat22 RotA(degreesToRadians(360 - bodyA->getRotation())), RotB(degreesToRadians(360 -bodyB->getRotation()));
-    Mat22 RotA(bodyA->getPhysicsData().second), RotB(bodyB->getPhysicsData().second);
-    //Transpose Matrix
-    Mat22 RotAT = RotA.Transpose();
-    Mat22 RotBT = RotB.Transpose();
-
-    //delta position
-    //red-vector
-    Vec2 dp = posB - posA;
-    //ch
-    Vec2 dA = RotAT * dp;
-    Vec2 dB = RotBT * dp;
-
-
-    Mat22 C = RotAT * RotB;
-    Mat22 absC = Abs(C);
-    Mat22 absCT = absC.Transpose();
-
-    // magic formula 檢測SAT
-    // source: https://stackoverflow.com/questions/40047219/in-box2d-lite-i-cant-figure-out-what-the-box-a-faces-and-box-b-faces-check?answertab=oldest#tab-top
-
-    // Box A faces
-    Vec2 faceA = Abs(dA) - hA - absC * hB;
-
-    // Box B faces
-    Vec2 faceB = Abs(dB) - absCT * hA - hB;
-
-    // Find best axis
-    Axis axis;
-    float separation;
-    Vec2 normal;
-
-
-    // 證明: https://www.randygaul.net/2013/03/28/custom-physics-engine-part-2-manifold-generation/
-    // 找出最適合的最小穿透軸
-    axis = FACE_A_X;
-    separation = faceA.x;
-    normal = dA.x > 0.0f ? RotA.col1 : -RotA.col1;
-
-    //magic-formula 決定最小穿透軸
-    const float relativeTol = 0.95f;
-    const float absoluteTol = 0.01f;
-    if (faceA.y > relativeTol * separation + absoluteTol * hA.y)
-    {
-        axis = FACE_A_Y;
-        separation = faceA.y;
-        normal = dA.y > 0.0f ? RotA.col2 : -RotA.col2;
-    }
-
-
-    if (faceB.x > relativeTol * separation + absoluteTol * hB.x)
-    {
-        axis = FACE_B_X;
-        separation = faceB.x;
-        normal = dB.x > 0.0f ? RotB.col1 : -RotB.col1;
-    }
-
-    if (faceB.y > relativeTol * separation + absoluteTol * hB.y)
-    {
-        axis = FACE_B_Y;
-        separation = faceB.y;
-        normal = dB.y > 0.0f ? RotB.col2 : -RotB.col2;
-    }
-
-    // Setup clipping plane data based on the separating axis
-    Vec2 frontNormal, sideNormal;
-    //與人碰撞的edge
-    // Vec2 v; (點點)
-    FeaturePair fp; //(點點夾的兩邊)
-    ClipVertex incidentEdge[2];
-    float front, negSide, posSide;
-    char negEdge, posEdge;
-
-    // Compute the clipping lines and the line segment to be clipped.
-    // 計算出各種的直線方程式
-    switch (axis)
-    {
-        case FACE_A_X:
-        {
-            //reference face vector
-            frontNormal = normal;
-            front = Dot(posA, frontNormal) + hA.x;
-            sideNormal = RotA.col2;
-            // dot product is to compute c (ax + by)
-            float side = Dot(posA, sideNormal);
-            // side
-            negSide = -side + hA.y;
-            posSide =  side + hA.y;
-            negEdge = EDGE3;
-            posEdge = EDGE1;
-            ComputeIncidentEdge(incidentEdge, hB, posB, RotB, frontNormal);
-        }
-            break;
-
-        case FACE_A_Y:
-        {
-            frontNormal = normal;
-            front = Dot(posA, frontNormal) + hA.y;
-            sideNormal = RotA.col1;
-            float side = Dot(posA, sideNormal);
-            negSide = -side + hA.x;
-            posSide =  side + hA.x;
-            negEdge = EDGE2;
-            posEdge = EDGE4;
-            ComputeIncidentEdge(incidentEdge, hB, posB, RotB, frontNormal);
-        }
-            break;
-
-        case FACE_B_X:
-        {
-            frontNormal = -normal;
-            front = Dot(posB, frontNormal) + hB.x;
-            sideNormal = RotB.col2;
-            float side = Dot(posB, sideNormal);
-            negSide = -side + hB.y;
-            posSide =  side + hB.y;
-            negEdge = EDGE3;
-            posEdge = EDGE1;
-            ComputeIncidentEdge(incidentEdge, hA, posA, RotA, frontNormal);
-        }
-            break;
-
-        case FACE_B_Y:
-        {
-            frontNormal = -normal;
-            front = Dot(posB, frontNormal) + hB.y;
-            sideNormal = RotB.col1;
-            float side = Dot(posB, sideNormal);
-            negSide = -side + hB.x;
-            posSide =  side + hB.x;
-            negEdge = EDGE2;
-            posEdge = EDGE4;
-            ComputeIncidentEdge(incidentEdge, hA, posA, RotA, frontNormal);
-        }
-            break;
-    }
-
-    // clip other face with 5 box planes (1 face plane, 4 edge planes)
-
-    ClipVertex clipPoints1[2];
-    ClipVertex clipPoints2[2];
-    int np;
-
-    // Clip to box side 1
-    // 先測試negtive-side，決定候選點
-    np = ClipSegmentToLine(clipPoints1, incidentEdge, -sideNormal, negSide, negEdge);
-    if (np < 2)
-        return 0;
-
-    // Clip to negative box side 1
-    // 再放入positive-side，進行第二次的過濾
-    np = ClipSegmentToLine(clipPoints2, clipPoints1, sideNormal, posSide, posEdge);
-    if (np < 2)
-        return 0;
-
-    // Now clipPoints2 contains the clipping points.
-    // Due to roundoff, it is possible that clipping removes all points.
-
-    int numContacts_ = 0;
-    for (int i = 0; i < 2; ++i)
-    {
-        float separation = Dot(frontNormal, clipPoints2[i].v) - front;
-
-        if (separation <= 0)
-        {
-            contacts[numContacts_].separation = separation;
-            contacts[numContacts_].normal = normal;
-            // slide contact point onto reference face (easy to cull)
-            contacts[numContacts_].position = clipPoints2[i].v - separation * frontNormal;
-            contacts[numContacts_].feature = clipPoints2[i].fp;
-
-            if (axis == FACE_B_X || axis == FACE_B_Y)
-                Flip(contacts[numContacts_].feature);
-            ++numContacts_;
-        }
-    }
-    return numContacts_;
-}

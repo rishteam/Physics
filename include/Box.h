@@ -1,10 +1,11 @@
 #pragma once
 #include "Shape.h"
 
-class Manifold;
+class Arbiter;
 class Polygon;
 class Circle;
 class Box;
+class Arbiter;
 
 class Box : public Shape
 {
@@ -14,13 +15,13 @@ public:
 
     virtual void setDebugDraw() override;
 
-    virtual bool Collide(Manifold *m, Shape &s) override
+    virtual bool Collide(Arbiter *m, Shape &s) override
     {
         return s.Collide(m, *this);
     }
-    virtual bool Collide(Manifold *m, Box &b) override;
-    virtual bool Collide(Manifold *m, Polygon &p) override;
-    virtual bool Collide(Manifold *m, Circle &c) override;
+    virtual bool Collide(Arbiter *m, Box &b) override;
+    virtual bool Collide(Arbiter *m, Polygon &p) override;
+    virtual bool Collide(Arbiter *m, Circle &c) override;
 
 
 private:

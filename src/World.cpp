@@ -1,5 +1,7 @@
 #include "World.h"
 #include "Arbiter.h"
+#include "Circle.h"
+#include "Polygon.h"
 
 bool World::accumulateImpulses = true;
 bool World::warmStarting = true;
@@ -19,14 +21,33 @@ World::World(Vec2 gravity_, float width_, float height_)
 void World::Clear()
 {
     //release space
-//    for(auto ptr : bodies)
-//    {
-//        Box* box = dynamic_cast<Box*>(ptr);
-//        delete box;
-//    }
-//    bodies.clear();
-//    joints.clear();
-//    arbiters.clear();
+    for(auto ptr : bodies)
+    {
+        switch(ptr->type)
+        {
+            case Shape::Type::Box:
+            {
+                Box *box = dynamic_cast<Box *>(ptr);
+                delete box;
+                break;
+            }
+            case Shape::Type::Circle:
+            {
+                Circle *circle = dynamic_cast<Circle *>(ptr);
+                delete circle;
+                break;
+            }
+            case Shape::Type::Polygon:
+            {
+                Polygon * poly = dynamic_cast<Polygon *>(ptr);
+                delete poly;
+                break;
+            }
+        }
+    }
+    bodies.clear();
+    joints.clear();
+    arbiters.clear();
 }
 
 void World::Add(Shape* body)

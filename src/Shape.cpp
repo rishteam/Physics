@@ -1,5 +1,5 @@
 #include "Shape.h"
-#include "Manifold.h"
+#include "Arbiter.h"
 
 Vec2 Shape::GetSupport( const Vec2 dir )
 {

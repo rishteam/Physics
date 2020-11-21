@@ -4,7 +4,6 @@
 #include <deque>
 #include <cmath>
 
-#include "Manifold.h"
 #include "Physics.h"
 #include "vector_math.h"
 
@@ -15,6 +14,7 @@ class Circle;
 class Polygon;
 class Box;
 class World;
+class Arbiter;
 
 class Shape : public sf::Drawable, public Physics
 {
@@ -46,10 +46,10 @@ public:
     bool BiasGreaterThan( float a, float b );
 
     // Detect Collision
-    virtual bool Collide(Manifold *m, Shape &s) = 0;
-    virtual bool Collide(Manifold *m, Box &b) = 0;
-    virtual bool Collide(Manifold *m, Polygon &p) = 0;
-    virtual bool Collide(Manifold *m, Circle &c) = 0;
+    virtual bool Collide(Arbiter *m, Shape &s) = 0;
+    virtual bool Collide(Arbiter *m, Box &b) = 0;
+    virtual bool Collide(Arbiter *m, Polygon &p) = 0;
+    virtual bool Collide(Arbiter *m, Circle &c) = 0;
 
 
     int m_vertexCount = 0;

@@ -1,7 +1,7 @@
 #include "Polygon.h"
 #include "Circle.h"
 #include "Box.h"
-#include "Manifold.h"
+#include "Arbiter.h"
 
 #define MaxPolyVertexCount 64
 
@@ -141,7 +141,7 @@ void Polygon::setDebugDraw()
 
 }
 
-bool Polygon::Collide(Manifold *m, Box &b)
+bool Polygon::Collide(Arbiter *m, Box &b)
 {
     m->contactCounter = 0;
 
@@ -233,7 +233,7 @@ bool Polygon::Collide(Manifold *m, Box &b)
         return false; // Due to floating point error, possible to not have required points
 
     // Flip
-    m->normal = flip ? -refFaceNormal : refFaceNormal;
+    m->contacts[0].normal = flip ? -refFaceNormal : refFaceNormal;
 
     // 透過clip截斷點，incidentFace
     // Keep points behind reference face
@@ -241,31 +241,31 @@ bool Polygon::Collide(Manifold *m, Box &b)
     float separation = Dot( refFaceNormal, incidentFace[0] ) - refC;
     if(separation <= 0.0f)
     {
-        m->Contacts[cp] = incidentFace[0];
-        m->penetration = -separation;
+        m->contacts[cp].position = incidentFace[0];
+        m->contacts[cp].penetration = -separation;
         ++cp;
     }
     else
     {
-        m->penetration = 0;
+        m->contacts[cp].penetration = 0;
     }
 
     separation = Dot( refFaceNormal, incidentFace[1] ) - refC;
     if(separation <= 0.0f)
     {
-        m->Contacts[cp] = incidentFace[1];
-        m->penetration += -separation;
+        m->contacts[cp].position = incidentFace[1];
+        m->contacts[cp].penetration += -separation;
         ++cp;
 
         // Average penetration
-        m->penetration /= (float)cp;
+//        m->penetration /= (float)cp;
     }
 
     m->contactCounter = cp;
     return true;
 }
 
-bool Polygon::Collide(Manifold *m, Polygon &p)
+bool Polygon::Collide(Arbiter *m, Polygon &p)
 {
     m->contactCounter = 0;
 
@@ -355,7 +355,8 @@ bool Polygon::Collide(Manifold *m, Polygon &p)
         return false; // Due to floating point error, possible to not have required points
 
     // Flip
-    m->normal = flip ? -refFaceNormal : refFaceNormal;
+    m->contacts[0].normal = flip ? -refFaceNormal : refFaceNormal;
+    m->contacts[1].normal = flip ? -refFaceNormal : refFaceNormal;
 
     // 透過clip截斷點，incidentFace
     // Keep points behind reference face
@@ -363,30 +364,30 @@ bool Polygon::Collide(Manifold *m, Polygon &p)
     float separation = Dot( refFaceNormal, incidentFace[0] ) - refC;
     if(separation <= 0.0f)
     {
-        m->Contacts[cp] = incidentFace[0];
-        m->penetration = -separation;
+        m->contacts[cp].position = incidentFace[0];
+        m->contacts[cp].penetration = -separation;
         ++cp;
     }
     else
     {
-        m->penetration = 0;
+        m->contacts[cp].penetration = 0;
     }
     separation = Dot( refFaceNormal, incidentFace[1] ) - refC;
     if(separation <= 0.0f)
     {
-        m->Contacts[cp] = incidentFace[1];
-        m->penetration += -separation;
+        m->contacts[cp].position = incidentFace[1];
+        m->contacts[cp].penetration += -separation;
         ++cp;
 
         // Average penetration
-        m->penetration /= (float)cp;
+//        m->penetration /= (float)cp;
     }
 
     m->contactCounter = cp;
     return true;
 }
 
-bool Polygon::Collide(Manifold *m, Circle &c)
+bool Polygon::Collide(Arbiter *m, Circle &c)
 {
     m->contactCounter = 0;
 
@@ -421,16 +422,16 @@ bool Polygon::Collide(Manifold *m, Circle &c)
     if(separation < EPSILON)
     {
         m->contactCounter = 1;
-        m->normal = -(this->u * this->m_normals[faceNormal]);
-        m->Contacts[0] = m->normal * c.getRadius() + c.position;
-        m->penetration = c.getRadius();
+        m->contacts[0].normal = -(this->u * this->m_normals[faceNormal]);
+        m->contacts[0].position = m->contacts[0].normal * c.getRadius() + c.position;
+        m->contacts[0].penetration = c.getRadius();
         return true;
     }
 
     // Determine which voronoi region of the edge center of circle lies within
     float dot1 = Dot( center - v1, v2 - v1 );
     float dot2 = Dot( center - v2, v1 - v2 );
-    m->penetration = c.getRadius() - separation;
+    m->contacts[0].penetration  = c.getRadius() - separation;
 
     // Closest to v1
     // 靠近v1
@@ -444,9 +445,9 @@ bool Polygon::Collide(Manifold *m, Circle &c)
         Vec2 n = v1 - center;
         n = this->u * n;
         n.Normalize( );
-        m->normal = n;
+        m->contacts[0].normal = n;
         v1 = this->u * v1 + this->position;
-        m->Contacts[0] = v1;
+        m->contacts[0].position = v1;
     }
 
     // Closest to v2
@@ -459,10 +460,10 @@ bool Polygon::Collide(Manifold *m, Circle &c)
         m->contactCounter = 1;
         Vec2 n = v2 - center;
         v2 = this->u * v2 + this->position;
-        m->Contacts[0] = v2;
+        m->contacts[0].position = v2;
         n = this->u * n;
         n.Normalize( );
-        m->normal = n;
+        m->contacts[0].normal = n;
     }
 
     // Closest to face
@@ -473,8 +474,8 @@ bool Polygon::Collide(Manifold *m, Circle &c)
         if(Dot( center - v1, n ) > c.getRadius())
             return false;
         n = this->u * n;
-        m->normal = -n;
-        m->Contacts[0] = m->normal * c.getRadius() + c.position;
+        m->contacts[0].normal  = -n;
+        m->contacts[0].position = m->contacts[0].normal * c.getRadius() + c.position;
         m->contactCounter = 1;
     }
     return true;
