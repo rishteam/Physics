@@ -2,11 +2,11 @@
 #include <vector>
 #include <map>
 #include "vector_math.h"
-#include "Shape.h"
 #include "Joint.h"
 
 class ArbiterKey;
 class Arbiter;
+class Shape;
 
 enum class COLLISION {
     SAT,

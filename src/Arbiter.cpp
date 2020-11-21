@@ -15,7 +15,7 @@ Arbiter::Arbiter(Shape* b1_, Shape* b2_)
 
     // Calculate Contact point
     b1->Collide(this, *b2);
-    
+
 }
 
 //預備好所需要的參數，包含k, delta_v, n, bias
@@ -172,49 +172,91 @@ void Arbiter::ApplyImpulse()
 // 更新arbiter中contact point的數量，以及其中的衝量大小
 void Arbiter::update(Contact* newContacts, int numContacts_)
 {
-    Contact mergedContacts[2];
-
-    for(int i = 0; i < numContacts_; i++)
-    {
-        Contact* cNew = newContacts + i;
-        int k = -1;
-        // 如果前一幀與這一幀的feature value不一樣，才更新下一幀的速率
-        for (int j = 0; j < contactCounter; ++j)
-        {
-            Contact* cOld = contacts + j;
-            if (cNew->penetration == cOld->penetration)
-            {
-                k = j;
-                break;
-            }
-        }
-
-        if (k > -1)
-        {
-            Contact* c = mergedContacts + i;
-            Contact* cOld = contacts + k;
-            *c = *cNew;
-            if (World::warmStarting)
-            {
-                c->Pn = cOld->Pn;
-                c->Pt = cOld->Pt;
-                c->Pnb = cOld->Pnb;
-            }
-            else
-            {
-                c->Pn = 0.0f;
-                c->Pt = 0.0f;
-                c->Pnb = 0.0f;
-            }
-        }
-        else
-        {
-            mergedContacts[i] = newContacts[i];
-        }
-    }
-
-    for (int i = 0; i < numContacts_; ++i)
-        this->contacts[i] = mergedContacts[i];
+//
+//    b1->Collide(this, *b2);
+//
+//    for(int i = 0; i < numContacts_; i++)
+////    {
+//        Contact* cNew = newContacts + i;
+//        int k = -1;
+//        if (k > -1)
+//            {
+//                Contact* c = mergedContacts + i;
+//                Contact* cOld = contacts + k;
+//                *c = *cNew;
+//                if (World::warmStarting)
+//                {
+//                    c->Pn = cOld->Pn;
+//                    c->Pt = cOld->Pt;
+//                    c->Pnb = cOld->Pnb;
+//                }
+//                else
+//                {
+//                    c->Pn = 0.0f;
+//                    c->Pt = 0.0f;
+//                    c->Pnb = 0.0f;
+//                }
+//            }
+//            else
+//            {
+//                mergedContacts[i] = newContacts[i];
+//            }
+//    }
+//    if (World::warmStarting)
+//    {
+//        c->Pn = cOld->Pn;
+//        c->Pt = cOld->Pt;
+//        c->Pnb = cOld->Pnb;
+//    }
+//    else
+//    {
+//        c->Pn = 0.0f;
+//        c->Pt = 0.0f;
+//        c->Pnb = 0.0f;
+//    }
+//    Contact mergedContacts[2];
+//
+//    for(int i = 0; i < numContacts_; i++)
+//    {
+//        Contact* cNew = newContacts + i;
+//        int k = -1;
+//        // 如果前一幀與這一幀的feature value不一樣，才更新下一幀的速率
+//        for (int j = 0; j < contactCounter; ++j)
+//        {
+//            Contact* cOld = contacts + j;
+//            if (cNew-> == cOld->penetration)
+//            {
+//                k = j;
+//                break;
+//            }
+//        }
+//
+//        if (k > -1)
+//        {
+//            Contact* c = mergedContacts + i;
+//            Contact* cOld = contacts + k;
+//            *c = *cNew;
+//            if (World::warmStarting)
+//            {
+//                c->Pn = cOld->Pn;
+//                c->Pt = cOld->Pt;
+//                c->Pnb = cOld->Pnb;
+//            }
+//            else
+//            {
+//                c->Pn = 0.0f;
+//                c->Pt = 0.0f;
+//                c->Pnb = 0.0f;
+//            }
+//        }
+//        else
+//        {
+//            mergedContacts[i] = newContacts[i];
+//        }
+//    }
+//
+//    for (int i = 0; i < numContacts_; ++i)
+//        this->contacts[i] = mergedContacts[i];
 
 }
 

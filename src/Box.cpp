@@ -31,6 +31,19 @@ Box::Box(float x, float y, float w, float h)
         m_normals[i1].Normalize( );
     }
 
+    if (mass < FLT_MAX)
+    {
+        invMass = 1.0f / mass;
+        I = mass * (wh.x * wh.x + wh.y * wh.y) / 12.0f;
+        invI = 1.0f / I;
+    }
+    else
+    {
+        invMass = 0.0f;
+        I = FLT_MAX;
+        invI = 0.0f;
+    }
+
     this->SetMatrix(0.0f);
     angle = 0.0f;
 }
@@ -374,9 +387,8 @@ bool Box::Collide(Arbiter *m, Circle &c)
         v1 = this->u * v1 + this->position;
         m->contacts[0].position = v1;
     }
-
-        // Closest to v2
-        // 靠近v2
+    // Closest to v2
+    // 靠近v2
     else if(dot2 <= 0.0f)
     {
         if(DistSqr( center, v2 ) > c.getRadius() * c.getRadius())
@@ -390,9 +402,8 @@ bool Box::Collide(Arbiter *m, Circle &c)
         n.Normalize( );
         m->contacts[0].normal = n;
     }
-
-        // Closest to face
-        // 靠近面
+    // Closest to face
+    // 靠近面
     else
     {
         Vec2 n = this->m_normals[faceNormal];

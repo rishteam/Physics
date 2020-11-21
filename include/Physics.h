@@ -1,9 +1,6 @@
 #include "vector_math.h"
 #include "World.h"
 
-#ifndef Physics_H
-#define Physics_H
-
 class Physics
 {
 public:
@@ -39,5 +36,3 @@ public:
     //慣性矩，慣性矩倒數
     float I, invI;
 };
-
-#endif

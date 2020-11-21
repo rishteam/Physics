@@ -26,7 +26,7 @@ int cnt2 = 0;
 static bool f_keepSimulate = true;
 static bool f_showContactPoints = true;
 
-//World world(Vec2(0.0, -9.8), 1280.0f, 780.0f);
+World world(Vec2(0.0, -9.8), 1280.0f, 780.0f);
 sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH,  WINDOW_HEIGHT), "Physics");
 
 // Polygon-Polygon contact Point
@@ -171,7 +171,6 @@ void BoxToBox(sf::Event event)
 
     Arbiter tmpM(box, box2);
 
-
     // Collide Detection
     if (box->Collide(&tmpM, *box2))
     {
@@ -194,6 +193,41 @@ void BoxToBox(sf::Event event)
         circle.setOrigin(5, 5);
         circle.setPosition(cp.x, cp.y);
         window.draw(circle);
+    }
+}
+
+
+void PhysicsDemo1()
+{
+    world.Clear();
+    std::deque<Vec2> tmp;
+    tmp.push_back({-5, 5});
+    tmp.push_back({5, 5});
+    tmp.push_back({5, -5});
+    tmp.push_back({-5, -5});
+
+    Shape *poly = new Polygon(tmp, Vec2(0, 0));
+    poly->SetMatrix(0.6666f);
+
+    std::deque<Vec2> tmp2;
+    tmp2.push_back({-30, 10});
+    tmp2.push_back({30, 10});
+    tmp2.push_back({30, -10});
+    tmp2.push_back({-30, -10});
+
+    Shape *poly2 = new Polygon(tmp2, Vec2(0, -20));
+    poly2->mass = FLT_MAX;
+
+    world.Add(poly);
+    world.Add(poly2);
+}
+
+void drawObject()
+{
+    for(auto &bd : world.bodies)
+    {
+        bd->setDebugDraw();
+        window.draw(*bd);
     }
 }
 
@@ -232,36 +266,62 @@ int main()
 
             window.clear(sf::Color::Black);
         }
-//        CircleToPolygonContactPoint(event);
-//        CircleToPolygonContactPoint(event);
-        BoxToBox(event);
+
         ImGui::SFML::Update(window, deltaClock.restart());
         ImGui::Begin("Contact Points Detection");
         if (ImGui::CollapsingHeader("Cases")) {
-            if (ImGui::Button("Case1: Circle To Polygon")) {
-                CircleToPolygonContactPoint(event);
+            if(ImGui::Button("Simple Demo"))
+            {
+                PhysicsDemo1();
             }
-            if (ImGui::Button("Case2: Polygon To Polygon")) {
-                PolygonToPolygonContactPoint(event);
+//            if (ImGui::Button("Case1: Circle To Polygon")) {
+//                CircleToPolygonContactPoint(event);
+//            }
+//            if (ImGui::Button("Case2: Polygon To Polygon")) {
+//                PolygonToPolygonContactPoint(event);
+//            }
+//            if (ImGui::Button("Demo3: Circle To Circle")) {
+//                CircleToCircleContactPoints(event);
+//            }
+//            if (ImGui::Button("Demo4 : Box To Box")){
+//                BoxToBox(event);
+//            }
+
+        }
+        if (ImGui::CollapsingHeader("Box's Data"))
+        {
+            for(int i = 0; i < world.bodies.size(); i++)
+            {
+                ImGui::Text("Object %d:", i);
+                ImGui::Text("[Physics] Center: (%f, %f)", world.bodies[i]->position.x, world.bodies[i]->position.y);
+                ImGui::Text("[Physics] angle: %f", radiansToDegrees(world.bodies[i]->angle) );
+                ImGui::Text("[Physics] mass: %f", world.bodies[i]->mass);
+                ImGui::Text("[Physics] invMass: %f", world.bodies[i]->invMass);
+                ImGui::Text("[Physics] I: %f", world.bodies[i]->I);
+                ImGui::Text("[Physics] invI: %f", world.bodies[i]->invI);
+                ImGui::Text("[Physics] Friction: %f", world.bodies[i]->friction);
+                ImGui::Separator();
             }
-            if (ImGui::Button("Demo3: Circle To Circle")) {
-                CircleToCircleContactPoints(event);
+        }
+
+        if (ImGui::CollapsingHeader("Arbiters"))
+        {
+            ImGui::Text("Arbiters size: %d", world.arbiters.size());
+            for(auto arbiter : world.arbiters)
+            {
+                ImGui::Text("Arbiters: Contact %d", arbiter.second.contactCounter);
+                ImGui::Separator();
             }
         }
         ImGui::End();
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+        {
+            world.Step(world.timeStep);
+        }
+        window.clear(sf::Color::Black);
+        drawObject();
         ImGui::SFML::Render(window);
-
         window.display();
-
-
-        //Render IMGUI
-
-//        if(f_keepSimulate || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-//        {
-//            world.Step(world.timeStep);
-//        }
-
-//        ImGui::SFML::Render(window);
-        // clear screen
     }
 }

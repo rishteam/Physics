@@ -4,6 +4,13 @@
 #include "World.h"
 #include "vector_math.h"
 
+enum class FeaturePair{
+    inEdge1,
+    outEdge1,
+    inEdge2,
+    outEdge2
+};
+
 struct Contact
 {
     Vec2 position = Vec2(0.0f, 0.0f);
@@ -16,9 +23,11 @@ struct Contact
     //切線方向的衝量
     float Pt = 0.0f;	// accumulated tangent impulse
     //加衝量加位置的偏差量
-    float Pnb = 0.0f;	// accumulated normal i+mpulse for position bias
+    float Pnb = 0.0f;	// accumulated normal impulse for position bias
     float massNormal = 0.0f, massTangent = 0.0f;
     float bias = 0.0f;
+    //
+    FeaturePair feature = FeaturePair::inEdge1;
 };
 
 class ArbiterKey

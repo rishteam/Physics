@@ -1,4 +1,3 @@
-
 #include "Physics.h"
 
 Physics::Physics(){
@@ -7,6 +6,18 @@ Physics::Physics(){
     angularVelocity = 0;
     force = Vec2(0.0, 0.0);
     torque = 0;
+//    if (mass < FLT_MAX)
+//    {
+//        invMass = 1.0f / mass;
+//        invI = 1.0f / I;
+//    }
+//    else
+//    {
+//        invMass = 0.0f;
+//        I = FLT_MAX;
+//        invI = 0.0f;
+//    }
+
 }
 
 std::pair<Vec2, float> Physics::getPhysicsData()

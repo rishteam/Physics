@@ -11,6 +11,7 @@ Polygon::Polygon(std::deque<Vec2> &pt, Vec2 pos)
 
     int count = pt.size();
 
+    // 找凸包
     // No hulls with less than 3 vertices (ensure actual polygon)
     assert( count > 2 && count <= MaxPolyVertexCount );
     count = std::min( (int)count, MaxPolyVertexCount );
@@ -103,6 +104,56 @@ Polygon::Polygon(std::deque<Vec2> &pt, Vec2 pos)
     position = pos;
     this->SetMatrix(0.0f);
     angle = 0.0f;
+
+
+    // Calculate centroid and moment of interia
+    Vec2 c( 0.0f, 0.0f ); // centroid
+    float area = 0.0f;
+    float I = 0.0f;
+    const float k_inv3 = 1.0f / 3.0f;
+
+    for(int i1 = 0; i1 < m_vertexCount; ++i1)
+    {
+        // Triangle vertices, third vertex implied as (0, 0)
+        Vec2 p1( m_vertices[i1] );
+        int i2 = i1 + 1 < m_vertexCount ? i1 + 1 : 0;
+        Vec2 p2( m_vertices[i2] );
+
+        float D = Cross( p1, p2 );
+        float triangleArea = 0.5f * D;
+
+        area += triangleArea;
+
+        // Use area to weight the centroid average, not just vertex position
+        c += triangleArea * k_inv3 * (p1 + p2);
+
+        float intx2 = p1.x * p1.x + p2.x * p1.x + p2.x * p2.x;
+        float inty2 = p1.y * p1.y + p2.y * p1.y + p2.y * p2.y;
+        I += (0.25f * k_inv3 * D) * (intx2 + inty2);
+    }
+
+    c *= 1.0f / area;
+
+    // Translate vertices to centroid (make the centroid (0, 0)
+    // for the polygon in model space)
+    // Not really necessary, but I like doing this anyway
+    for(int i = 0; i < m_vertexCount; ++i)
+        m_vertices[i] -= c;
+
+    // TODO: can modify density
+    float density = 1.0f;
+    if (mass < FLT_MAX)
+    {
+        mass = density * area;
+        I = I * density;
+        invI = 1.0f / I;
+    }
+    else
+    {
+        invMass = 0.0f;
+        I = FLT_MAX;
+        invI = 0.0f;
+    }
 
 }
 
