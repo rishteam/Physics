@@ -141,19 +141,19 @@ void Polygon::setDebugDraw()
 
 }
 
-bool Polygon::Collide(Manifold *m, Box *b)
+bool Polygon::Collide(Manifold *m, Box &b)
 {
     m->contactCounter = 0;
 
     // Check for a separating axis with A's face planes
     int faceA;
-    float penetrationA = FindAxisLeastPenetration(&faceA, this, dynamic_cast<Shape *>(b));
+    float penetrationA = FindAxisLeastPenetration(&faceA, this, &b);
     if(penetrationA >= 0.0f)
         return false;
 
     // Check for a separating axis with B's face planes
     int faceB;
-    float penetrationB = FindAxisLeastPenetration(&faceB, dynamic_cast<Shape *>(b), this);
+    float penetrationB = FindAxisLeastPenetration(&faceB, &b, this);
     if(penetrationB >= 0.0f)
         return false;
 
@@ -169,14 +169,14 @@ bool Polygon::Collide(Manifold *m, Box *b)
     if(BiasGreaterThan(penetrationA, penetrationB))
     {
         RefPoly = this;
-        IncPoly = dynamic_cast<Shape *>(b);
+        IncPoly = &b;
         referenceIndex = faceA;
         flip = false;
     }
 
     else
     {
-        RefPoly = dynamic_cast<Shape *>(b);
+        RefPoly = &b;
         IncPoly = this;
         referenceIndex = faceB;
         flip = true;
@@ -265,19 +265,19 @@ bool Polygon::Collide(Manifold *m, Box *b)
     return true;
 }
 
-bool Polygon::Collide(Manifold *m, Polygon *p)
+bool Polygon::Collide(Manifold *m, Polygon &p)
 {
     m->contactCounter = 0;
 
     // Check for a separating axis with A's face planes
     int faceA = 0;
-    float penetrationA = FindAxisLeastPenetration(&faceA, this, p);
+    float penetrationA = FindAxisLeastPenetration(&faceA, this, &p);
     if(penetrationA >= 0.0f)
         return false;
 
     // Check for a separating axis with B's face planes
     int faceB;
-    float penetrationB = FindAxisLeastPenetration( &faceB, p, this );
+    float penetrationB = FindAxisLeastPenetration( &faceB, &p, this );
     if(penetrationB >= 0.0f)
         return false;
 
@@ -293,13 +293,13 @@ bool Polygon::Collide(Manifold *m, Polygon *p)
     if(BiasGreaterThan(penetrationA, penetrationB))
     {
         RefPoly = this;
-        IncPoly = p;
+        IncPoly = &p;
         referenceIndex = faceA;
         flip = false;
     }
     else
     {
-        RefPoly = p;
+        RefPoly = &p;
         IncPoly = this;
         referenceIndex = faceB;
         flip = true;
@@ -386,13 +386,13 @@ bool Polygon::Collide(Manifold *m, Polygon *p)
     return true;
 }
 
-bool Polygon::Collide(Manifold *m, Circle *c)
+bool Polygon::Collide(Manifold *m, Circle &c)
 {
     m->contactCounter = 0;
 
     // Transform circle center to Polygon model space
     // 找最小穿透軸
-    Vec2 center = c->position;
+    Vec2 center = c.position;
     center = this->u.Transpose( ) * (center - this->position);
 
     // Find edge with minimum penetration
@@ -402,7 +402,7 @@ bool Polygon::Collide(Manifold *m, Circle *c)
     for(int i = 0; i < this->m_vertexCount; ++i)
     {
         float s = Dot( this->m_normals[i], center - this->m_vertices[i] );
-        if(s > c->getRadius())
+        if(s > c.getRadius())
             return false;
         if(s > separation)
         {
@@ -422,22 +422,22 @@ bool Polygon::Collide(Manifold *m, Circle *c)
     {
         m->contactCounter = 1;
         m->normal = -(this->u * this->m_normals[faceNormal]);
-        m->Contacts[0] = m->normal * c->getRadius() + c->position;
-        m->penetration = c->getRadius();
+        m->Contacts[0] = m->normal * c.getRadius() + c.position;
+        m->penetration = c.getRadius();
         return true;
     }
 
     // Determine which voronoi region of the edge center of circle lies within
     float dot1 = Dot( center - v1, v2 - v1 );
     float dot2 = Dot( center - v2, v1 - v2 );
-    m->penetration = c->getRadius() - separation;
+    m->penetration = c.getRadius() - separation;
 
     // Closest to v1
     // 靠近v1
     if(dot1 <= 0.0f)
     {
         // 檢查是否分離
-        if(DistSqr( center, v1 ) > c->getRadius() * c->getRadius())
+        if(DistSqr( center, v1 ) > c.getRadius() * c.getRadius())
             return false;
 
         m->contactCounter = 1;
@@ -453,7 +453,7 @@ bool Polygon::Collide(Manifold *m, Circle *c)
     // 靠近v2
     else if(dot2 <= 0.0f)
     {
-        if(DistSqr( center, v2 ) > c->getRadius() * c->getRadius())
+        if(DistSqr( center, v2 ) > c.getRadius() * c.getRadius())
             return false;
 
         m->contactCounter = 1;
@@ -470,11 +470,11 @@ bool Polygon::Collide(Manifold *m, Circle *c)
     else
     {
         Vec2 n = this->m_normals[faceNormal];
-        if(Dot( center - v1, n ) > c->getRadius())
+        if(Dot( center - v1, n ) > c.getRadius())
             return false;
         n = this->u * n;
         m->normal = -n;
-        m->Contacts[0] = m->normal * c->getRadius() + c->position;
+        m->Contacts[0] = m->normal * c.getRadius() + c.position;
         m->contactCounter = 1;
     }
     return true;

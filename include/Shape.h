@@ -46,10 +46,10 @@ public:
     bool BiasGreaterThan( float a, float b );
 
     // Detect Collision
-    virtual bool Collide(Manifold *m, Shape *s) = 0;
-    virtual bool Collide(Manifold *m, Box *b) = 0;
-    virtual bool Collide(Manifold *m, Polygon *p) = 0;
-    virtual bool Collide(Manifold *m, Circle *c) = 0;
+    virtual bool Collide(Manifold *m, Shape &s) = 0;
+    virtual bool Collide(Manifold *m, Box &b) = 0;
+    virtual bool Collide(Manifold *m, Polygon &p) = 0;
+    virtual bool Collide(Manifold *m, Circle &c) = 0;
 
 
     int m_vertexCount = 0;

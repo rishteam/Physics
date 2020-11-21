@@ -57,7 +57,7 @@ void PolygonToPolygonContactPoint(sf::Event event)
     Manifold tmpM(poly, poly2);
 
     // Collide Detection
-    if (poly->Collide(&tmpM, poly2))
+    if (poly->Collide(&tmpM, *poly2))
     {
         poly->selected = true;
         poly2->selected = true;
@@ -100,7 +100,7 @@ void CircleToPolygonContactPoint(sf::Event event)
     circle->setPosition(Vec2(event.mouseMove.x, event.mouseMove.y));
 
     // Collide Detection
-    if (poly->Collide(&tmpM, circle))
+    if (poly->Collide(&tmpM, *circle))
     {
         poly->selected = true;
         circle->selected = true;
@@ -127,26 +127,81 @@ void CircleToPolygonContactPoint(sf::Event event)
 // Circle-Circle contact Point
 void CircleToCircleContactPoints(sf::Event event)
 {
-    
+    Circle *circle = new Circle(10, 10, 10);
+    Circle *circle2 = new Circle(10, 10, 5);
+    Manifold tmpM(circle, circle2);
 
+    // Update with mouse
+    circle2->setPosition(Vec2(event.mouseMove.x, event.mouseMove.y));
+
+    // Collide Detection
+    if (circle2->Collide(&tmpM, *circle))
+    {
+        circle->selected = true;
+        circle2->selected = true;
+    }
+
+    // Draw
+    circle->setDebugDraw();
+    window.draw(*circle);
+    circle2->setDebugDraw();
+    window.draw(*circle2);
+
+    for(int i = 0; i < tmpM.contactCounter; i++)
+    {
+        sf::CircleShape circle;
+        circle.setRadius(5);
+        circle.setFillColor(sf::Color::Green);
+        Vec2 cp = World::ConvertWorldToScreen(Vec2(tmpM.Contacts[i].x, tmpM.Contacts[i].y));
+        circle.setOrigin(5, 5);
+        circle.setPosition(cp.x, cp.y);
+        window.draw(circle);
+    }
 };
+
+void BoxToBox(sf::Event event)
+{
+    Shape *box = new Box(0, 0, 10, 10);
+    box->SetMatrix(0.6666f);
+
+    Shape *box2 = new Box(0, 0, 10, 10);
+
+    // Update with mouse
+    box2->setPosition(Vec2(event.mouseMove.x, event.mouseMove.y));
+
+    Manifold tmpM(box, box2);
+
+
+    // Collide Detection
+    if (box->Collide(&tmpM, *box2))
+    {
+        box->selected = true;
+        box2->selected = true;
+    }
+
+    // Draw
+    box->setDebugDraw();
+    window.draw(*box);
+    box2->setDebugDraw();
+    window.draw(*box2);
+
+    for(int i = 0; i < tmpM.contactCounter; i++)
+    {
+        sf::CircleShape circle;
+        circle.setRadius(5);
+        circle.setFillColor(sf::Color::Green);
+        Vec2 cp = World::ConvertWorldToScreen(Vec2(tmpM.Contacts[i].x, tmpM.Contacts[i].y));
+        circle.setOrigin(5, 5);
+        circle.setPosition(cp.x, cp.y);
+        window.draw(circle);
+    }
+}
 
 int main()
 {
     window.setFramerateLimit(60);
     ImGui::SFML::Init(window);
     sf::Clock deltaClock;
-
-
-    //Shape-polygon objects use example
-//    std::deque<Vec2> tmp;
-//    tmp.push_back({-10, 20});
-//    tmp.push_back({0, 20});
-//    tmp.push_back({0, 0});
-//    tmp.push_back({-10, 0});
-//    Shape *poly2 = new Polygon(tmp, Vec2(-5, 0));
-
-
 
     while (window.isOpen())
     {
@@ -177,8 +232,9 @@ int main()
 
             window.clear(sf::Color::Black);
         }
-        PolygonToPolygonContactPoint(event);
 //        CircleToPolygonContactPoint(event);
+//        CircleToPolygonContactPoint(event);
+        BoxToBox(event);
         ImGui::SFML::Update(window, deltaClock.restart());
         ImGui::Begin("Contact Points Detection");
         if (ImGui::CollapsingHeader("Cases")) {

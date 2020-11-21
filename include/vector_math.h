@@ -62,6 +62,10 @@ public:
         return Vec2(x * scale, y * scale);
     }
 
+    Vec2 operator / (float scale)  {
+        return Vec2(x / scale, y / scale);
+    }
+
     void operator = (const Vec2& v)
     {
         x = v.x; y = v.y;
