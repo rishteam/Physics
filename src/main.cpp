@@ -57,7 +57,7 @@ void PolygonToPolygonContactPoint(sf::Event event)
     Arbiter tmpM(poly, poly2);
 
     // Collide Detection
-    if (poly->Collide(&tmpM, *poly2))
+    if (poly->Collide(tmpM, *poly2))
     {
         poly->selected = true;
         poly2->selected = true;
@@ -93,14 +93,14 @@ void CircleToPolygonContactPoint(sf::Event event)
     Shape *poly = new Polygon(tmp2, Vec2(0, 0), 10.0f);
     poly->SetMatrix(0.6666f);
 
-    Circle *circle = new Circle(10, 10, 10);
+    Circle *circle = new Circle(10, 10, 10, 10);
     Arbiter tmpM(poly, circle);
 
     // Update with mouse
     circle->setPosition(Vec2(event.mouseMove.x, event.mouseMove.y));
 
     // Collide Detection
-    if (poly->Collide(&tmpM, *circle))
+    if (poly->Collide(tmpM, *circle))
     {
         poly->selected = true;
         circle->selected = true;
@@ -127,15 +127,15 @@ void CircleToPolygonContactPoint(sf::Event event)
 // Circle-Circle contact Point
 void CircleToCircleContactPoints(sf::Event event)
 {
-    Circle *circle = new Circle(10, 10, 10);
-    Circle *circle2 = new Circle(10, 10, 5);
+    Circle *circle = new Circle(10, 10, 10, 10);
+    Circle *circle2 = new Circle(10, 10, 5, 10);
     Arbiter tmpM(circle, circle2);
 
     // Update with mouse
     circle2->setPosition(Vec2(event.mouseMove.x, event.mouseMove.y));
 
     // Collide Detection
-    if (circle2->Collide(&tmpM, *circle))
+    if (circle2->Collide(tmpM, *circle))
     {
         circle->selected = true;
         circle2->selected = true;
@@ -172,7 +172,7 @@ void BoxToBox(sf::Event event)
     Arbiter tmpM(box, box2);
 
     // Collide Detection
-    if (box->Collide(&tmpM, *box2))
+    if (box->Collide(tmpM, *box2))
     {
         box->selected = true;
         box2->selected = true;
@@ -196,18 +196,23 @@ void BoxToBox(sf::Event event)
     }
 }
 
-
 void PhysicsDemo1()
 {
-    world.Clear();
     std::deque<Vec2> tmp;
     tmp.push_back({-5, 5});
     tmp.push_back({5, 5});
     tmp.push_back({5, -5});
+    tmp.push_back({0, -10});
     tmp.push_back({-5, -5});
 
-    Shape *poly = new Box(0, -20, 30, 5, FLT_MAX);
-    poly->SetMatrix(0.6666f);
+//    Shape *poly = new Box(0, -5, 20, 5, FLT_MAX);
+    Polygon *poly = new Polygon(tmp, Vec2(-15,10), 10);
+
+    Box *box = new Box(-15, 0, 5, 5, 10);
+    poly->SetMatrix(0.3333f);
+
+    Box *floor = new Box(-15, -15, 20, 5, FLT_MAX);
+//    poly2->SetMatrix(-0.3333f);
 //
 //    std::deque<Vec2> tmp2;
 //    tmp2.push_back({-30, 10});
@@ -215,9 +220,10 @@ void PhysicsDemo1()
 //    tmp2.push_back({30, -10});
 //    tmp2.push_back({-30, -10});
 //
-//    Shape *poly2 = new Box(0, -20, 10, 10, FLT_MAX);
-    Circle *circle = new Circle(0, 10, 5);
+    Circle *circle = new Circle(-15, 30, 5, 10);
     world.Add(poly);
+    world.Add(floor);
+//    world.Add(box);
 //    world.Add(poly2);
     world.Add(circle);
 }
@@ -233,18 +239,18 @@ void drawObject()
 
 void drawContact()
 {
-    int i = 0;
-    for(auto arb : world.arbiters)
+    for(auto &arb : world.arbiters)
     {
-        sf::CircleShape circle;
-        circle.setRadius(5);
-        circle.setFillColor(sf::Color::Green);
-        auto a = arb.second;
-        Vec2 cp = World::ConvertWorldToScreen(Vec2(a.contacts[i].position.x, a.contacts[i].position.y));
-        i += 1;
-        circle.setOrigin(5, 5);
-        circle.setPosition(cp.x, cp.y);
-        window.draw(circle);
+        for(int i = 0; i < arb.second.contactCounter; i++)
+        {
+            sf::CircleShape circle;
+            circle.setRadius(5);
+            circle.setFillColor(sf::Color::Green);
+            Vec2 cp = World::ConvertWorldToScreen(Vec2(arb.second.contacts[i].position.x, arb.second.contacts[i].position.y));
+            circle.setOrigin(5, 5);
+            circle.setPosition(cp.x, cp.y);
+            window.draw(circle);
+        }
     }
 }
 
@@ -280,64 +286,65 @@ int main()
                 std::cout << "mouse x: " << event.mouseWheelScroll.x << std::endl;
                 std::cout << "mouse y: " << event.mouseWheelScroll.y << std::endl;
             }
-
-            window.clear(sf::Color::Black);
         }
 
         ImGui::SFML::Update(window, deltaClock.restart());
         ImGui::Begin("Contact Points Detection");
-        if (ImGui::CollapsingHeader("Cases")) {
+        if (ImGui::CollapsingHeader("Cases"))
+        {
             if(ImGui::Button("Simple Demo"))
             {
                 PhysicsDemo1();
             }
-//            if (ImGui::Button("Case1: Circle To Polygon")) {
-//                CircleToPolygonContactPoint(event);
-//            }
-//            if (ImGui::Button("Case2: Polygon To Polygon")) {
-//                PolygonToPolygonContactPoint(event);
-//            }
-//            if (ImGui::Button("Demo3: Circle To Circle")) {
-//                CircleToCircleContactPoints(event);
-//            }
-//            if (ImGui::Button("Demo4 : Box To Box")){
-//                BoxToBox(event);
-//            }
-
-        }
-        if (ImGui::CollapsingHeader("Box's Data"))
-        {
-            for(int i = 0; i < world.bodies.size(); i++)
+            if(ImGui::Button("Clear"))
             {
-                ImGui::Text("Object %d:", i);
-                ImGui::Text("[Physics] Center: (%f, %f)", world.bodies[i]->position.x, world.bodies[i]->position.y);
-                ImGui::Text("[Physics] angle: %f", radiansToDegrees(world.bodies[i]->angle) );
-                ImGui::Text("[Physics] mass: %f", world.bodies[i]->mass);
-                ImGui::Text("[Physics] invMass: %f", world.bodies[i]->invMass);
-                ImGui::Text("[Physics] I: %f", world.bodies[i]->I);
-                ImGui::Text("[Physics] invI: %f", world.bodies[i]->invI);
-                ImGui::Text("[Physics] Friction: %f", world.bodies[i]->friction);
-                ImGui::Separator();
+                world.Clear();
             }
         }
 
-        if (ImGui::CollapsingHeader("Arbiters"))
+        for(int i = 0; i < world.bodies.size(); i++)
         {
-            ImGui::Text("Arbiters size: %d", world.arbiters.size());
-            for(auto arbiter : world.arbiters)
-            {
-                ImGui::Text("Arbiters: Contact %d", arbiter.second.contactCounter);
-                ImGui::Separator();
-            }
+            ImGui::Text("Object %d:", i);
+            ImGui::Text("[Physics] Type: %d", world.bodies[i]->type);
+            ImGui::Text("[Physics] Center: (%f, %f)", world.bodies[i]->position.x, world.bodies[i]->position.y);
+            ImGui::Text("[Physics] angle: %f", radiansToDegrees(world.bodies[i]->angle) );
+            ImGui::Text("[Physics] mass: %f", world.bodies[i]->mass);
+            ImGui::Text("[Physics] invMass: %f", world.bodies[i]->invMass);
+            ImGui::Text("[Physics] I: %f", world.bodies[i]->I);
+            ImGui::Text("[Physics] invI: %f", world.bodies[i]->invI);
+            ImGui::Text("[Physics] Friction: %f", world.bodies[i]->friction);
+            ImGui::Separator();
         }
+
+        ImGui::Text("Arbiters size: %d", world.arbiters.size());
+        for(auto arbiter : world.arbiters)
+        {
+            ImGui::Text("Arbiters: Contact %d", arbiter.second.contactCounter);
+            ImGui::Text("Arbiters Contacts[0]: (%f, %f)", arbiter.second.contacts[0].position.x, arbiter.second.contacts[0].position.x);
+            ImGui::Text("Arbiters Contacts[0] Pn: %f", arbiter.second.contacts[0].Pn);
+            ImGui::Text("Arbiters Contacts[0] Pnb: %f", arbiter.second.contacts[0].Pnb);
+            ImGui::Text("Arbiters Contacts[0] Pt: %f", arbiter.second.contacts[0].Pt);
+            ImGui::Text("Arbiters Contacts[0] bias: %f", arbiter.second.contacts[0].bias);
+            ImGui::Text("Arbiters Contacts[0] penetration: %f", arbiter.second.contacts[0].penetration);
+
+            ImGui::Text("Arbiters Contacts[1]: (%f, %f)", arbiter.second.contacts[1].position.x, arbiter.second.contacts[1].position.x);
+            ImGui::Text("Arbiters b1: %d", arbiter.second.b1->type);
+            ImGui::Text("Arbiters b2: %d", arbiter.second.b2->type);
+            ImGui::Separator();
+        }
+
+        ImGui::Text("[Window] width: %d", WINDOW_WIDTH);
+        ImGui::Text("[Window] height: %d", WINDOW_HEIGHT);
+        ImGui::Text("[Window] fps: %f", world.timeStep);
+
         ImGui::End();
 
+        window.clear(sf::Color::Black);
 //        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 //        {
 //            world.Step(world.timeStep);
 //        }
         world.Step(world.timeStep);
-        window.clear(sf::Color::Black);
         drawObject();
         drawContact();
         ImGui::SFML::Render(window);

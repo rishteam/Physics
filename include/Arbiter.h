@@ -13,21 +13,20 @@ enum class FeaturePair{
 
 struct Contact
 {
-    Vec2 position = Vec2(0.0f, 0.0f);
-    Vec2 normal = Vec2(0.0f, 0.0f);
-    Vec2 r1 = Vec2(0.0f, 0.0f);
-    Vec2 r2 = Vec2(0.0f, 0.0f);
-    float penetration = 0.0f;
+    Contact(): Pn(0.0f), Pt(0.0f), Pnb(0.0f) {}
+    Vec2 position;
+    Vec2 normal;
+    Vec2 r1;
+    Vec2 r2;
+    float penetration;
     //累加衝量
-    float Pn = 0.0f;	// accumulated normal impulse
+    float Pn;	// accumulated normal impulse
     //切線方向的衝量
-    float Pt = 0.0f;	// accumulated tangent impulse
+    float Pt;	// accumulated tangent impulse
     //加衝量加位置的偏差量
-    float Pnb = 0.0f;	// accumulated normal impulse for position bias
-    float massNormal = 0.0f, massTangent = 0.0f;
-    float bias = 0.0f;
-    //
-    FeaturePair feature = FeaturePair::inEdge1;
+    float Pnb;	// accumulated normal impulse for position bias
+    float massNormal, massTangent;
+    float bias;
 };
 
 class ArbiterKey
@@ -45,7 +44,6 @@ public:
             body1 = b2; body2 = b1;
         }
     }
-    ~ArbiterKey() = default;
 
     Shape* body1;
     Shape* body2;

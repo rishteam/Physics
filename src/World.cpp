@@ -20,6 +20,7 @@ World::World(Vec2 gravity_, float width_, float height_)
 
 void World::Clear()
 {
+    arbiters.clear();
     //release space
     for(auto ptr : bodies)
     {
@@ -47,7 +48,6 @@ void World::Clear()
     }
     bodies.clear();
     joints.clear();
-    arbiters.clear();
 }
 
 void World::Add(Shape* body)
@@ -64,40 +64,30 @@ void World::Step(float delta_t)
 {
     float inv_dt = delta_t > 0.0f ? 1.0f / delta_t : 0.0f;
 
-    //Boardphase detection
-    BoardPhase();
+    // BoardPhase detection
+    this->BoardPhase();
 
     // Compute forces.
     for(int i = 0; i < bodies.size(); i++)
     {
-        if (bodies[i]->invMass == 0.0f)
+        if (bodies.at(i)->invMass == 0.0f)
             continue;
-        bodies[i]->ComputeForce(delta_t, gravity);
+        bodies.at(i)->ComputeForce(delta_t, gravity);
     }
-
-    //Pre-step arbiter
-//    for (auto jit : joints)
-//    {
-//        jit->PreStep(inv_dt);
-//    }
 
     for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb)
     {
         arb->second.PreStep(inv_dt);
     }
 
-    for (int i = 0; i < this->iterations; ++i)
+//    for (int i = 0; i < this->iterations; ++i)
+//    {
+    // Apply impulse
+    for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb)
     {
-        // Apply impulse
-        for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb) {
-            arb->second.ApplyImpulse();
-        }
-        // Joint
-//        for (auto jit : joints)
-//        {
-//            jit->ApplyImpulse();
-//        }
+        arb->second.ApplyImpulse();
     }
+//    }
 
     // Integrate Velocities
     for(int i = 0; i < bodies.size(); i++)
@@ -110,16 +100,14 @@ void World::BoardPhase()
 {
     for(int i = 0; i < bodies.size(); i++)
     {
-        Shape* b1 = bodies[i];
         for(int j = i+1; j < bodies.size(); j++)
         {
-            Shape* b2 = bodies[j];
-            if(b1->invMass == 0.0f && b2->invMass == 0.0f)
+            if(bodies[i]->invMass == 0.0f && bodies[j]->invMass == 0.0f)
                 continue;
 
             //add in Arbiter
-            Arbiter newArb(b1, b2);
-            ArbiterKey key(b1, b2);
+            Arbiter newArb(bodies[i], bodies[j]);
+            ArbiterKey key(bodies[i], bodies[j]);
 
             if (newArb.contactCounter > 0)
             {

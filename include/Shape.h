@@ -46,15 +46,14 @@ public:
     bool BiasGreaterThan( float a, float b );
 
     // Detect Collision
-    virtual bool Collide(Arbiter *m, Shape &s) = 0;
-    virtual bool Collide(Arbiter *m, Box &b) = 0;
-    virtual bool Collide(Arbiter *m, Polygon &p) = 0;
-    virtual bool Collide(Arbiter *m, Circle &c) = 0;
+    virtual bool Collide(Arbiter &arb, Shape &s) = 0;
+    virtual bool Collide(Arbiter &arb, Box &b) = 0;
+    virtual bool Collide(Arbiter &arb, Polygon &p) = 0;
+    virtual bool Collide(Arbiter &arb, Circle &c) = 0;
 
-
+    bool selected = false;
     int m_vertexCount = 0;
     // Vertices(只有位移量的點), Normal(法向量), u(旋轉矩陣)
-    bool selected = false;
     Mat22 u;
     Vec2 m_vertices[MaxVertexCount];
     Vec2 m_normals[MaxVertexCount];

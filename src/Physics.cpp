@@ -1,12 +1,13 @@
 #include "Physics.h"
 
 Physics::Physics(){
-    mass = 0;
+    mass = 10;
     velocity = Vec2(0.0f, 0.0f);
     angularVelocity = 0;
     force = Vec2(0.0, 0.0);
     torque = 0;
-
+    friction = 0.2f;
+    I = 0;
 }
 
 std::pair<Vec2, float> Physics::getPhysicsData()
@@ -28,7 +29,6 @@ float Physics::getfriction()
 {
     return friction;
 }
-
 
 void Physics::AddForce(const Vec2& f)
 {

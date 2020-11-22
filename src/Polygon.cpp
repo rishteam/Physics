@@ -192,9 +192,11 @@ void Polygon::setDebugDraw()
 
 }
 
-bool Polygon::Collide(Arbiter *m, Box &b)
+bool Polygon::Collide(Arbiter &arb, Box &b)
 {
-    m->contactCounter = 0;
+    arb.contactCounter = 0;
+    this->SetMatrix(angle);
+    b.SetMatrix(b.angle);
 
     // Check for a separating axis with A's face planes
     int faceA;
@@ -284,7 +286,7 @@ bool Polygon::Collide(Arbiter *m, Box &b)
         return false; // Due to floating point error, possible to not have required points
 
     // Flip
-    m->contacts[0].normal = flip ? -refFaceNormal : refFaceNormal;
+    arb.contacts[0].normal = flip ? -refFaceNormal : refFaceNormal;
 
     // 透過clip截斷點，incidentFace
     // Keep points behind reference face
@@ -292,33 +294,35 @@ bool Polygon::Collide(Arbiter *m, Box &b)
     float separation = Dot( refFaceNormal, incidentFace[0] ) - refC;
     if(separation <= 0.0f)
     {
-        m->contacts[cp].position = incidentFace[0];
-        m->contacts[cp].penetration = -separation;
+        arb.contacts[cp].position = incidentFace[0];
+        arb.contacts[cp].penetration = -separation;
         ++cp;
     }
     else
     {
-        m->contacts[cp].penetration = 0;
+        arb.contacts[cp].penetration = 0;
     }
 
     separation = Dot( refFaceNormal, incidentFace[1] ) - refC;
     if(separation <= 0.0f)
     {
-        m->contacts[cp].position = incidentFace[1];
-        m->contacts[cp].penetration += -separation;
+        arb.contacts[cp].position = incidentFace[1];
+        arb.contacts[cp].penetration += -separation;
         ++cp;
 
         // Average penetration
-//        m->penetration /= (float)cp;
+//        arb.penetration /= (float)cp;
     }
 
-    m->contactCounter = cp;
+    arb.contactCounter = cp;
     return true;
 }
 
-bool Polygon::Collide(Arbiter *m, Polygon &p)
+bool Polygon::Collide(Arbiter &arb, Polygon &p)
 {
-    m->contactCounter = 0;
+    arb.contactCounter = 0;
+    this->SetMatrix(angle);
+    p.SetMatrix(p.angle);
 
     // Check for a separating axis with A's face planes
     int faceA = 0;
@@ -328,7 +332,7 @@ bool Polygon::Collide(Arbiter *m, Polygon &p)
 
     // Check for a separating axis with B's face planes
     int faceB;
-    float penetrationB = FindAxisLeastPenetration( &faceB, &p, this );
+    float penetrationB = FindAxisLeastPenetration( &faceB, &p, this);
     if(penetrationB >= 0.0f)
         return false;
 
@@ -406,8 +410,8 @@ bool Polygon::Collide(Arbiter *m, Polygon &p)
         return false; // Due to floating point error, possible to not have required points
 
     // Flip
-    m->contacts[0].normal = flip ? -refFaceNormal : refFaceNormal;
-    m->contacts[1].normal = flip ? -refFaceNormal : refFaceNormal;
+    arb.contacts[0].normal = flip ? -refFaceNormal : refFaceNormal;
+    arb.contacts[1].normal = flip ? -refFaceNormal : refFaceNormal;
 
     // 透過clip截斷點，incidentFace
     // Keep points behind reference face
@@ -415,32 +419,34 @@ bool Polygon::Collide(Arbiter *m, Polygon &p)
     float separation = Dot( refFaceNormal, incidentFace[0] ) - refC;
     if(separation <= 0.0f)
     {
-        m->contacts[cp].position = incidentFace[0];
-        m->contacts[cp].penetration = -separation;
+        arb.contacts[cp].position = incidentFace[0];
+        arb.contacts[cp].penetration = -separation;
         ++cp;
     }
     else
     {
-        m->contacts[cp].penetration = 0;
+        arb.contacts[cp].penetration = 0;
     }
     separation = Dot( refFaceNormal, incidentFace[1] ) - refC;
     if(separation <= 0.0f)
     {
-        m->contacts[cp].position = incidentFace[1];
-        m->contacts[cp].penetration += -separation;
+        arb.contacts[cp].position = incidentFace[1];
+        arb.contacts[cp].penetration += -separation;
         ++cp;
 
         // Average penetration
-//        m->penetration /= (float)cp;
+//        arb.penetration /= (float)cp;
     }
 
-    m->contactCounter = cp;
+    arb.contactCounter = cp;
     return true;
 }
 
-bool Polygon::Collide(Arbiter *m, Circle &c)
+bool Polygon::Collide(Arbiter &arb, Circle &c)
 {
-    m->contactCounter = 0;
+    arb.contactCounter = 0;
+    this->SetMatrix(angle);
+    c.SetMatrix(c.angle);
 
     // Transform circle center to Polygon model space
     // 找最小穿透軸
@@ -472,17 +478,17 @@ bool Polygon::Collide(Arbiter *m, Circle &c)
     // Check to see if center is within polygon
     if(separation < EPSILON)
     {
-        m->contactCounter = 1;
-        m->contacts[0].normal = -(this->u * this->m_normals[faceNormal]);
-        m->contacts[0].position = m->contacts[0].normal * c.getRadius() + c.position;
-        m->contacts[0].penetration = c.getRadius();
+        arb.contactCounter = 1;
+        arb.contacts[0].normal = -(this->u * this->m_normals[faceNormal]);
+        arb.contacts[0].position = arb.contacts[0].normal * c.getRadius() + c.position;
+        arb.contacts[0].penetration = c.getRadius();
         return true;
     }
 
     // Determine which voronoi region of the edge center of circle lies within
     float dot1 = Dot( center - v1, v2 - v1 );
     float dot2 = Dot( center - v2, v1 - v2 );
-    m->contacts[0].penetration  = c.getRadius() - separation;
+    arb.contacts[0].penetration  = c.getRadius() - separation;
 
     // Closest to v1
     // 靠近v1
@@ -492,13 +498,13 @@ bool Polygon::Collide(Arbiter *m, Circle &c)
         if(DistSqr( center, v1 ) > c.getRadius() * c.getRadius())
             return false;
 
-        m->contactCounter = 1;
+        arb.contactCounter = 1;
         Vec2 n = v1 - center;
         n = this->u * n;
         n.Normalize( );
-        m->contacts[0].normal = n;
+        arb.contacts[0].normal = n;
         v1 = this->u * v1 + this->position;
-        m->contacts[0].position = v1;
+        arb.contacts[0].position = v1;
     }
 
     // Closest to v2
@@ -508,13 +514,13 @@ bool Polygon::Collide(Arbiter *m, Circle &c)
         if(DistSqr( center, v2 ) > c.getRadius() * c.getRadius())
             return false;
 
-        m->contactCounter = 1;
+        arb.contactCounter = 1;
         Vec2 n = v2 - center;
         v2 = this->u * v2 + this->position;
-        m->contacts[0].position = v2;
+        arb.contacts[0].position = v2;
         n = this->u * n;
         n.Normalize( );
-        m->contacts[0].normal = n;
+        arb.contacts[0].normal = n;
     }
 
     // Closest to face
@@ -525,9 +531,9 @@ bool Polygon::Collide(Arbiter *m, Circle &c)
         if(Dot( center - v1, n ) > c.getRadius())
             return false;
         n = this->u * n;
-        m->contacts[0].normal  = -n;
-        m->contacts[0].position = m->contacts[0].normal * c.getRadius() + c.position;
-        m->contactCounter = 1;
+        arb.contacts[0].normal  = -n;
+        arb.contacts[0].position = arb.contacts[0].normal * c.getRadius() + c.position;
+        arb.contactCounter = 1;
     }
     return true;
 }
