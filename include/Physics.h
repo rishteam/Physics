@@ -35,4 +35,8 @@ public:
     float mass, invMass;
     //慣性矩，慣性矩倒數
     float I, invI;
+
+    float restitution;
+    float staticFriction;
+    float dynamicFriction;
 };

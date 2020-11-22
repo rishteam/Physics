@@ -317,21 +317,21 @@ int main()
         }
 
         ImGui::Text("Arbiters size: %d", world.arbiters.size());
-        for(auto arbiter : world.arbiters)
-        {
-            ImGui::Text("Arbiters: Contact %d", arbiter.second.contactCounter);
-            ImGui::Text("Arbiters Contacts[0]: (%f, %f)", arbiter.second.contacts[0].position.x, arbiter.second.contacts[0].position.x);
-            ImGui::Text("Arbiters Contacts[0] Pn: %f", arbiter.second.contacts[0].Pn);
-            ImGui::Text("Arbiters Contacts[0] Pnb: %f", arbiter.second.contacts[0].Pnb);
-            ImGui::Text("Arbiters Contacts[0] Pt: %f", arbiter.second.contacts[0].Pt);
-            ImGui::Text("Arbiters Contacts[0] bias: %f", arbiter.second.contacts[0].bias);
-            ImGui::Text("Arbiters Contacts[0] penetration: %f", arbiter.second.contacts[0].penetration);
-
-            ImGui::Text("Arbiters Contacts[1]: (%f, %f)", arbiter.second.contacts[1].position.x, arbiter.second.contacts[1].position.x);
-            ImGui::Text("Arbiters b1: %d", arbiter.second.b1->type);
-            ImGui::Text("Arbiters b2: %d", arbiter.second.b2->type);
-            ImGui::Separator();
-        }
+//        for(auto arbiter : world.arbiters)
+//        {
+//            ImGui::Text("Arbiters: Contact %d", arbiter.second.contactCounter);
+//            ImGui::Text("Arbiters Contacts[0]: (%f, %f)", arbiter.second.contacts[0].position.x, arbiter.second.contacts[0].position.x);
+//            ImGui::Text("Arbiters Contacts[0] Pn: %f", arbiter.second.contacts[0].Pn);
+//            ImGui::Text("Arbiters Contacts[0] Pnb: %f", arbiter.second.contacts[0].Pnb);
+//            ImGui::Text("Arbiters Contacts[0] Pt: %f", arbiter.second.contacts[0].Pt);
+//            ImGui::Text("Arbiters Contacts[0] bias: %f", arbiter.second.contacts[0].bias);
+//            ImGui::Text("Arbiters Contacts[0] penetration: %f", arbiter.second.contacts[0].penetration);
+//
+//            ImGui::Text("Arbiters Contacts[1]: (%f, %f)", arbiter.second.contacts[1].position.x, arbiter.second.contacts[1].position.x);
+//            ImGui::Text("Arbiters b1: %d", arbiter.second.b1->type);
+//            ImGui::Text("Arbiters b2: %d", arbiter.second.b2->type);
+//            ImGui::Separator();
+//        }
 
         ImGui::Text("[Window] width: %d", WINDOW_WIDTH);
         ImGui::Text("[Window] height: %d", WINDOW_HEIGHT);

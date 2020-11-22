@@ -286,7 +286,7 @@ bool Polygon::Collide(Arbiter &arb, Box &b)
         return false; // Due to floating point error, possible to not have required points
 
     // Flip
-    arb.contacts[0].normal = flip ? -refFaceNormal : refFaceNormal;
+    arb.normal = flip ? -refFaceNormal : refFaceNormal;
 
     // 透過clip截斷點，incidentFace
     // Keep points behind reference face
@@ -295,19 +295,19 @@ bool Polygon::Collide(Arbiter &arb, Box &b)
     if(separation <= 0.0f)
     {
         arb.contacts[cp].position = incidentFace[0];
-        arb.contacts[cp].penetration = -separation;
+        arb.penetration = -separation;
         ++cp;
     }
     else
     {
-        arb.contacts[cp].penetration = 0;
+        arb.penetration = 0;
     }
 
     separation = Dot( refFaceNormal, incidentFace[1] ) - refC;
     if(separation <= 0.0f)
     {
         arb.contacts[cp].position = incidentFace[1];
-        arb.contacts[cp].penetration += -separation;
+        arb.penetration += -separation;
         ++cp;
 
         // Average penetration
@@ -410,8 +410,7 @@ bool Polygon::Collide(Arbiter &arb, Polygon &p)
         return false; // Due to floating point error, possible to not have required points
 
     // Flip
-    arb.contacts[0].normal = flip ? -refFaceNormal : refFaceNormal;
-    arb.contacts[1].normal = flip ? -refFaceNormal : refFaceNormal;
+    arb.normal = flip ? -refFaceNormal : refFaceNormal;
 
     // 透過clip截斷點，incidentFace
     // Keep points behind reference face
@@ -420,22 +419,22 @@ bool Polygon::Collide(Arbiter &arb, Polygon &p)
     if(separation <= 0.0f)
     {
         arb.contacts[cp].position = incidentFace[0];
-        arb.contacts[cp].penetration = -separation;
+        arb.penetration = -separation;
         ++cp;
     }
     else
     {
-        arb.contacts[cp].penetration = 0;
+        arb.penetration = 0;
     }
     separation = Dot( refFaceNormal, incidentFace[1] ) - refC;
     if(separation <= 0.0f)
     {
         arb.contacts[cp].position = incidentFace[1];
-        arb.contacts[cp].penetration += -separation;
+        arb.penetration += -separation;
         ++cp;
 
         // Average penetration
-//        arb.penetration /= (float)cp;
+        arb.penetration /= (float)cp;
     }
 
     arb.contactCounter = cp;
@@ -479,16 +478,16 @@ bool Polygon::Collide(Arbiter &arb, Circle &c)
     if(separation < EPSILON)
     {
         arb.contactCounter = 1;
-        arb.contacts[0].normal = -(this->u * this->m_normals[faceNormal]);
-        arb.contacts[0].position = arb.contacts[0].normal * c.getRadius() + c.position;
-        arb.contacts[0].penetration = c.getRadius();
+        arb.normal = -(this->u * this->m_normals[faceNormal]);
+        arb.contacts[0].position = arb.normal * c.getRadius() + c.position;
+        arb.penetration = c.getRadius();
         return true;
     }
 
     // Determine which voronoi region of the edge center of circle lies within
     float dot1 = Dot( center - v1, v2 - v1 );
     float dot2 = Dot( center - v2, v1 - v2 );
-    arb.contacts[0].penetration  = c.getRadius() - separation;
+    arb.penetration  = c.getRadius() - separation;
 
     // Closest to v1
     // 靠近v1
@@ -502,7 +501,7 @@ bool Polygon::Collide(Arbiter &arb, Circle &c)
         Vec2 n = v1 - center;
         n = this->u * n;
         n.Normalize( );
-        arb.contacts[0].normal = n;
+        arb.normal = n;
         v1 = this->u * v1 + this->position;
         arb.contacts[0].position = v1;
     }
@@ -520,7 +519,7 @@ bool Polygon::Collide(Arbiter &arb, Circle &c)
         arb.contacts[0].position = v2;
         n = this->u * n;
         n.Normalize( );
-        arb.contacts[0].normal = n;
+        arb.normal = n;
     }
 
     // Closest to face
@@ -531,8 +530,8 @@ bool Polygon::Collide(Arbiter &arb, Circle &c)
         if(Dot( center - v1, n ) > c.getRadius())
             return false;
         n = this->u * n;
-        arb.contacts[0].normal  = -n;
-        arb.contacts[0].position = arb.contacts[0].normal * c.getRadius() + c.position;
+        arb.normal = -n;
+        arb.contacts[0].position = arb.normal * c.getRadius() + c.position;
         arb.contactCounter = 1;
     }
     return true;

@@ -13,20 +13,8 @@ enum class FeaturePair{
 
 struct Contact
 {
-    Contact(): Pn(0.0f), Pt(0.0f), Pnb(0.0f) {}
+    Contact() = default;
     Vec2 position;
-    Vec2 normal;
-    Vec2 r1;
-    Vec2 r2;
-    float penetration;
-    //累加衝量
-    float Pn;	// accumulated normal impulse
-    //切線方向的衝量
-    float Pt;	// accumulated tangent impulse
-    //加衝量加位置的偏差量
-    float Pnb;	// accumulated normal impulse for position bias
-    float massNormal, massTangent;
-    float bias;
 };
 
 class ArbiterKey
@@ -66,16 +54,18 @@ public:
     Arbiter(Shape* b1_, Shape* b2_);
     ~Arbiter() = default;
     void Update();
-    void PreStep(float inv_dt);
+    void PreStep(float inv_dt, Vec2 gravity);
     void ApplyImpulse();
     int calContactPoints(Contact *contacts, Shape* b1, Shape* b2);
 
     Contact contacts[2];
     int contactCounter = 0;
+    Vec2 normal;
     float e = 0;
     float df = 0;
     float sf = 0;
     float friction = 0.0f;
+    float penetration = 0;
 
     Shape* b1;
     Shape* b2;

@@ -77,7 +77,7 @@ void World::Step(float delta_t)
 
     for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb)
     {
-        arb->second.PreStep(inv_dt);
+        arb->second.PreStep(inv_dt, gravity);
     }
 
 //    for (int i = 0; i < this->iterations; ++i)

@@ -85,16 +85,16 @@ bool Circle::Collide(Arbiter &arb, Box &b)
     if(separation < EPSILON)
     {
         arb.contactCounter = 1;
-        arb.contacts[0].normal = -(b.u * b.m_normals[faceNormal]);
-        arb.contacts[0].position = arb.contacts[0].normal * this->getRadius() + this->position;
-        arb.contacts[0].penetration = this->getRadius();
+        arb.normal = -(b.u * b.m_normals[faceNormal]);
+        arb.contacts[0].position = arb.normal * this->getRadius() + this->position;
+        arb.penetration = this->getRadius();
         return true;
     }
 
     // Determine which voronoi region of the edge center of circle lies within
     float dot1 = Dot( center - v1, v2 - v1 );
     float dot2 = Dot( center - v2, v1 - v2 );
-    arb.contacts[0].penetration = this->getRadius() - separation;
+    arb.penetration = this->getRadius() - separation;
 
     // Closest to v1
     // 靠近v1
@@ -108,7 +108,7 @@ bool Circle::Collide(Arbiter &arb, Box &b)
         Vec2 n = v1 - center;
         n = b.u * n;
         n.Normalize( );
-        arb.contacts[0].normal = n;
+        arb.normal = n;
         v1 = b.u * v1 + b.position;
         arb.contacts[0].position = v1;
     }
@@ -126,7 +126,7 @@ bool Circle::Collide(Arbiter &arb, Box &b)
         arb.contacts[0].position = v2;
         n = b.u * n;
         n.Normalize( );
-        arb.contacts[0].normal = n;
+        arb.normal = n;
     }
 
         // Closest to face
@@ -137,8 +137,8 @@ bool Circle::Collide(Arbiter &arb, Box &b)
         if(Dot( center - v1, n ) > this->getRadius())
             return false;
         n = b.u * n;
-        arb.contacts[0].normal = -n;
-        arb.contacts[0].position = arb.contacts[0].normal * this->getRadius() + this->position;
+        arb.normal = -n;
+        arb.contacts[0].position = arb.normal * this->getRadius() + this->position;
         arb.contactCounter = 1;
     }
     return true;
@@ -179,16 +179,16 @@ bool Circle::Collide(Arbiter &arb, Polygon &p)
     if(separation < EPSILON)
     {
         arb.contactCounter = 1;
-        arb.contacts[0].normal = -(p.u * p.m_normals[faceNormal]);
-        arb.contacts[0].position = arb.contacts[0].normal * this->getRadius() + this->position;
-        arb.contacts[0].penetration = this->getRadius();
+        arb.normal = -(p.u * p.m_normals[faceNormal]);
+        arb.contacts[0].position = arb.normal * this->getRadius() + this->position;
+        arb.penetration = this->getRadius();
         return true;
     }
 
     // Determine which voronoi region of the edge center of circle lies within
     float dot1 = Dot( center - v1, v2 - v1 );
     float dot2 = Dot( center - v2, v1 - v2 );
-    arb.contacts[0].penetration  = this->getRadius() - separation;
+    arb.penetration  = this->getRadius() - separation;
 
     // Closest to v1
     // 靠近v1
@@ -202,7 +202,7 @@ bool Circle::Collide(Arbiter &arb, Polygon &p)
         Vec2 n = v1 - center;
         n = p.u * n;
         n.Normalize( );
-        arb.contacts[0].normal = n;
+        arb.normal = n;
         v1 = p.u * v1 + p.position;
         arb.contacts[0].position = v1;
     }
@@ -220,7 +220,7 @@ bool Circle::Collide(Arbiter &arb, Polygon &p)
         arb.contacts[0].position = v2;
         n = p.u * n;
         n.Normalize( );
-        arb.contacts[0].normal = n;
+        arb.normal = n;
     }
 
         // Closest to face
@@ -231,8 +231,8 @@ bool Circle::Collide(Arbiter &arb, Polygon &p)
         if(Dot( center - v1, n ) > this->getRadius())
             return false;
         n = p.u * n;
-        arb.contacts[0].normal = -n;
-        arb.contacts[0].position = arb.contacts[0].normal * this->getRadius() + this->position;
+        arb.normal = -n;
+        arb.contacts[0].position = arb.normal * this->getRadius() + this->position;
         arb.contactCounter = 1;
     }
     return true;
@@ -260,17 +260,17 @@ bool Circle::Collide(Arbiter &arb, Circle &c)
     // Overlap
     if(distance == 0.0f)
     {
-        arb.contacts[0].penetration = this->radius;
-        arb.contacts[0].normal = Vec2(1, 0 );
+        arb.penetration = this->radius;
+        arb.normal = Vec2(1, 0 );
         arb.contacts[0].position = this->position;
     }
     //
     else
     {
-        arb.contacts[0].penetration = radius - distance;
+        arb.penetration = radius - distance;
         // Faster than using Normalized since we already performed sqrt
-        arb.contacts[0].normal = normal / distance;
-        arb.contacts[0].position = arb.contacts[0].normal * this->getRadius() + c.position;
+        arb.normal = normal / distance;
+        arb.contacts[0].position = arb.normal * this->getRadius() + c.position;
     }
 
     return true;
