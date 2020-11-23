@@ -272,7 +272,6 @@ static bool BiasGreaterThan(float a, float b)
     return a >= b * k_biasRelative + a * k_biasAbsolute;
 }
 
-
 // Collision All Case
 static bool Box2Box(Arbiter *arb, Shape *a, Shape *b)
 {
@@ -314,8 +313,8 @@ static bool Box2Box(Arbiter *arb, Shape *a, Shape *b)
 
     else
     {
-        RefPoly = box1;
-        IncPoly = box2;
+        RefPoly = box2;
+        IncPoly = box1;
         referenceIndex = faceB;
         flip = true;
     }
@@ -872,7 +871,6 @@ static bool Box2Polygon(Arbiter *arb, Shape *a, Shape *b)
         return false; // Due to floating point error, possible to not have required points
 
     // Flip
-    arb->normal = flip ? -refFaceNormal : refFaceNormal;
     arb->normal = flip ? -refFaceNormal : refFaceNormal;
 
     // 透過clip截斷點，incidentFace

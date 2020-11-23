@@ -226,7 +226,7 @@ void PhysicsDemo1()
     world.Add(box);
     world.Add(floor);
     world.Add(floor2);
-    world.Add(circle);
+//    world.Add(circle);
 //    world.Add(poly);
 //    world.Add(poly);
 }
