@@ -4,6 +4,7 @@
 #include "World.h"
 #include "vector_math.h"
 
+
 enum class FeaturePair{
     inEdge1,
     outEdge1,
@@ -23,7 +24,7 @@ public:
     //小的放前面
     ArbiterKey(Shape* b1, Shape* b2)
     {
-        if (b1 < b2)
+        if (b1 > b2)
         {
             body1 = b1; body2 = b2;
         }
@@ -51,12 +52,18 @@ inline bool operator < (const ArbiterKey& a1, const ArbiterKey& a2)
 class Arbiter
 {
 public:
-    Arbiter(Shape* b1_, Shape* b2_);
+    Arbiter(Shape* b1_, Shape* b2_) : b1( b1_), b2 (b2_)
+    {
+
+    };
+
+
     ~Arbiter() = default;
-    void Update();
+    void Solve();
+    void PositionalCorrection();
     void PreStep(float inv_dt, Vec2 gravity);
     void ApplyImpulse();
-    int calContactPoints(Contact *contacts, Shape* b1, Shape* b2);
+    void Update();
 
     Contact contacts[2];
     int contactCounter = 0;

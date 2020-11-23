@@ -36,20 +36,13 @@ public:
 
 
     // ManiFold Helper Function
-    /// 找最小穿透軸
-    float FindAxisLeastPenetration(int *faceIdx, Shape *A, Shape *B);
-    /// 找IncidentFace
-    void FindIncidentFace(Vec2 *v, Shape *Ref, Shape *Inc, int refIdx);
-    /// 面切除決定點
-    int Clip(Vec2 n, float c, Vec2 *face);
-    /// 最小穿透軸比較計算公式
-    bool BiasGreaterThan( float a, float b );
+
 
     // Detect Collision
-    virtual bool Collide(Arbiter &arb, Shape &s) = 0;
-    virtual bool Collide(Arbiter &arb, Box &b) = 0;
-    virtual bool Collide(Arbiter &arb, Polygon &p) = 0;
-    virtual bool Collide(Arbiter &arb, Circle &c) = 0;
+    virtual bool Collide(Arbiter &arb, Shape *s);
+//    virtual bool Collide(Arbiter &arb, Box &b) = 0;
+//    virtual bool Collide(Arbiter &arb, Polygon &p) = 0;
+//    virtual bool Collide(Arbiter &arb, Circle &c) = 0;
 
     bool selected = false;
     int m_vertexCount = 0;

@@ -15,13 +15,13 @@ public:
 
     virtual void setDebugDraw() override;
 
-    virtual bool Collide(Arbiter &arb, Shape &s) override
-    {
-        return s.Collide(arb, *this);
-    }
-    virtual bool Collide(Arbiter &arb, Box &b) override;
-    virtual bool Collide(Arbiter &arb, Polygon &p) override;
-    virtual bool Collide(Arbiter &arb, Circle &c) override;
+//    virtual bool Collide(Arbiter &arb, Shape &s) override
+//    {
+//        return s.Collide(arb, *this);
+//    }
+//    virtual bool Collide(Arbiter &arb, Box &b) override;
+//    virtual bool Collide(Arbiter &arb, Polygon &p) override;
+//    virtual bool Collide(Arbiter &arb, Circle &c) override;
 
 
 private:

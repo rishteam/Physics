@@ -46,6 +46,7 @@ public:
 //   TODO: implement QuadTree
     std::vector<Shape*> bodies;
     std::vector<Joint*> joints;
+    std::vector<Arbiter> arbList;
     std::map<ArbiterKey, Arbiter> arbiters;
 
 };

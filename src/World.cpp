@@ -20,9 +20,8 @@ World::World(Vec2 gravity_, float width_, float height_)
 
 void World::Clear()
 {
-    arbiters.clear();
     //release space
-    for(auto ptr : bodies)
+    for(auto &ptr : bodies)
     {
         switch(ptr->type)
         {
@@ -46,6 +45,7 @@ void World::Clear()
             }
         }
     }
+    arbiters.clear();
     bodies.clear();
     joints.clear();
 }
@@ -65,7 +65,7 @@ void World::Step(float delta_t)
     float inv_dt = delta_t > 0.0f ? 1.0f / delta_t : 0.0f;
 
     // BoardPhase detection
-    this->BoardPhase();
+    BoardPhase();
 
     // Compute forces.
     for(int i = 0; i < bodies.size(); i++)
@@ -75,29 +75,41 @@ void World::Step(float delta_t)
         bodies.at(i)->ComputeForce(delta_t, gravity);
     }
 
-    for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb)
+    for (auto arb = arbList.begin(); arb != arbList.end(); ++arb)
     {
-        arb->second.PreStep(inv_dt, gravity);
+        arb->PreStep(inv_dt, gravity);
     }
 
-//    for (int i = 0; i < this->iterations; ++i)
-//    {
-    // Apply impulse
-    for (auto arb = arbiters.begin(); arb != arbiters.end(); ++arb)
+    for (int i = 0; i < this->iterations; ++i)
     {
-        arb->second.ApplyImpulse();
+        // Apply impulse
+        for(int j = 0; j < arbList.size( ); ++j)
+        {
+            arbList[j].ApplyImpulse();
+        }
+//        for (auto arb = arbList.begin(); arb != arbList.end(); ++arb)
+//        {
+//            arb->ApplyImpulse();
+//        }
     }
-//    }
 
     // Integrate Velocities
     for(int i = 0; i < bodies.size(); i++)
     {
         bodies.at(i)->IntegrateVelocities(delta_t);
     }
+
+//    // Correct positions
+    for(int i = 0; i < arbList.size( ); ++i)
+    {
+        arbList[i].PositionalCorrection();
+    }
+
 }
 
 void World::BoardPhase()
 {
+    arbList.clear();
     for(int i = 0; i < bodies.size(); i++)
     {
         for(int j = i+1; j < bodies.size(); j++)
@@ -107,24 +119,31 @@ void World::BoardPhase()
 
             //add in Arbiter
             Arbiter newArb(bodies[i], bodies[j]);
-            ArbiterKey key(bodies[i], bodies[j]);
+            newArb.Solve();
 
-            if (newArb.contactCounter > 0)
+            if (newArb.contactCounter)
             {
-                auto iter = arbiters.find(key);
-                if (iter == arbiters.end())
-                {
-                    arbiters.insert(std::make_pair(key, newArb));
-                }
-                else
-                {
-                    iter->second.Update();
-                }
+                arbList.emplace_back(newArb);
             }
-            else
-            {
-                arbiters.erase(key);
-            }
+
+//            ArbiterKey key(bodies[i], bodies[j]);
+
+//            if (newArb.contactCounter > 0)
+//            {
+//                auto iter = arbiters.find(key);
+//                if (iter == arbiters.end())
+//                {
+//                    arbiters.insert(std::make_pair(key, newArb));
+//                }
+//                else
+//                {
+//                    iter->second.Update();
+//                }
+//            }
+//            else
+//            {
+//                arbiters.erase(key);
+//            }
         }
     }
 }

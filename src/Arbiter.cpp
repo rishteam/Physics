@@ -1,30 +1,31 @@
 #include "Arbiter.h"
+#include "Box.h"
+#include "Circle.h"
+#include "Polygon.h"
+#include "Collision.h"
 
-Arbiter::Arbiter(Shape* b1_, Shape* b2_)
+void Arbiter::Solve()
 {
-    if (b1_ > b2_)
-    {
-        b1 = b1_;
-        b2 = b2_;
-    }
-    else
-    {
-        b1 = b2_;
-        b2 = b1_;
-    }
-
-    // Calculate Contact point
     b1->SetMatrix(b1->angle);
     b2->SetMatrix(b2->angle);
-    // Find Contact Points
-    b1->Collide(*this, *b2);
+    Dispatch[(int)b1->type][(int)b2->type]( this, b1, b2 );
+};
+
+
+void Arbiter::PositionalCorrection()
+{
+    const float k_slop = 0.1f; // Penetration allowance
+    const float percent = 0.4f; // Penetration percentage to correct
+    Vec2 correction = (std::max( penetration - k_slop, 0.0f ) / (b1->invMass + b2->invMass)) * normal * percent;
+    b1->position -= correction * b1->invMass;
+    b2->position += correction * b2->invMass;
 }
 
 //預備好所需要的參數，包含k, delta_v, n, bias
 void Arbiter::PreStep(float inv_dt, Vec2 gravity)
 {
-    auto &body1 = b2;
-    auto &body2 = b1;
+//    auto &body1 = b2;
+//    auto &body2 = b1;
 //    // 必須要有個允許穿透值，否則在沒有穿透時計算衝量，會有抖動(jitter)發生
 //    const float k_allowedPenetration = 0.5f;
 //    // bangar 修正，是一個介於0~1之間的數字，越小則越慢才修正
@@ -103,8 +104,8 @@ void Arbiter::PreStep(float inv_dt, Vec2 gravity)
 //透過衝量，計算出速度
 void Arbiter::ApplyImpulse()
 {
-    auto &body1 = b2;
-    auto &body2 = b1;
+//    auto &body1 = b1;
+//    auto &body2 = b2;
 
 //    for (int i = 0; i < contactCounter; ++i)
 //    {
@@ -192,12 +193,12 @@ void Arbiter::ApplyImpulse()
     for(int i = 0; i < contactCounter; ++i)
     {
         // Calculate radii from COM to contact
-        Vec2 ra = contacts[i].position - body1->position;
-        Vec2 rb = contacts[i].position - body2->position;
+        Vec2 ra = contacts[i].position - b1->position;
+        Vec2 rb = contacts[i].position - b2->position;
 
         // Relative velocity
-        Vec2 rv = body2->velocity + Cross( body2->angularVelocity, rb ) -
-                  body1->velocity - Cross( body1->angularVelocity, ra );
+        Vec2 rv = b2->velocity + Cross( b2->angularVelocity, rb ) -
+                  b1->velocity - Cross( b1->angularVelocity, ra );
 
         // Relative velocity along the normal
         float contactVel = Dot( rv, normal );
@@ -208,7 +209,7 @@ void Arbiter::ApplyImpulse()
 
         float raCrossN = Cross( ra, normal );
         float rbCrossN = Cross( rb, normal );
-        float invMassSum = body1->invMass + body2->invMass + raCrossN * raCrossN * body1->invI + rbCrossN * rbCrossN * body2->invI;
+        float invMassSum = b1->invMass + b2->invMass + raCrossN * raCrossN * b1->invI + rbCrossN * rbCrossN * b2->invI;
 
         // Calculate impulse scalar
         float j = -(1.0f + e) * contactVel;
@@ -218,16 +219,16 @@ void Arbiter::ApplyImpulse()
         // Apply impulse
         Vec2 impulse = normal * j;
 
-        body1->velocity += body1->invMass * -impulse;
-        body1->angularVelocity += body1->invI * Cross( ra, -impulse );
+        b1->velocity += b1->invMass * -impulse;
+        b1->angularVelocity += b1->invI * Cross( ra, -impulse );
 
-        body2->velocity += body2->invMass * impulse;
-        body2->angularVelocity += body2->invI * Cross( rb, impulse );
+        b2->velocity += b2->invMass * impulse;
+        b2->angularVelocity += b2->invI * Cross( rb, impulse );
 
 
         // Friction impulse
-        rv = body2->velocity + Cross( body2->angularVelocity, rb ) -
-             body1->velocity - Cross( body1->angularVelocity, ra );
+        rv = b2->velocity + Cross( b2->angularVelocity, rb ) -
+             b1->velocity - Cross( b1->angularVelocity, ra );
 
         Vec2 t = rv - (normal * Dot( rv, normal ));
         t.Normalize( );
@@ -249,11 +250,11 @@ void Arbiter::ApplyImpulse()
             tangentImpulse = t * -j * df;
 
         // Apply friction impulse
-        body1->velocity += body1->invMass * -tangentImpulse;
-        body1->angularVelocity += body1->invI * Cross( ra, -tangentImpulse );
+        b1->velocity += b1->invMass * -tangentImpulse;
+        b1->angularVelocity += b1->invI * Cross( ra, -tangentImpulse );
 
-        body2->velocity += body2->invMass * tangentImpulse;
-        body2->angularVelocity += body2->invI * Cross( rb, tangentImpulse );
+        b2->velocity += b2->invMass * tangentImpulse;
+        b2->angularVelocity += b2->invI * Cross( rb, tangentImpulse );
     }
 }
 
@@ -261,9 +262,6 @@ void Arbiter::ApplyImpulse()
 // 更新arbiter中contact point的數量，以及其中的衝量大小
 void Arbiter::Update()
 {
-    if(!b1->Collide(*this, *b2))
-    {
-        contactCounter = 0;
-    }
+    Dispatch[(int)b1->type][(int)b2->type]( this, b1, b2 );
 }
 
