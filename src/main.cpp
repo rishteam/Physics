@@ -387,9 +387,9 @@ int main()
             ImGui::Separator();
         }
 
-//        ImGui::Text("Arbiters size: %d", world.arbiters.size());
-//        for(auto arbiter : world.arbiters)
-//        {
+        ImGui::Text("Arbiters size: %d", world.arbList.size());
+        for(auto arbiter : world.arbiters)
+        {
 //            ImGui::Text("Arbiters: Contact %d", arbiter.second.contactCounter);
 //            ImGui::Text("Arbiters Contacts[0]: (%f, %f)", arbiter.second.contacts[0].position.x, arbiter.second.contacts[0].position.x);
 //            ImGui::Text("Arbiters Contacts[0] Pn: %f", arbiter.second.contacts[0].Pn);
@@ -401,8 +401,8 @@ int main()
 //            ImGui::Text("Arbiters Contacts[1]: (%f, %f)", arbiter.second.contacts[1].position.x, arbiter.second.contacts[1].position.x);
 //            ImGui::Text("Arbiters b1: %d", arbiter.second.b1->type);
 //            ImGui::Text("Arbiters b2: %d", arbiter.second.b2->type);
-//            ImGui::Separator();
-//        }
+            ImGui::Separator();
+        }
 
         ImGui::Text("[Window] width: %d", WINDOW_WIDTH);
         ImGui::Text("[Window] height: %d", WINDOW_HEIGHT);

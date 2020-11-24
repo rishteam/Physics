@@ -16,6 +16,7 @@ struct Contact
 {
     Contact() = default;
     Vec2 position;
+    FeaturePair fp;
 };
 
 class ArbiterKey
@@ -55,6 +56,15 @@ public:
     Arbiter(Shape* b1_, Shape* b2_);
     ~Arbiter() = default;
 
+    bool operator == (const Arbiter& a1)
+    {
+        if (a1.b1 == b1 && a1.b2 == b2)
+            return true;
+        if (a1.b1 == b2 && a1.b2 == b1)
+            return true;
+        return false;
+    }
+
     void Solve();
     void PositionalCorrection();
     void PreStep(float inv_dt, Vec2 gravity);
@@ -64,6 +74,10 @@ public:
     Contact contacts[2];
     int contactCounter = 0;
     Vec2 normal;
+
+    float Pn = 0.0f;
+    float Pt;
+
     float e = 0;
     float df = 0;
     float sf = 0;

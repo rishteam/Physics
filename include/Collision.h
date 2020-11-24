@@ -393,6 +393,7 @@ static bool Circle2Circle(Arbiter *arb, Shape *a, Shape *b)
 {
     arb->b1 = b;
     arb->b2 = a;
+
     Circle *cir1 = reinterpret_cast<Circle *>(a);
     Circle *cir2 = reinterpret_cast<Circle *>(b);
     // n

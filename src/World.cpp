@@ -99,7 +99,7 @@ void World::Step(float delta_t)
         bodies.at(i)->IntegrateVelocities(delta_t);
     }
 
-//    // Correct positions
+    // Correct positions
     for(int i = 0; i < arbList.size( ); ++i)
     {
         arbList[i].PositionalCorrection();
@@ -109,7 +109,7 @@ void World::Step(float delta_t)
 
 void World::BoardPhase()
 {
-    arbList.clear();
+//    arbList.clear();
     for(int i = 0; i < bodies.size(); i++)
     {
         for(int j = i+1; j < bodies.size(); j++)
@@ -121,28 +121,25 @@ void World::BoardPhase()
             Arbiter newArb(bodies[i], bodies[j]);
             newArb.Solve();
 
-            if (newArb.contactCounter)
+            auto iter = find(arbList.begin(), arbList.end(), newArb);
+            if (newArb.contactCounter > 0)
             {
-                arbList.emplace_back(newArb);
+                if (iter == arbList.end())
+                {
+                    arbList.emplace_back(newArb);
+                }
+                else
+                {
+                    iter->Update();
+                }
             }
-
-//            ArbiterKey key(bodies[i], bodies[j]);
-//            if (newArb.contactCounter > 0)
-//            {
-//                auto iter = arbiters.find(key);
-//                if (iter == arbiters.end())
-//                {
-//                    arbiters.insert(std::make_pair(key, newArb));
-//                }
-//                else
-//                {
-//                    iter->second.Update();
-//                }
-//            }
-//            else
-//            {
-//                arbiters.erase(key);
-//            }
+            else
+            {
+                if (iter != arbList.end())
+                {
+                    arbList.erase(iter);
+                }
+            }
         }
     }
 }
