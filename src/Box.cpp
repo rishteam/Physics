@@ -30,6 +30,7 @@ Box::Box(float x, float y, float w, float h, float mass_)
         m_normals[i1] = Vec2( face.y, -face.x );
         m_normals[i1].Normalize( );
     }
+
     mass = mass_;
     if (mass < FLT_MAX)
     {

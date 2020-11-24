@@ -10,7 +10,6 @@ Circle::Circle(float x_, float y_, float radius_, float mass_)
     position.y = y_;
     radius = radius_;
     mass = mass_;
-    angle = 0.0f;
 
     if (mass < FLT_MAX)
     {
@@ -24,6 +23,10 @@ Circle::Circle(float x_, float y_, float radius_, float mass_)
         I = FLT_MAX;
         invI = 0.0f;
     }
+
+    angle = 0.0f;
+    SetMatrix(0.0f);
+
 }
 
 float Circle::getRadius()

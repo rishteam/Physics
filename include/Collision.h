@@ -570,6 +570,9 @@ static bool Polygon2Polygon(Arbiter *arb, Shape *a, Shape *b)
 
 static bool Box2Circle(Arbiter *arb, Shape *a, Shape *b)
 {
+    arb->b1 = b;
+    arb->b2 = a;
+
     Box *box1 = reinterpret_cast<Box *>(a);
     Circle *c = reinterpret_cast<Circle *>(b);
 
@@ -873,6 +876,7 @@ static bool Box2Polygon(Arbiter *arb, Shape *a, Shape *b)
     // Flip
     arb->normal = flip ? -refFaceNormal : refFaceNormal;
 
+
     // 透過clip截斷點，incidentFace
     // Keep points behind reference face
     int cp = 0; // clipped points behind reference face
@@ -905,6 +909,8 @@ static bool Box2Polygon(Arbiter *arb, Shape *a, Shape *b)
 
 static bool Polygon2Box(Arbiter *arb, Shape *a, Shape *b)
 {
+    arb->b1 = b;
+    arb->b2 = a;
     Box2Polygon(arb, b, a);
 }
 

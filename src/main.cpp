@@ -222,12 +222,12 @@ void PhysicsDemo1()
 //    tmp2.push_back({30, -10});
 //    tmp2.push_back({-30, -10});
 //
-    Circle *circle = new Circle(-15, 30, 5, 10);
-    world.Add(box);
+    Circle *circle = new Circle(-15, 20, 5, 10);
+//    world.Add(box);
+//    world.Add(poly);
     world.Add(floor);
     world.Add(floor2);
-//    world.Add(circle);
-//    world.Add(poly);
+    world.Add(circle);
 //    world.Add(poly);
 }
 
@@ -312,6 +312,8 @@ int main()
             ImGui::Text("[Physics] Center: (%f, %f)", world.bodies[i]->position.x, world.bodies[i]->position.y);
             ImGui::Text("[Physics] angle: %f", radiansToDegrees(world.bodies[i]->angle) );
             ImGui::Text("[Physics] mass: %f", world.bodies[i]->mass);
+            ImGui::Text("[Physics] Velocity: (%f, %f)", world.bodies[i]->velocity.x, world.bodies[i]->velocity.y);
+            ImGui::Text("[Physics] Angular Velocity: %f", world.bodies[i]->angularVelocity);
             ImGui::Text("[Physics] invMass: %f", world.bodies[i]->invMass);
             ImGui::Text("[Physics] I: %f", world.bodies[i]->I);
             ImGui::Text("[Physics] invI: %f", world.bodies[i]->invI);

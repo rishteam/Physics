@@ -127,7 +127,6 @@ void World::BoardPhase()
             }
 
 //            ArbiterKey key(bodies[i], bodies[j]);
-
 //            if (newArb.contactCounter > 0)
 //            {
 //                auto iter = arbiters.find(key);

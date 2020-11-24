@@ -4,6 +4,12 @@
 #include "Polygon.h"
 #include "Collision.h"
 
+Arbiter::Arbiter(Shape *b1_, Shape *b2_)
+{
+    b1 = b1_;
+    b2 = b2_;
+}
+
 void Arbiter::Solve()
 {
     b1->SetMatrix(b1->angle);
@@ -14,7 +20,7 @@ void Arbiter::Solve()
 
 void Arbiter::PositionalCorrection()
 {
-    const float k_slop = 0.1f; // Penetration allowance
+    const float k_slop = 0.05f; // Penetration allowance
     const float percent = 0.4f; // Penetration percentage to correct
     Vec2 correction = (std::max( penetration - k_slop, 0.0f ) / (b1->invMass + b2->invMass)) * normal * percent;
     b1->position -= correction * b1->invMass;

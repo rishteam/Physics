@@ -52,11 +52,7 @@ inline bool operator < (const ArbiterKey& a1, const ArbiterKey& a2)
 class Arbiter
 {
 public:
-    Arbiter(Shape* b1_, Shape* b2_) : b1( b1_), b2 (b2_)
-    {
-
-    };
-
+    Arbiter(Shape* b1_, Shape* b2_);
 
     ~Arbiter() = default;
     void Solve();
