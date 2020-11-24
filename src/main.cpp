@@ -25,6 +25,9 @@ int cnt = 220;
 int cnt2 = 0;
 static bool f_keepSimulate = true;
 static bool f_showContactPoints = true;
+static int mode = 0;
+
+
 
 World world(Vec2(0.0, -9.8), 1280.0f, 780.0f);
 sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH,  WINDOW_HEIGHT), "Physics");
@@ -195,6 +198,32 @@ sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH,  WINDOW_HEIGHT), "Physics");
 //    }
 //}
 
+void generatePolygon(float x, float y)
+{
+    std::deque<Vec2> tmp;
+    tmp.push_back({-5, 5});
+    tmp.push_back({5, 5});
+    tmp.push_back({5, -5});
+    tmp.push_back({0, -10});
+    tmp.push_back({-5, -5});
+
+    Polygon *poly = new Polygon(tmp, Vec2(x, y), 10);
+    world.Add(poly);
+}
+
+
+void generateBox(float x, float y)
+{
+    Box *box = new Box(x, y, 5, 5, 10);
+    world.Add(box);
+}
+
+void generateCircle(float x, float y)
+{
+    Circle *circle = new Circle(x, y, 5, 10);
+    world.Add(circle);
+}
+
 void PhysicsDemo1()
 {
     std::deque<Vec2> tmp;
@@ -205,13 +234,13 @@ void PhysicsDemo1()
     tmp.push_back({-5, -5});
 
 //    Shape *poly = new Box(0, -5, 20, 5, FLT_MAX);
-    Polygon *poly = new Polygon(tmp, Vec2(-15,20), 10);
+
 
     Box *box = new Box(-10, 20, 5, 5, 10);
 //    poly->SetMatrix(0.3333f);
 
-    Box *floor = new Box(-10, 10, 20, 5, FLT_MAX);
-    floor->SetMatrix(0.3333f);
+    Box *floor = new Box(0, -20, 100, 5, FLT_MAX);
+//    floor->SetMatrix(0.3333f);
 
     Box *floor2 = new Box(-35, -15, 20, 5, FLT_MAX);
 //    floor2->SetMatrix(-0.3333f);
@@ -223,11 +252,13 @@ void PhysicsDemo1()
 //    tmp2.push_back({-30, -10});
 //
     Circle *circle = new Circle(-15, 20, 5, 10);
+    Circle *circle2 = new Circle(-15, 0, 5, FLT_MAX);
 //    world.Add(box);
 //    world.Add(poly);
     world.Add(floor);
-    world.Add(floor2);
-    world.Add(circle);
+//    world.Add(floor2);
+//    world.Add(circle2);
+//    world.Add(circle);
 //    world.Add(poly);
 }
 
@@ -289,6 +320,41 @@ int main()
                 std::cout << "mouse x: " << event.mouseWheelScroll.x << std::endl;
                 std::cout << "mouse y: " << event.mouseWheelScroll.y << std::endl;
             }
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+            {
+                mode = 1;
+            }
+            else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+            {
+                mode = 2;
+            }
+            else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+            {
+                mode = 3;
+            }
+
+            if (event.type == sf::Event::MouseButtonPressed)
+            {
+                Vec2 tmp = World::ChangeToPhysicsWorld(Vec2(event.mouseButton.x, event.mouseButton.y));
+                switch(mode)
+                {
+                    case 1:
+                    {
+                        generateBox(tmp.x, tmp.y);
+                        break;
+                    }
+                    case 2:
+                    {
+                        generatePolygon(tmp.x, tmp.y);
+                        break;
+                    }
+                    case 3:
+                    {
+                        generateCircle(tmp.x, tmp.y);
+                        break;
+                    }
+                }
+            }
         }
 
         ImGui::SFML::Update(window, deltaClock.restart());
@@ -321,7 +387,7 @@ int main()
             ImGui::Separator();
         }
 
-        ImGui::Text("Arbiters size: %d", world.arbiters.size());
+//        ImGui::Text("Arbiters size: %d", world.arbiters.size());
 //        for(auto arbiter : world.arbiters)
 //        {
 //            ImGui::Text("Arbiters: Contact %d", arbiter.second.contactCounter);
@@ -341,7 +407,6 @@ int main()
         ImGui::Text("[Window] width: %d", WINDOW_WIDTH);
         ImGui::Text("[Window] height: %d", WINDOW_HEIGHT);
         ImGui::Text("[Window] fps: %f", world.timeStep);
-
         ImGui::End();
 
         window.clear(sf::Color::Black);

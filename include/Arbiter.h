@@ -53,8 +53,8 @@ class Arbiter
 {
 public:
     Arbiter(Shape* b1_, Shape* b2_);
-
     ~Arbiter() = default;
+
     void Solve();
     void PositionalCorrection();
     void PreStep(float inv_dt, Vec2 gravity);

@@ -5,19 +5,6 @@
 #include "Arbiter.h"
 
 typedef bool (*CollisionCallback)(Arbiter *arb, Shape *a, Shape *b);
-//class Collision
-//{
-//public:
-//
-//    float FindAxisLeastPenetration(int *faceIdx, Box *A, Box *B);
-//
-//    void FindIncidentFace(Vec2 *v, Shape *Ref, Shape *Inc, int refIdx);
-//
-//    int Clip(Vec2 n, float c, Vec2 *face);
-//
-//    bool BiasGreaterThan(float a, float b);
-//
-//};
 
 
 static float FindAxisLeastPenetration(int *faceIdx, Box *A, Box *B)
@@ -404,6 +391,8 @@ static bool Box2Box(Arbiter *arb, Shape *a, Shape *b)
 
 static bool Circle2Circle(Arbiter *arb, Shape *a, Shape *b)
 {
+    arb->b1 = b;
+    arb->b2 = a;
     Circle *cir1 = reinterpret_cast<Circle *>(a);
     Circle *cir2 = reinterpret_cast<Circle *>(b);
     // n
@@ -675,6 +664,8 @@ static bool Circle2Box(Arbiter *arb, Shape *a, Shape *b)
 
 static bool Polygon2Circle(Arbiter *arb, Shape *a, Shape *b)
 {
+    arb->b1 = b;
+    arb->b2 = a;
     Polygon *poly = reinterpret_cast<Polygon *>(a);
     Circle *cir = reinterpret_cast<Circle *>(b);
 

@@ -17,7 +17,6 @@ void Arbiter::Solve()
     Dispatch[(int)b1->type][(int)b2->type]( this, b1, b2 );
 };
 
-
 void Arbiter::PositionalCorrection()
 {
     const float k_slop = 0.05f; // Penetration allowance
