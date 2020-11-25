@@ -19,7 +19,7 @@ void Arbiter::Solve()
 
 void Arbiter::PositionalCorrection()
 {
-    const float k_slop = 0.0001f; // Penetration allowance
+    const float k_slop = 0.05f; // Penetration allowance
     const float percent = 0.4f; // Penetration percentage to correct
     Vec2 correction = (std::max( penetration - k_slop, 0.0f ) / (b1->invMass + b2->invMass)) * normal * percent;
     b1->position -= correction * b1->invMass;
@@ -219,29 +219,17 @@ void Arbiter::ApplyImpulse()
         // Calculate impulse scalar
         float j = -(1.0f + e) * contactVel;
         j /= invMassSum;
-        j /= (float)contactCounter;
+        j /= contactCounter;
 
         // Clamp the accumulated impulse
-//        float prev = j;
-//        float Pn0 = Pn;
-//
-//        Pn = prev;
-//        if (abs(Pn0 - j) < 0.1f)
-//        {
-//            Pn = 0.0f;
-//
-//        }
-
         // Apply impulse
         Vec2 impulse = normal * j;
-
 
         b1->velocity += b1->invMass * -impulse;
         b1->angularVelocity += b1->invI * Cross( ra, -impulse );
 
         b2->velocity += b2->invMass * impulse;
         b2->angularVelocity += b2->invI * Cross( rb, impulse );
-
 
         // Friction impulse
         rv = b2->velocity + Cross( b2->angularVelocity, rb ) -
@@ -253,10 +241,11 @@ void Arbiter::ApplyImpulse()
         // j tangent magnitude
         float jt = -Dot( rv, t );
         jt /= invMassSum;
-        jt /= (float)contactCounter;
+        jt /= contactCounter;
 
         // Don't apply tiny friction impulses
-        if( jt < EPSILON)
+        if(abs(jt
+        ) < EPSILON)
             return;
 
         // Coulumb's law
@@ -280,25 +269,8 @@ void Arbiter::ApplyImpulse()
 #define DISTANCE 1.0
 void Arbiter::Update()
 {
-//    Contact prev[2];
-//    int prevCounter = this->contactCounter;
-//    prev[0].position = this->contacts[0].position;
-//    prev[1].position = this->contacts[1].position;
+//    Arbiter prev = *this;
 
     Dispatch[(int)b1->type][(int)b2->type]( this, b1, b2 );
-
-//    if(prevCounter == contactCounter)
-//    {
-//        Vec2 p0_length = prev[0].position - this->contacts[0].position;
-//        Vec2 p1_length = prev[1].position - this->contacts[1].position;
-//        if( p0_length.getLength() < DISTANCE )
-//        {
-//            this->contacts[0].position = prev[0].position;
-//        }
-//        if( p1_length.getLength() < DISTANCE )
-//        {
-//            this->contacts[1].position = prev[1].position;
-//        }
-//    }
 }
 

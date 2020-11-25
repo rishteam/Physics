@@ -6,7 +6,6 @@ Physics::Physics(){
     angularVelocity = 0;
     force = Vec2(0.0, 0.0);
     torque = 0;
-    friction = 0.2f;
     I = 0;
     restitution = 0;
 }

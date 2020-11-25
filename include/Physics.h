@@ -24,14 +24,15 @@ public:
     Vec2 force;
     //力矩
     float torque;
-    //摩擦力
-    float friction;
+//    //摩擦力
+//    float friction;
     //質量，質量倒數
     float mass, invMass;
     //慣性矩，慣性矩倒數
     float I, invI;
 
-    float restitution;
-    float staticFriction;
-    float dynamicFriction;
+
+    float restitution = 0.2f;
+    float staticFriction = 0.5f;
+    float dynamicFriction = 0.3f;
 };

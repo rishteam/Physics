@@ -391,11 +391,8 @@ static bool Box2Box(Arbiter *arb, Shape *a, Shape *b)
 
 static bool Circle2Circle(Arbiter *arb, Shape *a, Shape *b)
 {
-    arb->b1 = b;
-    arb->b2 = a;
-
-    Circle *cir1 = reinterpret_cast<Circle *>(a);
-    Circle *cir2 = reinterpret_cast<Circle *>(b);
+    Circle *cir1 = reinterpret_cast<Circle *>(b);
+    Circle *cir2 = reinterpret_cast<Circle *>(a);
     // n
     Vec2 normal = cir1->position - cir2->position;
 
@@ -558,13 +555,10 @@ static bool Polygon2Polygon(Arbiter *arb, Shape *a, Shape *b)
     return true;
 }
 
-static bool Box2Circle(Arbiter *arb, Shape *a, Shape *b)
+static bool Circle2Box(Arbiter *arb, Shape *a, Shape *b)
 {
-    arb->b1 = b;
-    arb->b2 = a;
-
-    Box *box1 = reinterpret_cast<Box *>(a);
-    Circle *c = reinterpret_cast<Circle *>(b);
+    Box *box1 = reinterpret_cast<Box *>(b);
+    Circle *c = reinterpret_cast<Circle *>(a);
 
     arb->contactCounter = 0;
     box1->SetMatrix(box1->angle);
@@ -628,8 +622,8 @@ static bool Box2Circle(Arbiter *arb, Shape *a, Shape *b)
         v1 = box1->u * v1 + box1->position;
         arb->contacts[0].position = v1;
     }
-    // Closest to v2
-    // 靠近v2
+        // Closest to v2
+        // 靠近v2
     else if(dot2 <= 0.0f)
     {
         if(DistSqr( center, v2 ) > c->getRadius() * c->getRadius())
@@ -643,8 +637,8 @@ static bool Box2Circle(Arbiter *arb, Shape *a, Shape *b)
         n.Normalize( );
         arb->normal = n;
     }
-    // Closest to face
-    // 靠近面
+        // Closest to face
+        // 靠近面
     else
     {
         Vec2 n = box1->m_normals[faceNormal];
@@ -658,17 +652,16 @@ static bool Box2Circle(Arbiter *arb, Shape *a, Shape *b)
     return true;
 }
 
-static bool Circle2Box(Arbiter *arb, Shape *a, Shape *b)
+static bool Box2Circle(Arbiter *arb, Shape *a, Shape *b)
 {
-    Box2Circle(arb, b, a);
+    Circle2Box(arb, b, a);
+    arb->normal = -arb->normal;
 }
 
-static bool Polygon2Circle(Arbiter *arb, Shape *a, Shape *b)
+static bool Circle2Polygon(Arbiter *arb, Shape *a, Shape *b)
 {
-    arb->b1 = b;
-    arb->b2 = a;
-    Polygon *poly = reinterpret_cast<Polygon *>(a);
-    Circle *cir = reinterpret_cast<Circle *>(b);
+    Circle *cir = reinterpret_cast<Circle *>(a);
+    Polygon *poly = reinterpret_cast<Polygon *>(b);
 
     arb->contactCounter = 0;
     poly->SetMatrix(poly->angle);
@@ -733,8 +726,8 @@ static bool Polygon2Circle(Arbiter *arb, Shape *a, Shape *b)
         arb->contacts[0].position = v1;
     }
 
-    // Closest to v2
-    // 靠近v2
+        // Closest to v2
+        // 靠近v2
     else if(dot2 <= 0.0f)
     {
         if(DistSqr( center, v2 ) > cir->getRadius() * cir->getRadius())
@@ -749,8 +742,8 @@ static bool Polygon2Circle(Arbiter *arb, Shape *a, Shape *b)
         arb->normal = n;
     }
 
-    // Closest to face
-    // 靠近面
+        // Closest to face
+        // 靠近面
     else
     {
         Vec2 n = poly->m_normals[faceNormal];
@@ -764,9 +757,10 @@ static bool Polygon2Circle(Arbiter *arb, Shape *a, Shape *b)
     return true;
 }
 
-static bool Circle2Polygon(Arbiter *arb, Shape *a, Shape *b)
+static bool Polygon2Circle(Arbiter *arb, Shape *a, Shape *b)
 {
-    Polygon2Circle(arb, b, a);
+    Circle2Polygon(arb, b, a);
+    arb->normal = -arb->normal;
 }
 
 static bool Box2Polygon(Arbiter *arb, Shape *a, Shape *b)
@@ -901,9 +895,8 @@ static bool Box2Polygon(Arbiter *arb, Shape *a, Shape *b)
 
 static bool Polygon2Box(Arbiter *arb, Shape *a, Shape *b)
 {
-    arb->b1 = b;
-    arb->b2 = a;
     Box2Polygon(arb, b, a);
+    arb->normal = -arb->normal;
 }
 
 extern CollisionCallback Dispatch[3][3]=

@@ -109,7 +109,7 @@ void World::Step(float delta_t)
 
 void World::BoardPhase()
 {
-//    arbList.clear();
+    arbList.clear();
     for(int i = 0; i < bodies.size(); i++)
     {
         for(int j = i+1; j < bodies.size(); j++)
@@ -121,25 +121,25 @@ void World::BoardPhase()
             Arbiter newArb(bodies[i], bodies[j]);
             newArb.Solve();
 
-            auto iter = find(arbList.begin(), arbList.end(), newArb);
+//            auto iter = find(arbList.begin(), arbList.end(), newArb);
             if (newArb.contactCounter > 0)
             {
-                if (iter == arbList.end())
-                {
-                    arbList.emplace_back(newArb);
-                }
-                else
-                {
-                    iter->Update();
-                }
+//                if (iter == arbList.end())
+//                {
+                arbList.emplace_back(newArb);
+//                }
+//                else
+//                {
+//                    iter->Update();
+//                }
             }
-            else
-            {
-                if (iter != arbList.end())
-                {
-                    arbList.erase(iter);
-                }
-            }
+//            else
+//            {
+//                if (iter != arbList.end())
+//                {
+//                    arbList.erase(iter);
+//                }
+//            }
         }
     }
 }

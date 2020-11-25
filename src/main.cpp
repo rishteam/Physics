@@ -28,9 +28,8 @@ static bool f_showContactPoints = true;
 static int mode = 0;
 
 
-
-World world(Vec2(0.0, -9.8), 1280.0f, 780.0f);
-sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH,  WINDOW_HEIGHT), "Physics");
+World world(Vec2(0.0, -9.8), 1280.0f, 720.0f);
+sf::RenderWindow window(sf::VideoMode(1280.0f,  720.0f), "Physics");
 
 // Polygon-Polygon contact Point
 //void PolygonToPolygonContactPoint(sf::Event event)
@@ -208,6 +207,7 @@ void generatePolygon(float x, float y)
     tmp.push_back({-5, -5});
 
     Polygon *poly = new Polygon(tmp, Vec2(x, y), 10);
+    poly->SetMatrix(degreesToRadians(randomint(-90, 90)));
     world.Add(poly);
 }
 
@@ -215,6 +215,7 @@ void generatePolygon(float x, float y)
 void generateBox(float x, float y)
 {
     Box *box = new Box(x, y, 5, 5, 10);
+    box->SetMatrix(0.0f);
     world.Add(box);
 }
 
@@ -371,33 +372,37 @@ int main()
             }
         }
 
-        for(int i = 0; i < world.bodies.size(); i++)
-        {
-            ImGui::Text("Object %d:", i);
-            ImGui::Text("[Physics] Type: %d", world.bodies[i]->type);
-            ImGui::Text("[Physics] Center: (%f, %f)", world.bodies[i]->position.x, world.bodies[i]->position.y);
-            ImGui::Text("[Physics] angle: %f", radiansToDegrees(world.bodies[i]->angle) );
-            ImGui::Text("[Physics] mass: %f", world.bodies[i]->mass);
-            ImGui::Text("[Physics] Velocity: (%f, %f)", world.bodies[i]->velocity.x, world.bodies[i]->velocity.y);
-            ImGui::Text("[Physics] Angular Velocity: %f", world.bodies[i]->angularVelocity);
-            ImGui::Text("[Physics] invMass: %f", world.bodies[i]->invMass);
-            ImGui::Text("[Physics] I: %f", world.bodies[i]->I);
-            ImGui::Text("[Physics] invI: %f", world.bodies[i]->invI);
-            ImGui::Text("[Physics] Friction: %f", world.bodies[i]->friction);
-            ImGui::Separator();
-        }
+//        for(int i = 0; i < world.bodies.size(); i++)
+//        {
+//            ImGui::Text("Object %d:", i);
+//            ImGui::Text("[Physics] Type: %d", world.bodies[i]->type);
+//            ImGui::Text("[Physics] Center: (%f, %f)", world.bodies[i]->position.x, world.bodies[i]->position.y);
+//            ImGui::Text("[Physics] angle: %f", radiansToDegrees(world.bodies[i]->angle) );
+//            ImGui::Text("[Physics] mass: %f", world.bodies[i]->mass);
+//            ImGui::Text("[Physics] Velocity: (%f, %f)", world.bodies[i]->velocity.x, world.bodies[i]->velocity.y);
+//            ImGui::Text("[Physics] Angular Velocity: %f", world.bodies[i]->angularVelocity);
+//            ImGui::Text("[Physics] invMass: %f", world.bodies[i]->invMass);
+//            ImGui::Text("[Physics] I: %f", world.bodies[i]->I);
+//            ImGui::Text("[Physics] invI: %f", world.bodies[i]->invI);
+//            ImGui::Text("[Physics] Friction: %f", world.bodies[i]->friction);
+//            ImGui::Separator();
+//        }
 
         ImGui::Text("Arbiters size: %d", world.arbList.size());
-        for(auto arbiter : world.arbiters)
+
+//        ImGui::Text("Arbiters: Contact %d", world.arbList);
+        for(auto arbiter : world.arbList)
         {
-//            ImGui::Text("Arbiters: Contact %d", arbiter.second.contactCounter);
-//            ImGui::Text("Arbiters Contacts[0]: (%f, %f)", arbiter.second.contacts[0].position.x, arbiter.second.contacts[0].position.x);
-//            ImGui::Text("Arbiters Contacts[0] Pn: %f", arbiter.second.contacts[0].Pn);
-//            ImGui::Text("Arbiters Contacts[0] Pnb: %f", arbiter.second.contacts[0].Pnb);
-//            ImGui::Text("Arbiters Contacts[0] Pt: %f", arbiter.second.contacts[0].Pt);
+            ImGui::Text("Contact Counter: %d", arbiter.contactCounter);
+            for(int i = 0; i < arbiter.contactCounter; ++i)
+            {
+                ImGui::Text("Arbiters Contacts[%d]: (%f, %f)",
+                            i,
+                            arbiter.contacts[i].position.x,
+                            arbiter.contacts[i].position.y);
+            }
+//            ImGui::Text("Arbiters Contacts[0] Pnb: %f", arbiter.contacts[i].Pnb);
 //            ImGui::Text("Arbiters Contacts[0] bias: %f", arbiter.second.contacts[0].bias);
-//            ImGui::Text("Arbiters Contacts[0] penetration: %f", arbiter.second.contacts[0].penetration);
-//
 //            ImGui::Text("Arbiters Contacts[1]: (%f, %f)", arbiter.second.contacts[1].position.x, arbiter.second.contacts[1].position.x);
 //            ImGui::Text("Arbiters b1: %d", arbiter.second.b1->type);
 //            ImGui::Text("Arbiters b2: %d", arbiter.second.b2->type);

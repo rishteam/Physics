@@ -39,7 +39,7 @@ public:
 
 
     // Detect Collision
-    virtual bool Collide(Arbiter &arb, Shape *s);
+//    virtual bool Collide(Arbiter &arb, Shape *s);
 //    virtual bool Collide(Arbiter &arb, Box &b) = 0;
 //    virtual bool Collide(Arbiter &arb, Polygon &p) = 0;
 //    virtual bool Collide(Arbiter &arb, Circle &c) = 0;

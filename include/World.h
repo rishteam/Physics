@@ -40,7 +40,7 @@ public:
     static float width;
     static float height;
     static Vec2 m_center;
-    float timeStep = 1.0 / 60.0f;
+    float timeStep = 1.0 / 30.0f;
     int iterations = 10;
 
 //   TODO: implement QuadTree

@@ -35,8 +35,8 @@ void Shape::setPosition(Vec2 mouse)
     position = update;
 }
 
-bool Shape::Collide(Arbiter &arb, Shape *s)
-{
+//bool Shape::Collide(Arbiter &arb, Shape *s)
+//{
 //    int b1Type = 0;
 //    Box *box1 = nullptr;
 //    Circle *circle1 = nullptr;
@@ -559,4 +559,4 @@ bool Shape::Collide(Arbiter &arb, Shape *s)
 //            break;
 //        }
 //    }
-}
+//}

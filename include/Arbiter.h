@@ -71,18 +71,14 @@ public:
     void ApplyImpulse();
     void Update();
 
+    float penetration = 0.0f;
+    Vec2 normal;
     Contact contacts[2];
     int contactCounter = 0;
-    Vec2 normal;
 
-    float Pn = 0.0f;
-    float Pt;
-
-    float e = 0;
+    float e;
     float df = 0;
     float sf = 0;
-    float friction = 0.0f;
-    float penetration = 0;
 
     Shape* b1;
     Shape* b2;
