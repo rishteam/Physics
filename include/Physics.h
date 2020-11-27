@@ -24,8 +24,6 @@ public:
     Vec2 force;
     //力矩
     float torque;
-//    //摩擦力
-//    float friction;
     //質量，質量倒數
     float mass, invMass;
     //慣性矩，慣性矩倒數

@@ -1,5 +1,4 @@
 #include "Joint.h"
-#include "Box.h"
 #include "Shape.h"
 
 Joint::Joint()
@@ -10,35 +9,33 @@ Joint::Joint()
 }
 
 
-void Joint::Set(Shape *b1_, Shape *b2_, const Vec2& anchor_screen)
+void Joint::Set(Shape *b1_, Shape *b2_, const Vec2& anchor_)
 {
-    b1 = b1_;
-    b2 = b2_;
-    Box* body1 = dynamic_cast<Box*>(b1);
-    Box* body2 = dynamic_cast<Box*>(b2);
+    body1 = b1_;
+    body2 = b2_;
 
+    // Rotate Matrix
     Mat22 Rot1(body1->angle);
     Mat22 Rot2(body2->angle);
+    // Transpose Matrix
     Mat22 Rot1T = Rot1.Transpose();
     Mat22 Rot2T = Rot2.Transpose();
 
-    Vec2 anchor = World::ChangeToPhysicsWorld(anchor_screen);
+    // 固定點(觀察點)
+    anchor = anchor_;
 
-
+    // change local space
     localAnchor1 = Rot1T * (anchor - body1->position);
     localAnchor2 = Rot2T * (anchor - body2->position);
 
+    // initialize parameter
     P.Set(0.0f, 0.0f);
-
     softness = 0.0f;
     biasFactor = 0.2f;
 }
 
 void Joint::PreStep(float inv_dt)
 {
-    // Pre-compute anchors, mass matrix, and bias.
-    Box* body1 = dynamic_cast<Box*>(b1);
-    Box* body2 = dynamic_cast<Box*>(b2);
     Mat22 Rot1(body1->angle);
     Mat22 Rot2(body2->angle);
 
@@ -49,6 +46,7 @@ void Joint::PreStep(float inv_dt)
     // invM = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
     //      = [1/m1+1/m2     0    ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 * [r1.y*r1.y -r1.x*r1.y]
     //        [    0     1/m1+1/m2]           [-r1.x*r1.y r1.x*r1.x]           [-r1.x*r1.y r1.x*r1.x]
+
     Mat22 K1;
     K1.col1.x = body1->invMass + body2->invMass;	K1.col2.x = 0.0f;
     K1.col1.y = 0.0f;								K1.col2.y = body1->invMass + body2->invMass;
@@ -71,34 +69,26 @@ void Joint::PreStep(float inv_dt)
     Vec2 p2 = body2->position + r2;
     Vec2 dp = p2 - p1;
 
-    if (World::positionCorrection)
-    {
-        bias = -biasFactor * inv_dt * dp;
-    }
-    else
-    {
-        bias.Set(0.0f, 0.0f);
-    }
 
-    if (World::warmStarting)
-    {
-        // Apply accumulated impulse.
-        body1->velocity -= body1->invMass * P;
-        body1->angularVelocity -= body1->invI * Cross(r1, P);
+    bias = -biasFactor * inv_dt * dp;
 
-        body2->velocity += body2->invMass * P;
-        body2->angularVelocity += body2->invI * Cross(r2, P);
-    }
-    else
-    {
-        P.Set(0.0f, 0.0f);
-    }
+//    if (World::warmStarting)
+//    {
+//        // Apply accumulated impulse.
+//        body1->velocity -= body1->invMass * P;
+//        body1->angularVelocity -= body1->invI * Cross(r1, P);
+//
+//        body2->velocity += body2->invMass * P;
+//        body2->angularVelocity += body2->invI * Cross(r2, P);
+//    }
+//    else
+//    {
+//        P.Set(0.0f, 0.0f);
+//    }
 }
 
 void Joint::ApplyImpulse()
 {
-    Box* body1 = dynamic_cast<Box*>(b1);
-    Box* body2 = dynamic_cast<Box*>(b2);
     Vec2 dv = body2->velocity + Cross(body2->angularVelocity, r2) - body1->velocity - Cross(body1->angularVelocity, r1);
 
     Vec2 impulse(0.0f, 0.0f);

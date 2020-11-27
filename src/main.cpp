@@ -10,6 +10,7 @@
 #include "Circle.h"
 #include "Polygon.h"
 #include "Arbiter.h"
+#include "Joint.h"
 
 #include "imgui.h"
 #include "imgui-SFML.h"
@@ -20,11 +21,6 @@
 #define OBJ_COUNT 10
 
 sf::Font font;
-double timer = 0;
-int cnt = 220;
-int cnt2 = 0;
-static bool f_keepSimulate = true;
-static bool f_showContactPoints = true;
 static int mode = 0;
 
 
@@ -236,7 +232,6 @@ void PhysicsDemo1()
 
 //    Shape *poly = new Box(0, -5, 20, 5, FLT_MAX);
 
-
     Box *box = new Box(-10, 20, 5, 5, 10);
 //    poly->SetMatrix(0.3333f);
 
@@ -244,23 +239,11 @@ void PhysicsDemo1()
 //    floor->SetMatrix(0.3333f);
 
     Box *floor2 = new Box(-35, -15, 20, 5, FLT_MAX);
-//    floor2->SetMatrix(-0.3333f);
-//
-//    std::deque<Vec2> tmp2;
-//    tmp2.push_back({-30, 10});
-//    tmp2.push_back({30, 10});
-//    tmp2.push_back({30, -10});
-//    tmp2.push_back({-30, -10});
-//
+
     Circle *circle = new Circle(-15, 20, 5, 10);
     Circle *circle2 = new Circle(-15, 0, 5, FLT_MAX);
-//    world.Add(box);
-//    world.Add(poly);
+
     world.Add(floor);
-//    world.Add(floor2);
-//    world.Add(circle2);
-//    world.Add(circle);
-//    world.Add(poly);
 }
 
 void drawObject()
@@ -274,18 +257,64 @@ void drawObject()
 
 void drawContact()
 {
-    for(auto &arb : world.arbiters)
+    for(auto &arb : world.arbList)
     {
-        for(int i = 0; i < arb.second.contactCounter; i++)
+        for(int i = 0; i < arb.contactCounter; i++)
         {
             sf::CircleShape circle;
             circle.setRadius(5);
             circle.setFillColor(sf::Color::Green);
-            Vec2 cp = World::ConvertWorldToScreen(Vec2(arb.second.contacts[i].position.x, arb.second.contacts[i].position.y));
+            Vec2 cp = World::ConvertWorldToScreen(Vec2(arb.contacts[i].position.x, arb.contacts[i].position.y));
             circle.setOrigin(5, 5);
             circle.setPosition(cp.x, cp.y);
             window.draw(circle);
         }
+    }
+}
+
+void setJoint()
+{
+    Joint *jit = new Joint();
+
+    std::deque<Vec2> tmp;
+    tmp.push_back({-2.5, 2.5});
+    tmp.push_back({2.5, 2.5});
+    tmp.push_back({2.5, -2.5});
+    tmp.push_back({0, -2.5});
+    tmp.push_back({-2.5, -2.5});
+    Polygon *poly = new Polygon(tmp, Vec2(5.0, 5.0), 10);
+
+    world.bodies.push_back(poly);
+    jit->Set(world.bodies[0], world.bodies[1],Vec2(0.0f, 5.0f));
+    world.joints.push_back(jit);
+}
+
+void drawJoint()
+{
+    for(auto j : world.joints)
+    {
+        sf::CircleShape r1Pos, r2Pos, anchor;
+        Vec2 r1p = World::ConvertWorldToScreen(Vec2(j->body1->position.x, j->body1->position.y));
+        Vec2 r2p = World::ConvertWorldToScreen(Vec2(j->body1->position.x, j->body1->position.y));
+        Vec2 anchorP = World::ConvertWorldToScreen(Vec2(j->anchor.x, j->anchor.y));
+
+        r1Pos.setRadius(5);
+        r1Pos.setFillColor(sf::Color::Green);
+        r1Pos.setOrigin(5, 5);
+        r1Pos.setPosition(r1p.x, r2p.y);
+        window.draw(r1Pos);
+
+        r2Pos.setRadius(5);
+        r2Pos.setFillColor(sf::Color::Green);
+        r2Pos.setOrigin(5, 5);
+        r2Pos.setPosition(r2p.x, r2p.y);
+        window.draw(r2Pos);
+
+        anchor.setRadius(5);
+        anchor.setFillColor(sf::Color::Red);
+        anchor.setOrigin(5, 5);
+        anchor.setPosition(anchorP.x, anchorP.y);
+        window.draw(anchor);
     }
 }
 
@@ -321,6 +350,7 @@ int main()
                 std::cout << "mouse x: " << event.mouseWheelScroll.x << std::endl;
                 std::cout << "mouse y: " << event.mouseWheelScroll.y << std::endl;
             }
+
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
             {
                 mode = 1;
@@ -359,6 +389,7 @@ int main()
         }
 
         ImGui::SFML::Update(window, deltaClock.restart());
+
         ImGui::Begin("Contact Points Detection");
         if (ImGui::CollapsingHeader("Cases"))
         {
@@ -366,62 +397,75 @@ int main()
             {
                 PhysicsDemo1();
             }
+            if(ImGui::Button("Set Joint"))
+            {
+                setJoint();
+            }
             if(ImGui::Button("Clear"))
             {
                 world.Clear();
             }
         }
 
-//        for(int i = 0; i < world.bodies.size(); i++)
-//        {
-//            ImGui::Text("Object %d:", i);
-//            ImGui::Text("[Physics] Type: %d", world.bodies[i]->type);
-//            ImGui::Text("[Physics] Center: (%f, %f)", world.bodies[i]->position.x, world.bodies[i]->position.y);
-//            ImGui::Text("[Physics] angle: %f", radiansToDegrees(world.bodies[i]->angle) );
-//            ImGui::Text("[Physics] mass: %f", world.bodies[i]->mass);
-//            ImGui::Text("[Physics] Velocity: (%f, %f)", world.bodies[i]->velocity.x, world.bodies[i]->velocity.y);
-//            ImGui::Text("[Physics] Angular Velocity: %f", world.bodies[i]->angularVelocity);
-//            ImGui::Text("[Physics] invMass: %f", world.bodies[i]->invMass);
-//            ImGui::Text("[Physics] I: %f", world.bodies[i]->I);
-//            ImGui::Text("[Physics] invI: %f", world.bodies[i]->invI);
-//            ImGui::Text("[Physics] Friction: %f", world.bodies[i]->friction);
-//            ImGui::Separator();
-//        }
-
-        ImGui::Text("Arbiters size: %d", world.arbList.size());
-
-//        ImGui::Text("Arbiters: Contact %d", world.arbList);
-        for(auto arbiter : world.arbList)
+        if(ImGui::CollapsingHeader("Generate Object"))
         {
-            ImGui::Text("Contact Counter: %d", arbiter.contactCounter);
-            for(int i = 0; i < arbiter.contactCounter; ++i)
+            for(int i = 0; i < world.bodies.size(); i++)
             {
-                ImGui::Text("Arbiters Contacts[%d]: (%f, %f)",
-                            i,
-                            arbiter.contacts[i].position.x,
-                            arbiter.contacts[i].position.y);
+                ImGui::Text("Object %d:", i);
+                ImGui::Text("[Physics] Type: %d", world.bodies[i]->type);
+                ImGui::Text("[Physics] Center: (%f, %f)", world.bodies[i]->position.x, world.bodies[i]->position.y);
+                ImGui::Text("[Physics] angle: %f", radiansToDegrees(world.bodies[i]->angle) );
+                ImGui::Text("[Physics] mass: %f", world.bodies[i]->mass);
+                ImGui::Text("[Physics] Velocity: (%f, %f)", world.bodies[i]->velocity.x, world.bodies[i]->velocity.y);
+                ImGui::Text("[Physics] Angular Velocity: %f", world.bodies[i]->angularVelocity);
+                ImGui::Text("[Physics] invMass: %f", world.bodies[i]->invMass);
+                ImGui::Text("[Physics] I: %f", world.bodies[i]->I);
+                ImGui::Text("[Physics] invI: %f", world.bodies[i]->invI);
+                ImGui::Separator();
             }
-//            ImGui::Text("Arbiters Contacts[0] Pnb: %f", arbiter.contacts[i].Pnb);
-//            ImGui::Text("Arbiters Contacts[0] bias: %f", arbiter.second.contacts[0].bias);
-//            ImGui::Text("Arbiters Contacts[1]: (%f, %f)", arbiter.second.contacts[1].position.x, arbiter.second.contacts[1].position.x);
-//            ImGui::Text("Arbiters b1: %d", arbiter.second.b1->type);
-//            ImGui::Text("Arbiters b2: %d", arbiter.second.b2->type);
+        }
+
+        if(ImGui::CollapsingHeader("Arbiters"))
+        {
+            ImGui::Text("Arbiters size: %d", world.arbList.size());
+            for (auto arbiter : world.arbList) {
+                ImGui::Text("Contact Counter: %d", arbiter.contactCounter);
+                for (int i = 0; i < arbiter.contactCounter; ++i) {
+                    ImGui::Text("Arbiters Contacts[%d]: (%f, %f)",
+                                i,
+                                arbiter.contacts[i].position.x,
+                                arbiter.contacts[i].position.y);
+                }
+                ImGui::Separator();
+            }
+        }
+
+        if(ImGui::CollapsingHeader("Joint"))
+        {
+            ImGui::Text("Joint size: %d", world.joints.size());
+            for(auto &jit : world.joints)
+            {
+                ImGui::Text("Body1: %d", jit->body1->type);
+                ImGui::Text("Body2: %d", jit->body2->type);
+            }
             ImGui::Separator();
         }
 
-        ImGui::Text("[Window] width: %d", WINDOW_WIDTH);
-        ImGui::Text("[Window] height: %d", WINDOW_HEIGHT);
-        ImGui::Text("[Window] fps: %f", world.timeStep);
+        if(ImGui::CollapsingHeader("Window Information"))
+        {
+            ImGui::Text("[Window] width: %d", WINDOW_WIDTH);
+            ImGui::Text("[Window] height: %d", WINDOW_HEIGHT);
+            ImGui::Text("[Window] fps: %f", world.timeStep);
+        }
+
         ImGui::End();
 
         window.clear(sf::Color::Black);
-//        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-//        {
-//            world.Step(world.timeStep);
-//        }
         world.Step(world.timeStep);
         drawObject();
         drawContact();
+        drawJoint();
+
         ImGui::SFML::Render(window);
         window.display();
     }

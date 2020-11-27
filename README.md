@@ -3,19 +3,25 @@
 ## Collision detection
 
 * Board-phase
-	* AABB
+	* O(N^2) detection
 	* Quad-tree(TODO)
 
 * narrow-phase
 	* SAT(Separate-Axis-Theorem)
-	* GJK(Gilbert–Johnson–Keerthi)(TODO)
 
+## Build
 
-## Physics parameter
-
-* modify box2d(coordinate transform), box2d-lite(physics detail)
+* Modify Impulse-Engine 
+* SFML Render
 
 ## Note
-- https://hackmd.io/bo-sYg9TQhyGgpWfJoWC2Q?view
+* https://hackmd.io/bo-sYg9TQhyGgpWfJoWC2Q?view
 
+## Reference
 
+* Impulse-Engine
+    * https://github.com/RandyGaul/ImpulseEngine
+* Box2d-Lite
+    * https://github.com/erincatto/box2d-lite
+* Allen Chou
+    * https://allenchou.net/

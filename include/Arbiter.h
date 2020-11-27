@@ -4,19 +4,12 @@
 #include "World.h"
 #include "vector_math.h"
 
-
-enum class FeaturePair{
-    inEdge1,
-    outEdge1,
-    inEdge2,
-    outEdge2
-};
-
 struct Contact
 {
     Contact() = default;
     Vec2 position;
-    FeaturePair fp;
+    float Pn;	// accumulated normal impulse
+    float Pt;	// accumulated tangent impulse
 };
 
 class ArbiterKey
@@ -59,10 +52,13 @@ public:
     bool operator == (const Arbiter& a1)
     {
         if (a1.b1 == b1 && a1.b2 == b2)
+        {
             return true;
-        if (a1.b1 == b2 && a1.b2 == b1)
-            return true;
-        return false;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     void Solve();
@@ -75,6 +71,7 @@ public:
     Vec2 normal;
     Contact contacts[2];
     int contactCounter = 0;
+
 
     float e;
     float df = 0;

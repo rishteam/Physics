@@ -3,12 +3,11 @@
 #include "Circle.h"
 #include "Polygon.h"
 
-bool World::accumulateImpulses = false;
+bool World::accumulateImpulses = true;
 bool World::warmStarting = false;
 bool World::positionCorrection = true;
 float World::width = 1280;
 float World::height = 720;
-COLLISION World::collision_type = COLLISION::SAT;
 Vec2 World::m_center = Vec2(0, 0);
 
 World::World(Vec2 gravity_, float width_, float height_)
@@ -20,7 +19,8 @@ World::World(Vec2 gravity_, float width_, float height_)
 
 void World::Clear()
 {
-    //release space
+    joints.clear();
+    // Release Space
     for(auto &ptr : bodies)
     {
         switch(ptr->type)
@@ -45,9 +45,9 @@ void World::Clear()
             }
         }
     }
-    arbiters.clear();
+    // Clear All World Data
+    arbList.clear();
     bodies.clear();
-    joints.clear();
 }
 
 void World::Add(Shape* body)
@@ -67,30 +67,42 @@ void World::Step(float delta_t)
     // BoardPhase detection
     BoardPhase();
 
-    // Compute forces.
+    // Compute Forces
     for(int i = 0; i < bodies.size(); i++)
     {
         if (bodies.at(i)->invMass == 0.0f)
+        {
             continue;
-        bodies.at(i)->ComputeForce(delta_t, gravity);
+        }
+        else
+        {
+            bodies.at(i)->ComputeForce(delta_t, gravity);
+        }
     }
 
-    for (auto arb = arbList.begin(); arb != arbList.end(); ++arb)
+    // Prepare to Calculate
+    for (auto &arb : arbList)
     {
-        arb->PreStep(inv_dt, gravity);
+        arb.PreStep(inv_dt, gravity);
     }
 
-    for (int i = 0; i < this->iterations; ++i)
+    for(auto &jit : joints)
     {
-        // Apply impulse
+        jit->PreStep(inv_dt);
+    }
+
+    // Apply impulse
+    for (int i = 0; i < iterations; ++i)
+    {
         for(int j = 0; j < arbList.size( ); ++j)
         {
             arbList[j].ApplyImpulse();
         }
-//        for (auto arb = arbList.begin(); arb != arbList.end(); ++arb)
-//        {
-//            arb->ApplyImpulse();
-//        }
+
+        for(int k = 0; k < joints.size(); ++k)
+        {
+            joints[k]->ApplyImpulse();
+        }
     }
 
     // Integrate Velocities
@@ -109,37 +121,38 @@ void World::Step(float delta_t)
 
 void World::BoardPhase()
 {
-    arbList.clear();
     for(int i = 0; i < bodies.size(); i++)
     {
         for(int j = i+1; j < bodies.size(); j++)
         {
+            // Inverse Mass
             if(bodies[i]->invMass == 0.0f && bodies[j]->invMass == 0.0f)
                 continue;
 
-            //add in Arbiter
+            // Add in Arbiter
+            // Here Implement
             Arbiter newArb(bodies[i], bodies[j]);
             newArb.Solve();
 
-//            auto iter = find(arbList.begin(), arbList.end(), newArb);
+            auto iter = find(arbList.begin(), arbList.end(), newArb);
             if (newArb.contactCounter > 0)
             {
-//                if (iter == arbList.end())
-//                {
-                arbList.emplace_back(newArb);
-//                }
-//                else
-//                {
-//                    iter->Update();
-//                }
+                if (iter == arbList.end())
+                {
+                    arbList.emplace_back(newArb);
+                }
+                else
+                {
+                    iter->Update();
+                }
             }
-//            else
-//            {
-//                if (iter != arbList.end())
-//                {
-//                    arbList.erase(iter);
-//                }
-//            }
+            else
+            {
+                if (iter != arbList.end())
+                {
+                    arbList.erase(iter);
+                }
+            }
         }
     }
 }

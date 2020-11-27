@@ -8,10 +8,6 @@ class ArbiterKey;
 class Arbiter;
 class Shape;
 
-enum class COLLISION {
-    SAT,
-    GJK
-};
 
 class World
 {
@@ -28,12 +24,12 @@ public:
 
     void BoardPhase();
 
+    // Coordinate Translate
     static Vec2 ChangeToPhysicsWorld(const Vec2& ps);
 
     static Vec2 ConvertWorldToScreen(const Vec2& pw);
 
     Vec2 gravity;
-    static COLLISION collision_type;
     static bool accumulateImpulses;
     static bool warmStarting;
     static bool positionCorrection;
@@ -43,10 +39,8 @@ public:
     float timeStep = 1.0 / 30.0f;
     int iterations = 10;
 
-//   TODO: implement QuadTree
+    // TODO: implement QuadTree
     std::vector<Shape*> bodies;
     std::vector<Joint*> joints;
     std::vector<Arbiter> arbList;
-    std::map<ArbiterKey, Arbiter> arbiters;
-
 };
