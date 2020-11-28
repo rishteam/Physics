@@ -48,19 +48,18 @@ void Arbiter::PreStep(float inv_dt, Vec2 gravity)
         Vec2 tangent = Cross(normal, 1.0f);
 
         // 將前次累積的衝量，先將施加在物體上
-//        if (World::accumulateImpulses)
-//        {
-//            // Apply normal + friction impulse
-//            Vec2 P = contacts[i].Pn * normal + contacts[i].Pt * tangent;
-//
-//            b1->velocity -= b1->invMass * P;
-//            b1->angularVelocity -= b1->invI * Cross(ra, P);
-//
-//            b2->velocity += b2->invMass * P;
-//            b2->angularVelocity += b2->invI * Cross(rb, P);
-//        }
-    }
+        if (World::accumulateImpulses)
+        {
+            // Apply normal + friction impulse
+            Vec2 P = contacts[i].Pn * normal + contacts[i].Pt * tangent;
 
+            b1->velocity -= b1->invMass * P;
+            b1->angularVelocity -= b1->invI * Cross(ra, P);
+
+            b2->velocity += b2->invMass * P;
+            b2->angularVelocity += b2->invI * Cross(rb, P);
+        }
+    }
 }
 
 //透過衝量，計算出速度
@@ -78,34 +77,34 @@ void Arbiter::ApplyImpulse()
 
         // Relative velocity along the normal
         // DeltaV . N (分子)
-        float contactVel = Dot( dv, normal );
+        float vn = Dot( dv, normal );
 
         // Do not resolve if velocities are separating
-        if(contactVel > 0)
-            return;
+//        if(vn > 0)
+//            return;
 
         float raCrossN = Cross( ra, normal );
         float rbCrossN = Cross( rb, normal );
         float effectiveMass = b1->invMass + b2->invMass + raCrossN * raCrossN * b1->invI + rbCrossN * rbCrossN * b2->invI;
 
         // 恢復係數 * DeltaV . N
-        float j = -(1.0f + e) * contactVel;
+        float j = -(1.0f + e) * vn;
         // 有效質量
         j /= effectiveMass;
         // 若有兩點，則分配給兩個點去修正
         j /= contactCounter;
 
-//        if (World::accumulateImpulses)
-//        {
-//            // Clamp the accumulated impulse
-//            float Pn0 = contacts[i].Pn;
-//            contacts[i].Pn = Max(Pn0 + j, 0.0f);
-//            j = contacts[i].Pn - Pn0;
-//        }
-//        else
-//        {
-//            j = Max(j, 0.0f);
-//        }
+        if (World::accumulateImpulses)
+        {
+            // Clamp the accumulated impulse
+            float Pn0 = contacts[i].Pn;
+            contacts[i].Pn = Max(j + Pn0, 0.0f);
+            j = contacts[i].Pn - Pn0;
+        }
+        else
+        {
+            j = Max(j, 0.0f);
+        }
 
 
         // 修正衝量方向 * 修正衝量大小
@@ -125,8 +124,11 @@ void Arbiter::ApplyImpulse()
         dv = b2->velocity + Cross( b2->angularVelocity, rb ) -
              b1->velocity - Cross( b1->angularVelocity, ra );
 
-        Vec2 t = dv - (normal * Dot(dv, normal));
-        t.Normalize( );
+
+//        Vec2 t = dv - (normal * Dot(dv, normal));
+        Vec2 t = Cross(normal, 1.0f);
+//        float vt = Dot(dv, t);
+//        t.Normalize( );
 
         // 切線方向上的衝量
         float jt = -Dot( dv, t );
@@ -134,33 +136,32 @@ void Arbiter::ApplyImpulse()
         jt /= contactCounter;
 
         // Don't apply tiny friction impulses
-        if(abs(jt) < EPSILON)
-            return;
-
-//        if (World::accumulateImpulses)
-//        {
-//            float maxPt = sf * contacts[i].Pn;
-//            // Clamp friction
-//            float oldTangentImpulse = contacts[i].Pt;
-//            contacts[i].Pt = Clamp(oldTangentImpulse + jt, -maxPt, maxPt);
-//            jt = contacts[i].Pt - oldTangentImpulse;
-//        }
+//        if(abs(jt) < EPSILON)
+//            return;
 
         // Coulumb's law
-        Vec2 tangentImpulse = Vec2(0.0f, 0.0f);
+//        Vec2 tangentImpulse = Vec2(0.0f, 0.0f);
         // 沒超過最大靜摩擦力
-        if(std::abs( jt ) < j * sf)
+//        if(std::abs( jt ) < j * sf)
+//        {
+//            tangentImpulse = t * jt;
+//        }
+//        // 轉換成動摩擦力
+//        else
+//        {
+//            tangentImpulse = t * -j * df;
+//        }
+        if (World::accumulateImpulses)
         {
-            tangentImpulse = t * jt;
-        }
-        // 轉換成動摩擦力
-        else
-        {
-            tangentImpulse = t * -j * df;
+            float maxPt = 0.5 * contacts[i].Pn;
+            // Clamp friction
+            float oldTangentImpulse = contacts[i].Pt;
+            contacts[i].Pt = Clamp(oldTangentImpulse + jt, -maxPt, maxPt);
+            jt = contacts[i].Pt - oldTangentImpulse;
         }
 
-//        Vec2 tangentImpulse = jt * t;
-        // 透過切線方向上(也就是摩擦力)的衝量進行修正
+        Vec2 tangentImpulse = jt * t;
+        //透過切線方向上(也就是摩擦力)的衝量進行修正
         b1->velocity += b1->invMass * -tangentImpulse;
         b1->angularVelocity += b1->invI * Cross( ra, -tangentImpulse );
 
@@ -172,9 +173,9 @@ void Arbiter::ApplyImpulse()
 void Arbiter::PositionalCorrection()
 {
     // Penetration allowance
-    const float k_slop = 0.05f;
+    const float k_slop = 0.01f;
     // Penetration percentage to correct
-    const float percent = 0.4f;
+    const float percent = 0.2f;
     Vec2 correction = (std::max( penetration - k_slop, 0.0f ) / (b1->invMass + b2->invMass)) * normal * percent;
     b1->position -= correction * b1->invMass;
     b2->position += correction * b2->invMass;

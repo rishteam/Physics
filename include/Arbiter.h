@@ -72,7 +72,6 @@ public:
     Contact contacts[2];
     int contactCounter = 0;
 
-
     float e;
     float df = 0;
     float sf = 0;
