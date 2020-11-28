@@ -4,7 +4,7 @@
 #include "Polygon.h"
 
 bool World::accumulateImpulses = true;
-bool World::warmStarting = false;
+bool World::warmStarting = true;
 bool World::positionCorrection = true;
 float World::width = 1280;
 float World::height = 720;

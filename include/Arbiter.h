@@ -73,9 +73,7 @@ public:
     int contactCounter = 0;
 
     float e;
-    float df = 0;
-    float sf = 0;
-
+    float f;
     Shape* b1;
     Shape* b2;
 };

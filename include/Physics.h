@@ -29,8 +29,8 @@ public:
     //慣性矩，慣性矩倒數
     float I, invI;
 
-
+    // 恢復係數
     float restitution = 0.2f;
-    float staticFriction = 0.5f;
-    float dynamicFriction = 0.3f;
+    // 摩擦力
+    float friction = 0.2f;
 };
